@@ -25,7 +25,7 @@
     "camelcase": 0,
     "no-process-env": 0,
     "one-var-declaration-per-line": 0,
-    "import/no-dynamic-require": 0,
+  
     "new-cap": 0,
     "no-undefined": 0,
     "import/no-extraneous-dependencies": [
@@ -40,7 +40,7 @@
     "no-param-reassign": 0,
     "linebreak-style": 0,
     "no-underscore-dangle": 0,
-    "comma-dangle": 0,
+    "comma-dangle": 1,
     "curly": ["error", "multi-line"],
     "no-undef": "off",
     "import/no-unresolved": [0, { "commonjs": true }],
