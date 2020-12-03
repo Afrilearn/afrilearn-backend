@@ -2,17 +2,17 @@ import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema(
   {
-    fullName: {
+    firstName: {
+      type: String,
+      required: true,
+    },
+    lastName: {
       type: String,
       required: true,
     },
     userName: {
       type: String,
       unique: true,
-      trim: true,
-    },
-    googleUserId: {
-      type: String,
       trim: true,
     },
     password: {
@@ -23,78 +23,35 @@ const UserSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    gender: {
-      type: String,
-    },
-    country: {
-      type: String,
-    },
-    phoneNumber: {
-      type: String,
-    },
-    dayOfBirth: {
-      type: Number,
-    },
-    monthOfBirth: {
-      type: String,
-    },
-    yearOfBirth: {
-      type: Number,
-    },
-    userLocation: {
-      type: String,
-    },
-    education: {
-      type: String,
-    },
-    guardianName: {
-      type: String,
-    },
-    guardianEmail: {
-      type: String,
-    },
-    guardianPhone: {
-      type: String,
-    },
-    primarySport: {
-      type: String,
-    },
-    academyName: {
-      type: String,
-    },
-    yearEstablished: {
-      type: Number,
-    },
-    biography: {
-      type: String,
-    },
     role: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'role',
+      required: true,
     },
-    verified: {
-      type: Boolean,
-      default: false,
+    googleUserId: {
+      type: String,
+      trim: true,
+    },
+    referralCode: {
+      type: String,
+      trim: true,
+    },
+    referee: {
+      type: String,
     },
     isActivated: {
       type: Boolean,
       default: false,
     },
-    coverPhotoUrl: {
-      type: String,
-    },
     profilePhotoUrl: {
       type: String,
     },
-    createdAt: {
-      type: Date,
-      default: Date.now(),
-    },
   },
-
+  { timestamps: true },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  }
+  },
 );
 
 const User = mongoose.model('user', UserSchema);
