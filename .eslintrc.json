@@ -1,0 +1,73 @@
+{
+  "root": true,
+  "extends": "airbnb-base",
+  "env": {
+    "node": true,
+    "es6": true,
+    "mocha": true,
+    "commonjs": true
+  },
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaVersion": 6,
+    "sourceType": "module",
+    "allowImportExportEverywhere": true,
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "plugins": ["flowtype"],
+  "globals": {
+    "_": false
+  },
+  "rules": {
+    "one-var": 0,
+    "camelcase": 0,
+    "no-process-env": 0,
+    "one-var-declaration-per-line": 0,
+    "import/no-dynamic-require": 0,
+    "new-cap": 0,
+    "no-undefined": 0,
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": true,
+        "optionalDependencies": false,
+        "peerDependencies": false
+      }
+    ],
+    "consistent-return": 0,
+    "no-param-reassign": 0,
+    "linebreak-style": 0,
+    "no-underscore-dangle": 0,
+    "comma-dangle": 0,
+    "curly": ["error", "multi-line"],
+    "no-undef": "off",
+    "import/no-unresolved": [0, { "commonjs": true }],
+    "no-shadow": [
+      "off",
+      {
+        "allow": ["req", "res", "err"]
+      }
+    ],
+    "valid-jsdoc": [
+      "error",
+      {
+        "requireReturn": true,
+        "requireReturnType": true,
+        "requireParamDescription": false,
+        "requireReturnDescription": true
+      }
+    ],
+    "require-jsdoc": [
+      "error",
+      {
+        "require": {
+          "FunctionDeclaration": true,
+          "MethodDefinition": true,
+          "ClassDeclaration": true
+        }
+      }
+    ]
+  }
+}
