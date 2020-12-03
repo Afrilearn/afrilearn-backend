@@ -9,9 +9,9 @@
   },
   "parser": "babel-eslint",
   "parserOptions": {
-    "ecmaVersion": 6,
+    "ecmaVersion": 11,
     "sourceType": "module",
-    "allowImportExportEverywhere": true,
+    "allowImportExportEverywhere": true,    
     "ecmaFeatures": {
       "jsx": true
     }
