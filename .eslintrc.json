@@ -4,8 +4,12 @@
   "env": {
     "node": true,
     "es6": true,
-    "mocha": true,
-    "commonjs": true
+    "mocha": true
+  },  
+  "ecmaFeatures": {
+    "modules": true,
+    "spread" : true,
+    "restParams" : true
   },
   "parser": "babel-eslint",
   "parserOptions": {
