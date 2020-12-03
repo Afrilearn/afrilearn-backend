@@ -97,12 +97,6 @@ const UserSchema = new mongoose.Schema(
   }
 );
 
-UserSchema.virtual('feature', {
-  ref: 'feature',
-  localField: '_id',
-  foreignField: 'userId',
-  justOne: true,
-});
 
 const User = mongoose.model('user', UserSchema);
 
