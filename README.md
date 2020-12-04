@@ -3,7 +3,7 @@ Afrilearn is an education technology corporation leveraging seasoned teachers, a
 
 [![](https://img.shields.io/badge/Protected_by-Hound-a873d1.svg)](https://houndci.com)
 
-
+[![Build Status](https://travis-ci.org/Afrilearn/afrilearn-backend.svg?branch=develop)](https://travis-ci.org/Afrilearn/afrilearn-backend)
 
 ## Required Features
 
