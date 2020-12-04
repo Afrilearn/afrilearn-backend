@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
-import { config } from "dotenv";
-import logger from "../config";
+import mongoose from 'mongoose';
+import { config } from 'dotenv';
+import logger from '../config';
 
 config();
 
@@ -13,6 +13,7 @@ mongoose.connect(url, {
   useFindAndModify: false,
 });
 const { connection } = mongoose;
-connection.once("open", () => {
-  logger.info("MongoDB database connected successfully");
+
+connection.once('open', () => {
+  logger.info('MongoDB database connected successfully');
 });
