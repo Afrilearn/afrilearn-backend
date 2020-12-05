@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node -r esm src/",
     "dev": "nodemon -r esm src/",
-    "test": "nyc --reporter=html --reporter=text mocha src/**/*.test.js -r esm --cache false --timeout 250000  --recursive --exit",
+    "test": "nyc --reporter=html --reporter=text mocha src/**/*.test.js -r esm  --timeout 20000  --recursive --exit",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "lint": "eslint src/**/* --ext js --fix --ignore-pattern src/logs/*"
   },

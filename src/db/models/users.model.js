@@ -2,19 +2,10 @@ import mongoose from 'mongoose';
 
 const UserSchema = new mongoose.Schema(
   {
-    firstName: {
+    fullName: {
       type: String,
       required: true,
-    },
-    lastName: {
-      type: String,
-      required: true,
-    },
-    userName: {
-      type: String,
-      unique: true,
-      trim: true,
-    },
+    },    
     password: {
       type: String,
     },
@@ -22,6 +13,18 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+    },
+    phoneNumber: {
+      type: String,    
+      trim: true,
+    },
+    country: {
+      type: String,    
+      trim: true,
+    },
+    state: {
+      type: String,    
+      trim: true,
     },
     role: {
       type: mongoose.Schema.Types.ObjectId,
@@ -37,7 +40,8 @@ const UserSchema = new mongoose.Schema(
       trim: true,
     },
     referee: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'user',    
     },
     isActivated: {
       type: Boolean,

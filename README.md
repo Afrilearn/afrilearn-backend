@@ -1,9 +1,7 @@
 # afrilearn-backend
 Afrilearn is an education technology corporation leveraging seasoned teachers, animators and developers to deliver affordable, world-class education for Africans, anywhere.
 
-[![](https://img.shields.io/badge/Protected_by-Hound-a873d1.svg)](https://houndci.com)
-
-[![Build Status](https://travis-ci.org/Afrilearn/afrilearn-backend.svg?branch=develop)](https://travis-ci.org/Afrilearn/afrilearn-backend)
+[![](https://img.shields.io/badge/Protected_by-Hound-a873d1.svg)](https://houndci.com)  [![Build Status](https://travis-ci.org/Afrilearn/afrilearn-backend.svg?branch=develop)](https://travis-ci.org/Afrilearn/afrilearn-backend)  [![Coverage Status](https://coveralls.io/repos/github/Afrilearn/afrilearn-backend/badge.svg)](https://coveralls.io/github/Afrilearn/afrilearn-backend)
 
 ## Required Features
 
