@@ -1,26 +1,14 @@
-<<<<<<< HEAD
 import mongoose from 'mongoose';
-=======
-import mongoose from "mongoose";
->>>>>>> 2eb635f... chore: Database Schema Design
 
 const QuestionSchema = new mongoose.Schema(
   {
     lessonId: {
       type: mongoose.Schema.Types.ObjectId,
-<<<<<<< HEAD
       ref: 'lesson',
     },
     creatorId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'user',
-=======
-      ref: "lesson",
-    },
-    creatorId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
->>>>>>> 2eb635f... chore: Database Schema Design
     },
     question: {
       type: String,
@@ -72,9 +60,9 @@ const QuestionSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  }
+  },
 );
 
-const Question = mongoose.model("question", QuestionSchema);
+const Question = mongoose.model('question', QuestionSchema);
 
 export default Question;
