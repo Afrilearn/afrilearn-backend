@@ -11,10 +11,10 @@ sgMail.setApiKey(process.env.SEND_GRID_API);
  * @param {String} message The mail content
  * @returns {object} An email on user's email
  */
-async function sendEmail(to, subject = 'AMPZ', message) {
+async function sendEmail(to, subject = 'Afrilearn', message) {
   const msg = {
     to,
-    from: 'info@ampz.tv',
+    from: 'afrilearners@gmail.com',
     subject,
     text: message,
     html: message,

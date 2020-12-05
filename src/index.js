@@ -12,8 +12,8 @@ const app = express();
 const port = process.env.PORT || 5000;
 global.logger = logger;
 app.use(cors());
-
 app.use(morgan('combined', { stream: logger.stream }));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
