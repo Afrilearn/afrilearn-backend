@@ -59,7 +59,37 @@ class AuthController {
         error: 'Error creating new user',
       });
     }
+  }  
+  
+  /**
+   * Activate user account.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async activateAccount(req, res) {
+    try {     
+        const {id} =req.data;
+
+        const newData = {
+            isActivated: true,
+        };
+
+        await Auth.findByIdAndUpdate(id, { ...newData });
+        
+        return res.status(200).json({
+            status: 'success',
+            data: {
+                message:"Account activation successful"
+            },
+        });
+    } catch (err) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error activating user account',
+      });
+    }
   }
- 
 }
 export default AuthController;
