@@ -30,6 +30,8 @@ const user = {
   role: '5fc8f4b99d1e3023e4942152',
 };
 
+let myToken;
+
 describe('No Matching Endpoint', () => {
   describe('* Unknown ', () => {
     it('should throw 404 error when endpoint is not found', (done) => {
@@ -105,6 +107,70 @@ describe('Auth Route Endpoints', () => {
       done();
     });
   });
+  describe('POST api/v1/auth/activate_account', () => {
+    before((done) => {
+      Auth.find({ email: 'okwuosachijioke56687@gmail.com' }, (err, myuser) => {
+        if (myuser) {
+          (async () => {
+            myToken = await Helper.generateToken(
+              myuser[0].id,
+              myuser[0].role,
+              myuser[0].fullName
+            );
+          })();
+          done();
+        }
+      });
+    });
+    it('should activate account if user supplies valid token', (done) => {
+      chai
+        .request(app)
+        .get(`/api/v1/auth/activate_account?token=${myToken}`)     
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('object');
+          res.body.should.have.property('status').eql('success');
+          res.body.should.have.property('data');
+          done();
+        });
+    });
+    it('should not activate account if the user does not supply token', (done) => {
+      chai
+        .request(app)
+        .get('/api/v1/auth/activate_account')     
+        .end((err, res) => {
+          res.should.have.status(401);
+          res.body.should.be.an('object');
+          res.body.should.have.property('status').eql('401 Unauthorized');
+          res.body.should.have.property('error');
+          done();
+        });
+    });  
+    it('should not activate account if the user supply invalid token', (done) => {
+      chai
+        .request(app)
+        .get(`/api/v1/auth/activate_account?token=57576576thfcgfnfhfghfghfngfdtrd`)     
+        .end((err, res) => {
+          res.should.have.status(401);
+          res.body.should.be.an('object');
+          res.body.should.have.property('status').eql('401 Unauthorized');
+          res.body.should.have.property('error').eql('Access token is Invalid');
+          done();
+        });
+    });   
+    it('Should fake server error', (done) => {
+      const req = { body: {} };
+      const res = {
+        status() {},
+        send() {},
+      };
+      sinon.stub(res, 'status').returnsThis();
+      AuthController.activateAccount(req, res);
+      res.status.should.have.callCount(1);
+      done();
+    });
+  });
+ 
   describe('Auth Services Mock', () => {
     it('Should fake server error on emailExist function', (done) => {
       const req = { body: {} };
