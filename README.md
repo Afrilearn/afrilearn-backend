@@ -28,8 +28,8 @@ To install and run this project you would need to have installed:
 
 To run:
 ```
-$ git clone https://github.com/ProjectAMPZ/ampz-backend-sept-2020.git
-$ cd ampz-backend-sept-2020
+$ git clone https://github.com/Afrilearn/afrilearn-backend.git
+$ cd afrilearn-backend
 $ npm install
 $ npm run dev
 ```
