@@ -1,6 +1,7 @@
 import Auth from '../db/models/users.model';
 import Helper from '../utils/user.utils';
 import sendEmail from '../utils/email.utils';
+import AuthServices from '../services/auth.services';
 
 /**
  *Contains Auth Controller
@@ -88,6 +89,57 @@ class AuthController {
       return res.status(500).json({
         status: '500 Internal server error',
         error: 'Error activating user account',
+      });
+    }
+  }
+   /**
+   * Login user.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async login(req, res) {
+    try {
+      const { email, password } = req.body;
+      const user = await AuthServices.emailExist(email, res);
+
+      if (!user) {
+        return res.status(401).json({
+          status: '401 Unauthorized',
+          error: 'Invalid email address',
+        });
+      }
+
+      const confirmPassword = await Helper.verifyPassword(
+        password,
+        user.password
+      );
+
+      if (!confirmPassword) {
+        return res.status(401).json({
+          status: '401 Unauthorized',
+          error: 'Invalid password',
+        });
+      }
+
+      const token = await Helper.generateToken(
+        user.id,
+        user.role,
+        user.fullName
+      );
+
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          token,
+          user
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error Logging in user',
       });
     }
   }
