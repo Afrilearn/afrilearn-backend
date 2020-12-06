@@ -15,19 +15,19 @@ export default {
     return isMatch;
   },
 
-  // async randomIntInc(low, high) {
-  //   return Math.floor(Math.random() * (high - low + 1) + low);
-  // },
+  async randomIntInc(low, high) {
+    return Math.floor(Math.random() * (high - low + 1) + low);
+  },
 
-  // async generateCode(num) {
-  //   let randomNum = '';
-  //   // eslint-disable-next-line no-plusplus
-  //   for (let i = 0; i < num; i++) {
-  //     // eslint-disable-next-line no-await-in-loop
-  //     randomNum += await this.randomIntInc(1, 10);
-  //   }
-  //   return randomNum;
-  // },
+  async generateCode(num) {
+    let randomNum = '';
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < num; i++) {
+      // eslint-disable-next-line no-await-in-loop
+      randomNum += await this.randomIntInc(1, 10);
+    }
+    return randomNum;
+  },
 
   async generateToken(id, role, fullName) {
     const token = jwt.sign(

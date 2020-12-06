@@ -2,6 +2,7 @@ import Auth from '../db/models/users.model';
 import Helper from '../utils/user.utils';
 import sendEmail from '../utils/email.utils';
 import AuthServices from '../services/auth.services';
+import ResetPassword from '../db/models/resetPassword.model';
 
 /**
  *Contains Auth Controller
@@ -140,6 +141,44 @@ class AuthController {
       return res.status(500).json({
         status: '500 Internal server error',
         error: 'Error Logging in user',
+      });
+    }
+  }
+
+  /**
+   * Reset Password.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async resetPassword(req, res) {
+    try {
+      const { email } = req.params;   
+     
+      const Time = new Date();
+      const expiringDate = Time.setDate(Time.getDate() + 1);
+      await ResetPassword.deleteOne({ email });    
+
+      const token = await Helper.generateCode(5);
+      
+      const data = {
+        email,
+        expiringDate,
+        token
+      };
+      
+      await ResetPassword.create({ ...data });
+      const message = `Click on the link below to reset your password<br/>Click the link https://www.myafrilearn.com/?token=${token}&email=${email}`;
+      sendEmail(email, 'Password Reset', message);
+      return res.status(201).json({
+        status: 'success',
+        message: 'Password reset link sent to your mail',
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error reseting password',
       });
     }
   }

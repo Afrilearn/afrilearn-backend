@@ -263,4 +263,42 @@ describe('Auth Route Endpoints', () => {
       done();
     });
   });
- });
+  describe('GET api/v1/auth/:email/reset_password', () => {
+    it('should not send the user a reset password link if the users email does not exist', (done) => {
+      chai
+        .request(app)
+        .get('/api/v1/auth/okwuosach@gmail.com/reset_password')
+        .end((err, res) => {
+          res.should.have.status(401);
+          res.body.should.be.an('object');
+          res.body.should.have.property('status').eql('401 Unauthorized');
+          res.body.should.have.property('error');
+          done();
+        });
+    });
+    it('should send the user reset password link via mail when he provides valid email', (done) => {
+      chai
+        .request(app)
+        .get('/api/v1/auth/okwuosachijioke56687@gmail.com/reset_password')
+        .end((err, res) => {
+          res.should.have.status(201);
+          res.body.should.be.an('object');
+          res.body.should.have.property('status').eql('success');
+          res.body.should.have.property('message');
+          done();
+        });
+    });
+    it('Should fake server error', (done) => {
+      const req = { body: {} };
+      const res = {
+        status() {},
+        send() {},
+      };
+      sinon.stub(res, 'status').returnsThis();
+      AuthController.resetPassword(req, res);
+      res.status.should.have.callCount(1);
+      done();
+    });
+  });
+  
+});
