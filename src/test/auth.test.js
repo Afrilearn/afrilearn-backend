@@ -9,12 +9,12 @@ import Email from '../utils/email.utils';
 import AuthService from '../services/auth.services';
 import Helper from '../utils/user.utils';
 import Auth from '../db/models/users.model';
+import ResetPassword from '../db/models/resetPassword.model';
 
 chai.should();
 chai.use(Sinonchai);
 chai.use(chaiHttp);
 const { expect } = chai;
-
 
 const incompleteUser = {
   email: 'hackerbay888@gmail.com' 
@@ -36,8 +36,14 @@ const wrongPasscode = {
   email: 'okwuosachijioke56687@gmail.com',
   password: '1234560'
 }
+const changePasswordInvalidCode = {
+  email: 'okwuosachijioke56687@gmail.com',
+  password: '12345678',
+  code: '34534543',
+};
 
 let myToken;
+let passwordToken;
 
 describe('No Matching Endpoint', () => {
   describe('* Unknown ', () => {
@@ -254,6 +260,17 @@ describe('Auth Route Endpoints', () => {
       res.status.should.have.callCount(0);
       done();
     });
+    it('Should fake server error on verifyPasscode function', (done) => {
+      const req = { body: {} };
+      const res = {
+        status() {},
+        send() {},
+      };
+      sinon.stub(res, 'status').returnsThis();
+      AuthService.verifyPasscode(req, res);
+      res.status.should.have.callCount(0);
+      done();
+    });
     it('Should mock encrypt password', (done) => {
       expect(Helper.encrptPassword('reqBody'));
       done();
@@ -300,5 +317,106 @@ describe('Auth Route Endpoints', () => {
       done();
     });
   });
-  
+  describe('POST api/v1/auth/change_password', () => {
+    before((done) => {
+      (async () => {
+        await ResetPassword.findOne(
+          { email: 'okwuosachijioke56687@gmail.com' },
+          (err, myuser) => {
+            if (myuser) {
+              passwordToken = myuser.token;
+            }
+          }
+        );
+      })();
+      done();
+    });
+    it('should not change password if all parameters are not supplied', (done) => {
+      chai
+        .request(app)
+        .post('/api/v1/auth/change_password')
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.be.an('object');
+          res.body.should.have.property('status').eql('400 Invalid Request');
+          res.body.should.have.property('error');
+          done();
+        });
+    });
+    it('should not change password if passcode is invalid', (done) => {
+      chai
+        .request(app)
+        .post('/api/v1/auth/change_password')
+        .send(changePasswordInvalidCode)
+        .end((err, res) => {
+          res.should.have.status(401);
+          res.body.should.be.an('object');
+          res.body.should.have.property('status').eql('401 Unauthorized');
+          res.body.should.have.property('error');
+          done();
+        });
+    });
+    it('should change password if suppied data is complete', (done) => {
+      chai
+        .request(app)
+        .post('/api/v1/auth/change_password')
+        .send({
+          email: 'okwuosachijioke56687@gmail.com',
+          password: '123456',
+          code: passwordToken,
+        })
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('object');
+          res.body.should.have.property('status').eql('success');
+          res.body.should.have.property('message');
+          done();
+        });
+    });
+    it('Should fake server error', (done) => {
+      const req = { body: {} };
+      const res = {
+        status() {},
+        send() {},
+      };
+      sinon.stub(res, 'status').returnsThis();
+      AuthController.changePassword(req, res);
+      res.status.should.have.callCount(0);
+      done();
+    });
+  });
+  describe('POST api/v1/auth/change_password', () => {
+    before((done) => {
+      const newData = {
+        expiringDate: '2343',
+      };
+      ResetPassword.findOneAndUpdate(
+        { email: 'okwuosachijioke56687@gmail.com' },
+        { ...newData },
+        (err, myuser) => {
+          if (myuser) {
+            done();
+          }
+        }
+      );
+    });
+    it('should not verify token if is it expired', (done) => {
+      chai
+        .request(app)
+        .post('/api/v1/auth/change_password')
+        .send({
+          email: 'okwuosachijioke56687@gmail.com',
+          password: '123456',
+          code: passwordToken,
+        })
+        .end((err, res) => {
+          res.should.have.status(401);
+          res.body.should.be.an('object');
+          res.body.should.have.property('status').eql('401 Unauthorized');
+          res.body.should.have.property('error');
+          done();
+        });
+    });
+  });
+ 
 });
