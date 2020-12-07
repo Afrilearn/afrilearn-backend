@@ -16,5 +16,6 @@ router.patch(
   validateToken,
   ClassController.acceptRejectRetractClassRequest,
 );
+router.get('/:classId/students', ClassController.getStudentsInClass);
 
 export default router;

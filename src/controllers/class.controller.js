@@ -110,5 +110,35 @@ class ClassController {
       });
     }
   }
+
+  /**
+   * Get list of students in a class
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getStudentsInClass(req, res) {
+    try {
+      const classMembers = await ClassMember.find({
+        classId: req.params.classId,
+      })
+        .select('userId -_id')
+        .populate('userId', 'fullName');
+
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          classMembers,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error Loading class',
+      });
+    }
+  }
 }
 export default ClassController;
