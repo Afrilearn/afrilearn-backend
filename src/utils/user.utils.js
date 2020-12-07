@@ -9,7 +9,7 @@ export default {
     const pass = await bcrypt.hash(password, 8);
     return pass;
   },
-  
+
   async verifyPassword(plainText, hashedText) {
     const isMatch = await bcrypt.compare(plainText, hashedText);
     return isMatch;
@@ -35,7 +35,7 @@ export default {
         data: { id, role, fullName },
       },
       process.env.SECRET,
-      { expiresIn: '30d' }
+      { expiresIn: '30d' },
     );
     return token;
   },

@@ -29,40 +29,40 @@ class AuthController {
       } = req.body;
 
       const encryptpassword = await Helper.encrptPassword(password);
-      
+
       const newUser = {
         fullName,
         password: encryptpassword,
-        email,      
+        email,
         role,
       };
-   
-      const result = await Auth.create({ ...newUser });   
+
+      const result = await Auth.create({ ...newUser });
 
       const token = await Helper.generateToken(
         result._id,
         role,
-        fullName
+        fullName,
       );
 
       const message = `Please verify your email address to complete your Afrilearn Account.<br/>Click the link https://www.myafrilearn.com/?token=${token}`;
-      sendEmail(email, 'Account Activation', message);     
+      sendEmail(email, 'Account Activation', message);
 
       return res.status(201).json({
         status: 'success',
         data: {
-           token, 
-           user:result
-        }
-      });   
+          token,
+          user: result,
+        },
+      });
     } catch (err) {
       return res.status(500).json({
         status: '500 Internal server error',
         error: 'Error creating new user',
       });
     }
-  }  
-  
+  }
+
   /**
    * Activate user account.
    * @param {Request} req - Response object.
@@ -71,21 +71,21 @@ class AuthController {
    * @returns {JSON} - A JSON success response.
    */
   static async activateAccount(req, res) {
-    try {     
-        const {id} =req.data;
+    try {
+      const { id } = req.data;
 
-        const newData = {
-            isActivated: true,
-        };
+      const newData = {
+        isActivated: true,
+      };
 
-        await Auth.findByIdAndUpdate(id, { ...newData });
-        
-        return res.status(200).json({
-            status: 'success',
-            data: {
-                message:"Account activation successful"
-            },
-        });
+      await Auth.findByIdAndUpdate(id, { ...newData });
+
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          message: 'Account activation successful',
+        },
+      });
     } catch (err) {
       return res.status(500).json({
         status: '500 Internal server error',
@@ -93,7 +93,8 @@ class AuthController {
       });
     }
   }
-   /**
+
+  /**
    * Login user.
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
@@ -114,7 +115,7 @@ class AuthController {
 
       const confirmPassword = await Helper.verifyPassword(
         password,
-        user.password
+        user.password,
       );
 
       if (!confirmPassword) {
@@ -127,14 +128,14 @@ class AuthController {
       const token = await Helper.generateToken(
         user.id,
         user.role,
-        user.fullName
+        user.fullName,
       );
 
       return res.status(200).json({
         status: 'success',
         data: {
           token,
-          user
+          user,
         },
       });
     } catch (err) {
@@ -154,20 +155,20 @@ class AuthController {
    */
   static async resetPassword(req, res) {
     try {
-      const { email } = req.params;   
-     
+      const { email } = req.params;
+
       const Time = new Date();
       const expiringDate = Time.setDate(Time.getDate() + 1);
-      await ResetPassword.deleteOne({ email });    
+      await ResetPassword.deleteOne({ email });
 
       const token = await Helper.generateCode(5);
-      
+
       const data = {
         email,
         expiringDate,
-        token
+        token,
       };
-      
+
       await ResetPassword.create({ ...data });
       const message = `Click on the link below to reset your password<br/>Click the link https://www.myafrilearn.com/?token=${token}&email=${email}`;
       sendEmail(email, 'Password Reset', message);
@@ -210,6 +211,5 @@ class AuthController {
       });
     }
   }
-
 }
 export default AuthController;

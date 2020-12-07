@@ -25,7 +25,7 @@ class SignUp {
         .isLength({ min: 3 })
         .withMessage('Fullname  should be at least 3 characters long')
         .trim()
-        .escape(),    
+        .escape(),
       check('email')
         .exists()
         .withMessage('Email is required')
@@ -80,7 +80,7 @@ class SignUp {
       return res.status(400).json({
         status: '400 Invalid Request',
         error: 'Your request contains invalid parameters',
-        errors: errArr
+        errors: errArr,
       });
     }
     return next();
@@ -100,12 +100,10 @@ class SignUp {
     if (user) {
       return res.status(409).json({
         status: '409 Conflict',
-        error: 'Email address already exists'
+        error: 'Email address already exists',
       });
     }
     return next();
   }
-
- 
 }
 export default SignUp;

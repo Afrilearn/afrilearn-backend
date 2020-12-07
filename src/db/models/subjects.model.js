@@ -17,6 +17,11 @@ const SubjectSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   },
 );
+SubjectSchema.virtual('mainSubjects', {
+  ref: 'mainSubject',
+  localField: '_id',
+  foreignField: 'mainSubjectId',
+});
 
 const Subject = mongoose.model('subject', SubjectSchema);
 
