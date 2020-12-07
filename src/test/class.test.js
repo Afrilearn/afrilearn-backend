@@ -34,7 +34,6 @@ describe('Classes ', () => {
       .set('token', token)
       .send({
         name: 'Class for testing',
-        userId: '5fc8cc978e28fa50986ecac9',
         courseId: '5fc8cc978e28fa50986ecac9',
         classCode: '00000000',
       })
@@ -44,6 +43,25 @@ describe('Classes ', () => {
         res.body.should.have.property('status').eql('success');
         res.body.should.have.property('data');
         res.body.data.should.have.property('class');
+        done();
+      });
+  });
+
+  it('should return a classMember and message with status 200', (done) => {
+    chai
+      .request(app)
+      .post('/api/v1/classes/send-class-request')
+      .set('token', token)
+      .send({
+        courseId: '5fc8cc978e28fa50986ecac9',
+      })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('classMember');
+        res.body.data.should.have.property('message');
         done();
       });
   });
@@ -59,6 +77,20 @@ describe('Classes ', () => {
 
     ClassController.addClass(req, res);
     res.status.should.have.callCount(0);
+    done();
+  });
+
+  it('fakes server error', (done) => {
+    const req = { body: {} };
+    const res = {
+      status() {},
+      send() {},
+    };
+
+    sinon.stub(res, 'status').returnsThis();
+
+    ClassController.sendClassRequest(req, res);
+    res.status.should.have.callCount(1);
     done();
   });
 });
