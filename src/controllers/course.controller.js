@@ -114,7 +114,7 @@ class CourseController {
       return res.status(200).json({
         status: 'success',
         data: {
-          subjects, 
+          subjects
         },
       });
     } catch (error) {
