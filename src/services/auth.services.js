@@ -22,13 +22,13 @@ export default {
         email,
       };
       const user = await ResetPassword.findOne(condition);
-      if (user.token !== code) {       
-        return 2;       
+      if (user.token !== code) {
+        return 2;
       }
       const Time = new Date();
       const currentDate = Time.setDate(Time.getDate());
-      if (+user.expiringDate < currentDate) {      
-        return 3;        
+      if (+user.expiringDate < currentDate) {
+        return 3;
       }
       return true;
     } catch (err) {
@@ -38,5 +38,5 @@ export default {
       });
     }
   },
- 
+
 };

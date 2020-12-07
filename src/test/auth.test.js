@@ -2,8 +2,8 @@ import chai from 'chai';
 import chaiHttp from 'chai-http';
 import Sinonchai from 'sinon-chai';
 import sinon from 'sinon';
-import app from '../index';
 import sgMail from '@sendgrid/mail';
+import app from '../index';
 import AuthController from '../controllers/auth.controller';
 import Email from '../utils/email.utils';
 import AuthService from '../services/auth.services';
@@ -17,11 +17,11 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 const incompleteUser = {
-  email: 'hackerbay888@gmail.com' 
+  email: 'hackerbay888@gmail.com',
 };
 const invalidEmail = {
   email: 'hackerbay888@gmail.com',
-  password:'86789789' 
+  password: '86789789',
 };
 const user = {
   fullName: 'hackerbay',
@@ -34,8 +34,8 @@ const user = {
 };
 const wrongPasscode = {
   email: 'okwuosachijioke56687@gmail.com',
-  password: '1234560'
-}
+  password: '1234560',
+};
 const changePasswordInvalidCode = {
   email: 'okwuosachijioke56687@gmail.com',
   password: '12345678',
@@ -60,9 +60,9 @@ describe('No Matching Endpoint', () => {
 });
 describe('Auth Route Endpoints', () => {
   before((done) => {
-    Auth.deleteMany({ email: 'okwuosachijioke56687@gmail.com' }, (err) =>{
-      if(!err){
-        done()
+    Auth.deleteMany({ email: 'okwuosachijioke56687@gmail.com' }, (err) => {
+      if (!err) {
+        done();
       }
     });
   });
@@ -128,7 +128,7 @@ describe('Auth Route Endpoints', () => {
             myToken = await Helper.generateToken(
               myuser[0].id,
               myuser[0].role,
-              myuser[0].fullName
+              myuser[0].fullName,
             );
           })();
           done();
@@ -138,7 +138,7 @@ describe('Auth Route Endpoints', () => {
     it('should activate account if user supplies valid token', (done) => {
       chai
         .request(app)
-        .get(`/api/v1/auth/activate_account?token=${myToken}`)     
+        .get(`/api/v1/auth/activate_account?token=${myToken}`)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.an('object');
@@ -150,7 +150,7 @@ describe('Auth Route Endpoints', () => {
     it('should not activate account if the user does not supply token', (done) => {
       chai
         .request(app)
-        .get('/api/v1/auth/activate_account')     
+        .get('/api/v1/auth/activate_account')
         .end((err, res) => {
           res.should.have.status(401);
           res.body.should.be.an('object');
@@ -158,11 +158,11 @@ describe('Auth Route Endpoints', () => {
           res.body.should.have.property('error');
           done();
         });
-    });  
+    });
     it('should not activate account if the user supply invalid token', (done) => {
       chai
         .request(app)
-        .get(`/api/v1/auth/activate_account?token=57576576thfcgfnfhfghfghfngfdtrd`)     
+        .get('/api/v1/auth/activate_account?token=57576576thfcgfnfhfghfghfngfdtrd')
         .end((err, res) => {
           res.should.have.status(401);
           res.body.should.be.an('object');
@@ -170,7 +170,7 @@ describe('Auth Route Endpoints', () => {
           res.body.should.have.property('error').eql('Access token is Invalid');
           done();
         });
-    });   
+    });
     it('Should fake server error', (done) => {
       const req = { body: {} };
       const res = {
@@ -247,7 +247,7 @@ describe('Auth Route Endpoints', () => {
       res.status.should.have.callCount(0);
       done();
     });
-  });  
+  });
   describe('Auth Services Mock', () => {
     it('Should fake server error on emailExist function', (done) => {
       const req = { body: {} };
@@ -326,7 +326,7 @@ describe('Auth Route Endpoints', () => {
             if (myuser) {
               passwordToken = myuser.token;
             }
-          }
+          },
         );
       })();
       done();
@@ -397,7 +397,7 @@ describe('Auth Route Endpoints', () => {
           if (myuser) {
             done();
           }
-        }
+        },
       );
     });
     it('should not verify token if is it expired', (done) => {
@@ -418,5 +418,4 @@ describe('Auth Route Endpoints', () => {
         });
     });
   });
- 
 });
