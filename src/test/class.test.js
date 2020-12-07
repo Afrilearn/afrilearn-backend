@@ -96,7 +96,21 @@ describe('Classes ', () => {
         res.body.should.have.property('status').eql('success');
         res.body.should.have.property('data');
         res.body.data.should.have.property('classMember');
-        // res.body.data.classMember.should.have.property("status").eql("accept");
+        done();
+      });
+  });
+
+  it('should return a students in a class with status 200', (done) => {
+    chai
+      .request(app)
+      .get(`/api/v1/classes/${class_id}/students`)
+      .set('token', token)
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('classMembers');
         done();
       });
   });
@@ -140,6 +154,19 @@ describe('Classes ', () => {
 
     ClassController.acceptRejectRetractClassRequest(req, res);
     res.status.should.have.callCount(0);
+    done();
+  });
+  it('fakes server error', (done) => {
+    const req = { body: {} };
+    const res = {
+      status() {},
+      send() {},
+    };
+
+    sinon.stub(res, 'status').returnsThis();
+
+    ClassController.getStudentsInClass(req, res);
+    res.status.should.have.callCount(1);
     done();
   });
 });
