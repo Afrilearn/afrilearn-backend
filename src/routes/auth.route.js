@@ -34,5 +34,12 @@ router.get(
     AuthController.resetPassword
 );
   
+router.post(
+    '/change_password',
+    PasswordResetValidator.validateData(),
+    PasswordResetValidator.myValidationResult,
+    PasswordResetValidator.verifyPasscode,
+    AuthController.changePassword
+);
 
 export default router;

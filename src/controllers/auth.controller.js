@@ -182,5 +182,34 @@ class AuthController {
       });
     }
   }
+
+  /**
+   * Change Password.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async changePassword(req, res) {
+    try {
+      const { email, password } = req.body;
+      const encryptpassword = await Helper.encrptPassword(password);
+      const newData = {
+        password: encryptpassword,
+      };
+      await Auth.findOneAndUpdate({ email }, { ...newData });
+
+      return res.status(200).json({
+        status: 'success',
+        message: 'Password changed successfully',
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error changing password',
+      });
+    }
+  }
+
 }
 export default AuthController;
