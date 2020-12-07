@@ -12,34 +12,34 @@ router.post(
   SignUpValidator.validateData(),
   SignUpValidator.myValidationResult,
   SignUpValidator.emailAlreadyExist,
-  AuthController.signUp
+  AuthController.signUp,
 );
 
 router.get(
-    '/activate_account', 
-    verifyToken, 
-    AuthController.activateAccount
+  '/activate_account',
+  verifyToken,
+  AuthController.activateAccount,
 );
 
 router.post(
-    '/login',
-    LoginValidator.validateData(),
-    LoginValidator.myValidationResult,
-    AuthController.login
+  '/login',
+  LoginValidator.validateData(),
+  LoginValidator.myValidationResult,
+  AuthController.login,
 );
 
 router.get(
-    '/:email/reset_password',
-    PasswordResetValidator.emailAlreadyExist,
-    AuthController.resetPassword
+  '/:email/reset_password',
+  PasswordResetValidator.emailAlreadyExist,
+  AuthController.resetPassword,
 );
-  
+
 router.post(
-    '/change_password',
-    PasswordResetValidator.validateData(),
-    PasswordResetValidator.myValidationResult,
-    PasswordResetValidator.verifyPasscode,
-    AuthController.changePassword
+  '/change_password',
+  PasswordResetValidator.validateData(),
+  PasswordResetValidator.myValidationResult,
+  PasswordResetValidator.verifyPasscode,
+  AuthController.changePassword,
 );
 
 export default router;

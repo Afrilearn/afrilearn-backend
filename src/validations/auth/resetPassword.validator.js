@@ -57,7 +57,7 @@ class PasswordReset {
       return res.status(400).json({
         status: '400 Invalid Request',
         error: 'Your request contains invalid parameters',
-        errors: errArr
+        errors: errArr,
       });
     }
     return next();
@@ -77,7 +77,7 @@ class PasswordReset {
     if (!user) {
       return res.status(401).json({
         status: '401 Unauthorized',
-        error: 'User not found'
+        error: 'User not found',
       });
     }
     return next();
@@ -97,12 +97,12 @@ class PasswordReset {
     if (result === 2) {
       return res.status(401).json({
         status: '401 Unauthorized',
-        error: 'Passcode is Invalid'
+        error: 'Passcode is Invalid',
       });
     } if (result === 3) {
       return res.status(401).json({
         status: '401 Unauthorized',
-        error: 'Passcode has expired'
+        error: 'Passcode has expired',
       });
     }
     return next();

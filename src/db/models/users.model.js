@@ -5,10 +5,10 @@ const UserSchema = new mongoose.Schema(
     fullName: {
       type: String,
       required: true,
-    },    
+    },
     password: {
       type: String,
-      default: 'password'
+      default: 'password',
     },
     email: {
       type: String,
@@ -16,15 +16,15 @@ const UserSchema = new mongoose.Schema(
       unique: true,
     },
     phoneNumber: {
-      type: String,    
+      type: String,
       trim: true,
     },
     country: {
-      type: String,    
+      type: String,
       trim: true,
     },
     state: {
-      type: String,    
+      type: String,
       trim: true,
     },
     role: {
@@ -42,7 +42,7 @@ const UserSchema = new mongoose.Schema(
     },
     referee: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'user',    
+      ref: 'user',
     },
     isActivated: {
       type: Boolean,

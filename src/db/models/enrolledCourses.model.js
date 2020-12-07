@@ -6,6 +6,10 @@ const EnrolledCourseSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'user',
     },
+    status: {
+      type: String,
+      default: 'trial',
+    },
     classId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'class',
@@ -16,12 +20,15 @@ const EnrolledCourseSchema = new mongoose.Schema(
     },
     duration: {
       type: Number,
+      default: 0,
     },
     startDate: {
       type: Date,
+      default: Date.now(),
     },
     endDate: {
       type: Date,
+      default: new Date().setHours(48),
     },
   },
   { timestamps: true },
