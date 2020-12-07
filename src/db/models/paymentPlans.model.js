@@ -8,6 +8,9 @@ const PaymentPlanSchema = new mongoose.Schema(
     amount: {
       type: Number,
     },
+    duration: {
+      type: Number,
+    },
   },
   { timestamps: true },
   {
