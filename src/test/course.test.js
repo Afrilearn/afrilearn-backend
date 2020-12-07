@@ -58,23 +58,23 @@ describe('Courses ', () => {
       });
   });
 
-  it("should return array of enrolledCourses with status 200", (done) => {
+  it('should return array of enrolledCourses with status 200', (done) => {
     chai
       .request(app)
-      .post("/api/v1/courses/add-course")
-      .set("token", token)
+      .post('/api/v1/courses/add-course')
+      .set('token', token)
       .send({ courseId: course_id })
       .end((err, res) => {
         res.should.have.status(200);
-        res.body.should.be.an("object");
-        res.body.should.have.property("status").eql("success");
-        res.body.should.have.property("data");
-        res.body.data.should.have.property("course");
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('course');
         done();
       });
   });
 
-  it("should return array of courses with status 200", (done) => {
+  it('should return array of courses with status 200', (done) => {
     chai
       .request(app)
       .get('/api/v1/courses')
@@ -114,16 +114,16 @@ describe('Courses ', () => {
         done();
       });
   });
-  it("should return array of subjects with status 200", (done) => {
+  it('should return array of subjects with status 200', (done) => {
     chai
       .request(app)
       .get(`/api/v1/courses/${course_id}/subjects`)
       .end((err, res) => {
         res.should.have.status(200);
-        res.body.should.be.an("object");
-        res.body.should.have.property("status").eql("success");
-        res.body.should.have.property("data");
-        res.body.data.should.have.property("subjects");
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('subjects');
         done();
       });
   });

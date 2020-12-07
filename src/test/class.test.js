@@ -8,6 +8,7 @@ import app from '../index';
 // import logger from '../config';
 
 import ClassController from '../controllers/class.controller';
+import ClassMember from '../db/models/classMembers.model';
 
 chai.should();
 chai.use(Sinonchai);
@@ -16,6 +17,8 @@ chai.use(chaiHttp);
 
 describe('Classes ', () => {
   const user_id = new mongoose.mongo.ObjectId();
+  const class_id = new mongoose.mongo.ObjectId();
+  const course_id = new mongoose.mongo.ObjectId();
   const token = jwt.sign(
     {
       data: {
@@ -27,6 +30,17 @@ describe('Classes ', () => {
     process.env.SECRET,
   );
 
+  before(async () => {
+    await ClassMember.create({
+      classId: class_id,
+      userId: user_id,
+    });
+  });
+
+  after(async () => {
+    await ClassMember.findByIdAndDelete(class_id);
+  });
+
   it('should return a class with status 200', (done) => {
     chai
       .request(app)
@@ -34,7 +48,7 @@ describe('Classes ', () => {
       .set('token', token)
       .send({
         name: 'Class for testing',
-        courseId: '5fc8cc978e28fa50986ecac9',
+        courseId: course_id,
         classCode: '00000000',
       })
       .end((err, res) => {
@@ -53,7 +67,7 @@ describe('Classes ', () => {
       .post('/api/v1/classes/send-class-request')
       .set('token', token)
       .send({
-        courseId: '5fc8cc978e28fa50986ecac9',
+        courseId: course_id,
       })
       .end((err, res) => {
         res.should.have.status(200);
@@ -62,6 +76,27 @@ describe('Classes ', () => {
         res.body.should.have.property('data');
         res.body.data.should.have.property('classMember');
         res.body.data.should.have.property('message');
+        done();
+      });
+  });
+
+  it('should return a classMember with updated status with status 200', (done) => {
+    chai
+      .request(app)
+      .patch('/api/v1/classes/accept-reject-class-request')
+      .set('token', token)
+      .send({
+        classId: class_id,
+        userId: user_id,
+        status: 'accept',
+      })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('classMember');
+        // res.body.data.classMember.should.have.property("status").eql("accept");
         done();
       });
   });
@@ -91,6 +126,20 @@ describe('Classes ', () => {
 
     ClassController.sendClassRequest(req, res);
     res.status.should.have.callCount(1);
+    done();
+  });
+
+  it('fakes server error', (done) => {
+    const req = { body: {} };
+    const res = {
+      status() {},
+      send() {},
+    };
+
+    sinon.stub(res, 'status').returnsThis();
+
+    ClassController.acceptRejectRetractClassRequest(req, res);
+    res.status.should.have.callCount(0);
     done();
   });
 });

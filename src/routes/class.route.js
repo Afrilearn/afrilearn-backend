@@ -10,6 +10,11 @@ router.post(
   '/send-class-request',
   validateToken,
   ClassController.sendClassRequest,
-); 
+);
+router.patch(
+  '/accept-reject-class-request',
+  validateToken,
+  ClassController.acceptRejectRetractClassRequest,
+);
 
 export default router;
