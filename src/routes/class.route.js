@@ -6,5 +6,10 @@ import validateToken from '../middlewares/auth.middleware';
 const router = Router();
 
 router.post('/add-class', validateToken, ClassController.addClass);
+router.post(
+  '/send-class-request',
+  validateToken,
+  ClassController.sendClassRequest,
+); 
 
 export default router;
