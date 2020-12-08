@@ -1,9 +1,11 @@
 import { Router } from 'express';
 import AuthController from '../controllers/auth.controller';
+import SocialLoginController from '../controllers/socialLogin.controller';
 import SignUpValidator from '../validations/auth/signup.validator';
 import verifyToken from '../middlewares/auth.middleware';
 import LoginValidator from '../validations/auth/login.validator';
 import PasswordResetValidator from '../validations/auth/resetPassword.validator';
+import SocialLoginValidator from '../validations/auth/socialLogin.validator';
 
 const router = Router();
 
@@ -40,6 +42,13 @@ router.post(
   PasswordResetValidator.myValidationResult,
   PasswordResetValidator.verifyPasscode,
   AuthController.changePassword,
+);
+
+router.post(
+  '/social_login/google',
+  SocialLoginValidator.validateData(),
+  SocialLoginValidator.myValidationResult,
+  SocialLoginController.socialLoginGoogle
 );
 
 export default router;

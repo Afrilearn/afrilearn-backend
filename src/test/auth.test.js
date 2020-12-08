@@ -418,4 +418,34 @@ describe('Auth Route Endpoints', () => {
         });
     });
   });
+  describe('POST api/v1/auth/social_login/google', () => {
+    it('should not login a user if the user supplies incomplete information', (done) => {
+      chai
+        .request(app)
+        .post('/api/v1/auth/social_login/google')
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.be.an('object');
+          res.body.should.have.property('status').eql('400 Invalid Request');
+          res.body.should.have.property('error');
+          done();
+        });
+    });
+    it('should not login a user if the user token is invalid', (done) => {
+      chai
+        .request(app)
+        .post('/api/v1/auth/social_login/google')
+        .send({ token: 'invalid' })
+        .end((err, res) => {
+          res.should.have.status(500);
+          res.body.should.be.an('object');
+          res.body.should.have
+            .property('status')
+            .eql('500 Internal server error');
+          res.body.should.have.property('error');
+          done();
+        });
+    });   
+  });
+ 
 });
