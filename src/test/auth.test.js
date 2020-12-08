@@ -445,7 +445,6 @@ describe('Auth Route Endpoints', () => {
           res.body.should.have.property('error');
           done();
         });
-    });   
+    });
   });
- 
 });

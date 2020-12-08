@@ -48,7 +48,7 @@ router.post(
   '/social_login/google',
   SocialLoginValidator.validateData(),
   SocialLoginValidator.myValidationResult,
-  SocialLoginController.socialLoginGoogle
+  SocialLoginController.socialLoginGoogle,
 );
 
 export default router;
