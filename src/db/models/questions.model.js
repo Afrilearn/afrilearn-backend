@@ -5,6 +5,7 @@ const QuestionSchema = new mongoose.Schema(
     lessonId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'lesson',
+      required: true,
     },
     creatorId: {
       type: mongoose.Schema.Types.ObjectId,

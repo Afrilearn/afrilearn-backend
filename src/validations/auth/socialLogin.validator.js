@@ -20,7 +20,7 @@ class Login {
         .withMessage('Token is required')
         .not()
         .isEmpty()
-        .withMessage('Token cannot be empty')      
+        .withMessage('Token cannot be empty'),
     ];
   }
 
