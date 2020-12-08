@@ -60,6 +60,7 @@
   "nyc": {
     "exclude": [
       "src/index.js",
+      "src/controllers/socialLogin.controller.js",
       "src/config/index.js",
       "src/db/*",
       "src/routes/index.js",
