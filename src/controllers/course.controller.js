@@ -2,6 +2,7 @@ import Course from '../db/models/courses.model';
 import Subject from '../db/models/subjects.model';
 import EnrolledCourse from '../db/models/enrolledCourses.model';
 import MainSubject from '../db/models/mainSubjects.model';
+import SubjectProgress from '../db/models/subjectProgresses.model';
 /**
  *Contains Course Controller
  *
@@ -124,5 +125,32 @@ class CourseController {
       });
     }
   }
+   /**
+   * Submit subject progress
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof SubjectController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async subjectProgress(req, res) {
+    try {   
+      const progress = await SubjectProgress.create(req.body) 
+      return res.status(201).json({
+        status: 'success',
+        data: {
+          progress
+        },
+      });
+
+    } catch (error) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error submitting progress',
+      });
+    }
+  }
 }
 export default CourseController;
+
+
