@@ -2,6 +2,24 @@ import mongoose from 'mongoose';
 
 const QuizResultsSchema = new mongoose.Schema(
   {
+    results: [
+      {
+        questionId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: 'question',
+        },
+        optionSelected: {
+          type: Number,
+        },
+        correctOption: {
+          type: Number,
+        },
+        status: {
+          type: String,
+          enum: ['correct', 'skipped', 'incorrect'],
+        },
+      },
+    ],
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'user',

@@ -1,7 +1,7 @@
 import Course from '../db/models/courses.model';
 import Subject from '../db/models/subjects.model';
 import EnrolledCourse from '../db/models/enrolledCourses.model';
-import mainSubject from '../db/models/mainSubjects.model';
+import MainSubject from '../db/models/mainSubjects.model';
 /**
  *Contains Course Controller
  *
@@ -109,7 +109,7 @@ class CourseController {
       }).populate({
         path: 'mainSubjectId',
         select: 'name',
-        model: mainSubject,
+        model: MainSubject,
       });
       return res.status(200).json({
         status: 'success',
