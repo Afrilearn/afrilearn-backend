@@ -19,7 +19,7 @@ const subjectProgress = {
   subjectId: '5fcf78a4a26c8527bc8f423a',
   courseId: '5fcf78a4a26c8527bc8f423a',
   lessonId: '5fcf78a4a26c8527bc8f423a',
-  classId: '5fcf78a4a26c8527bc8f423a' 
+  classId: '5fcf78a4a26c8527bc8f423a',
 };
 
 describe('Courses ', () => {
@@ -192,7 +192,7 @@ describe('Courses ', () => {
   it('should register subject progress if it had not been done before', (done) => {
     chai
       .request(app)
-      .post(`/api/v1/courses/subject-progress`)
+      .post('/api/v1/courses/subject-progress')
       .set('token', token)
       .send(subjectProgress)
       .end((err, res) => {
@@ -207,7 +207,7 @@ describe('Courses ', () => {
   it('should not register subject progress if it had not been done before', (done) => {
     chai
       .request(app)
-      .post(`/api/v1/courses/subject-progress`)
+      .post('/api/v1/courses/subject-progress')
       .set('token', token)
       .send(subjectProgress)
       .end((err, res) => {
@@ -221,7 +221,7 @@ describe('Courses ', () => {
   it('should not register progress if the user supplies incomplete information', (done) => {
     chai
       .request(app)
-      .post(`/api/v1/courses/subject-progress`)
+      .post('/api/v1/courses/subject-progress')
       .set('token', token)
       .end((err, res) => {
         res.should.have.status(400);
@@ -244,5 +244,4 @@ describe('Courses ', () => {
     res.status.should.have.callCount(0);
     done();
   });
-  
 });
