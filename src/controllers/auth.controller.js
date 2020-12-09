@@ -3,8 +3,6 @@ import Helper from '../utils/user.utils';
 import sendEmail from '../utils/email.utils';
 import AuthServices from '../services/auth.services';
 import ResetPassword from '../db/models/resetPassword.model';
-import EnrolledCourse from '../db/models/enrolledCourses.model';
-import ClassMember from '../db/models/classMembers.model';
 
 /**
  *Contains Auth Controller

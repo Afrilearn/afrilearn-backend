@@ -58,8 +58,15 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-UserSchema.virtual('enrolledCourse', {
+UserSchema.virtual('enrolledCourses', {
   ref: 'enrolledCourse',
+  localField: '_id',
+  foreignField: 'userId',
+  justOne: false,
+});
+
+UserSchema.virtual('classMembership', {
+  ref: 'classMember',
   localField: '_id',
   foreignField: 'userId',
   justOne: false,
