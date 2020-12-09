@@ -14,12 +14,13 @@ const SubjectProgressSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'course',
     },
+    subjectId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'subject',
+    },
     lessonId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'lesson',
-    },
-    value: {
-      type: Number,
+      ref: 'subject',
     },
   },
   { timestamps: true },

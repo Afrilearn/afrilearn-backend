@@ -3,6 +3,7 @@ import CourseController from '../controllers/course.controller';
 import validateToken from '../middlewares/auth.middleware';
 import AddEnrolledCourseValidator from '../validations/courses/addEnrolledCourse.validator';
 // import authRouter from './auth.route';
+import SubjectProgressValidator from '../validations/course/subjectProgress.validator';
 
 const router = Router();
 
@@ -15,6 +16,14 @@ router.post(
   AddEnrolledCourseValidator.validateData(),
   AddEnrolledCourseValidator.myValidationResult,
   CourseController.addCourseToEnrolledCourses,
+);
+router.post(
+  '/subject-progress',
+  validateToken,
+  SubjectProgressValidator.validateData(),
+  SubjectProgressValidator.myValidationResult,
+  SubjectProgressValidator.progressExist,  
+  CourseController.subjectProgress,
 );
 
 export default router;
