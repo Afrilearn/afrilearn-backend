@@ -1,4 +1,5 @@
 import Auth from '../db/models/users.model';
+import EnrolledCourse from '../db/models/enrolledCourses.model';
 import ResetPassword from '../db/models/resetPassword.model';
 
 export default {
@@ -7,7 +8,7 @@ export default {
       const condition = {
         email,
       };
-      const user = await Auth.findOne(condition);
+      const user = await Auth.findOne(condition).populate({ path: 'enrolledCourse', model:EnrolledCourse, populate: { path: 'courseId', select: 'name, imageUrl', }});
       return user;
     } catch (err) {
       return res.status(500).json({

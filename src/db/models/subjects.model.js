@@ -3,11 +3,11 @@ import mongoose from 'mongoose';
 const SubjectSchema = new mongoose.Schema(
   {
     mainSubjectId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'mainSubject',
     },
     courseId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'course',
     },
   },

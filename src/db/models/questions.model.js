@@ -3,12 +3,12 @@ import mongoose from 'mongoose';
 const QuestionSchema = new mongoose.Schema(
   {
     lessonId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'lesson',
       required: true,
     },
     creatorId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'user',
     },
     question: {
