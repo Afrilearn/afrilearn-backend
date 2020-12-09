@@ -82,5 +82,47 @@ class LessonController {
       });
     }
   }
+
+  /**
+   * Get test result
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof LessonController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getTestResult(req, res) {
+    try {
+      let quizResult = await QuizResult.findOne({
+        lessonId: req.params.lessonId,
+        userId: req.data.id,
+      });
+      if (Object.keys(req.body).includes('classId')) {
+        quizResult = await QuizResult.findOne({
+          lessonId: req.params.lessonId,
+          userId: req.data.id,
+          classId: req.body.classId,
+        });
+      }
+      if (!quizResult) {
+        return res.status(404).json({
+          status: '404 error not found',
+          error: 'Result not found',
+        });
+      }
+
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          results: quizResult,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error Loading courses',
+      });
+    }
+  }
 }
 export default LessonController;

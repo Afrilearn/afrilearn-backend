@@ -14,5 +14,10 @@ router.post(
   verifyToken,
   LessonController.saveTestResult,
 );
+router.get(
+  '/:lessonId/get-test-results',
+  verifyToken,
+  LessonController.getTestResult,
+);
 
 export default router;

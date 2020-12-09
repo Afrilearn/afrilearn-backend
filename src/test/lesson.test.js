@@ -21,6 +21,7 @@ describe('Classes ', () => {
   const user_id = new mongoose.mongo.ObjectId();
   const question_id = new mongoose.mongo.ObjectId();
   const lesson_id = new mongoose.mongo.ObjectId();
+  const unknown_lesson_id = new mongoose.mongo.ObjectId();
   const token = jwt.sign(
     {
       data: {
@@ -133,6 +134,48 @@ describe('Classes ', () => {
       });
   });
 
+  it('should return array of quiz results with status 200', (done) => {
+    chai
+      .request(app)
+      .get(`/api/v1/lessons/${lesson_id}/get-test-results`)
+      .set('token', token)
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('results');
+        done();
+      });
+  });
+
+  it('should return array of quiz results related to a class with status 200', (done) => {
+    chai
+      .request(app)
+      .get(`/api/v1/lessons/${lesson_id}/get-test-results`)
+      .set('token', token)
+      .send({ classId: '5fc8e7134bfe993c34a9689c' })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('results');
+        done();
+      });
+  });
+  it("should not return array of quiz results when lesson doesn't exists, status 404", (done) => {
+    chai
+      .request(app)
+      .get(`/api/v1/lessons/${unknown_lesson_id}/get-test-results`)
+      .set('token', token)
+      .end((err, res) => {
+        res.should.have.status(404);
+        res.body.should.be.an('object');
+        done();
+      });
+  });
+
   it('fakes server error', (done) => {
     const req = { body: {} };
     const res = {
@@ -157,6 +200,20 @@ describe('Classes ', () => {
     sinon.stub(res, 'status').returnsThis();
 
     LessonController.saveTestResult(req, res);
+    res.status.should.have.callCount(1);
+    done();
+  });
+
+  it('fakes server error', (done) => {
+    const req = { body: {} };
+    const res = {
+      status() {},
+      send() {},
+    };
+
+    sinon.stub(res, 'status').returnsThis();
+
+    LessonController.getTestResult(req, res);
     res.status.should.have.callCount(1);
     done();
   });
