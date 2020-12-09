@@ -105,7 +105,7 @@ class AuthController {
     try {
       const { email, password } = req.body;
       const user = await AuthServices.emailExist(email, res);
-    
+
       if (!user) {
         return res.status(401).json({
           status: '401 Unauthorized',
@@ -138,7 +138,6 @@ class AuthController {
           user,
         },
       });
-    
     } catch (err) {
       return res.status(500).json({
         status: '500 Internal server error',

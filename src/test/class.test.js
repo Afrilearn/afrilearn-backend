@@ -9,6 +9,7 @@ import app from '../index';
 
 import ClassController from '../controllers/class.controller';
 import ClassMember from '../db/models/classMembers.model';
+import Class from '../db/models/classes.model';
 
 chai.should();
 chai.use(Sinonchai);
@@ -31,6 +32,13 @@ describe('Classes ', () => {
   );
 
   before(async () => {
+    await Class.create({
+      _id: class_id,
+      userId: user_id,
+      name: 'Primary Testing',
+      courseId: course_id,
+      classCode: '00000000',
+    });
     await ClassMember.create({
       classId: class_id,
       userId: user_id,
@@ -39,9 +47,10 @@ describe('Classes ', () => {
 
   after(async () => {
     await ClassMember.findByIdAndDelete(class_id);
+    await Class.findByIdAndDelete(class_id);
   });
 
-  it('should return a class with status 200', (done) => {
+  it('should  save an EnrooledClass and return a class with status 200', (done) => {
     chai
       .request(app)
       .post('/api/v1/classes/add-class')
@@ -151,6 +160,20 @@ describe('Classes ', () => {
       });
   });
 
+  it('should return a class with status 200', (done) => {
+    chai
+      .request(app)
+      .get(`/api/v1/classes/${class_id}`)
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('class');
+        done();
+      });
+  });
+
   it('fakes server error', (done) => {
     const req = { body: {} };
     const res = {
@@ -192,6 +215,7 @@ describe('Classes ', () => {
     res.status.should.have.callCount(0);
     done();
   });
+
   it('fakes server error', (done) => {
     const req = { body: {} };
     const res = {
@@ -202,6 +226,20 @@ describe('Classes ', () => {
     sinon.stub(res, 'status').returnsThis();
 
     ClassController.getStudentsInClass(req, res);
+    res.status.should.have.callCount(1);
+    done();
+  });
+
+  it('fakes server error', (done) => {
+    const req = { body: {} };
+    const res = {
+      status() {},
+      send() {},
+    };
+
+    sinon.stub(res, 'status').returnsThis();
+
+    ClassController.getClassById(req, res);
     res.status.should.have.callCount(1);
     done();
   });

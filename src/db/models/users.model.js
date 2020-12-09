@@ -50,7 +50,7 @@ const UserSchema = new mongoose.Schema(
     profilePhotoUrl: {
       type: String,
     },
-  }, 
+  },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },

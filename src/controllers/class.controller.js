@@ -1,6 +1,7 @@
 import ClassModel from '../db/models/classes.model';
 import ClassMember from '../db/models/classMembers.model';
 import Helper from '../utils/user.utils';
+
 /**
  *Contains Class Controller
  *
@@ -131,6 +132,31 @@ class ClassController {
         status: 'success',
         data: {
           classMembers,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error Loading class',
+      });
+    }
+  }
+
+  /**
+   * Get a class by ID
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getClassById(req, res) {
+    try {
+      const clazz = await ClassModel.findById(req.params.classId);
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          class: clazz,
         },
       });
     } catch (error) {
