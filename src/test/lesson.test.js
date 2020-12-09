@@ -10,6 +10,7 @@ import app from '../index';
 import LessonController from '../controllers/lesson.controller';
 import Question from '../db/models/questions.model';
 import QuizResult from '../db/models/quizResults.model';
+import Lesson from '../db/models/lessons.model';
 
 chai.should();
 chai.use(Sinonchai);
@@ -22,6 +23,17 @@ describe('Classes ', () => {
   const question_id = new mongoose.mongo.ObjectId();
   const lesson_id = new mongoose.mongo.ObjectId();
   const unknown_lesson_id = new mongoose.mongo.ObjectId();
+  const new_lesson = {
+    _id: lesson_id,
+    subjectId: '5fc8d2a4b55ab52a40d75a54',
+    courseId: '5fc8d2a4b55ab52a40d75a54',
+    creatorId: '5fc8d2a4b55ab52a40d75a54',
+    termId: '5fc8d2a4b55ab52a40d75a54',
+    title: 'lorem ipsum vicini',
+    content:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.',
+    videoUrl: 'https://www.youtube.com/watch?v=kSdR1UIWh_s',
+  };
   const token = jwt.sign(
     {
       data: {
@@ -82,12 +94,13 @@ describe('Classes ', () => {
       explanation:
         'Muhammed Buhari is the president of the federal republic of Nigeria',
     });
-    // await QuizResult.create({ ...testResultData });
+    await Lesson.create({ ...new_lesson });
   });
 
   after(async () => {
     await Question.findByIdAndDelete(question_id);
     await QuizResult.findByIdAndDelete(test_result_id);
+    await Lesson.findByIdAndDelete(lesson_id);
   });
 
   it('should return array of question with status 200', (done) => {
@@ -164,6 +177,7 @@ describe('Classes ', () => {
         done();
       });
   });
+
   it("should not return array of quiz results when lesson doesn't exists, status 404", (done) => {
     chai
       .request(app)
@@ -172,6 +186,35 @@ describe('Classes ', () => {
       .end((err, res) => {
         res.should.have.status(404);
         res.body.should.be.an('object');
+        done();
+      });
+  });
+
+  it('should return array of lessons with status 200', (done) => {
+    chai
+      .request(app)
+      .get('/api/v1/lessons')
+      .query({ searchQuery: 'vicini' })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('lessons');
+        done();
+      });
+  });
+
+  it('should return array of lessons even with no searchQuery, with status 200', (done) => {
+    chai
+      .request(app)
+      .get('/api/v1/lessons')
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('lessons');
         done();
       });
   });
@@ -214,6 +257,20 @@ describe('Classes ', () => {
     sinon.stub(res, 'status').returnsThis();
 
     LessonController.getTestResult(req, res);
+    res.status.should.have.callCount(1);
+    done();
+  });
+
+  it('fakes server error', (done) => {
+    const req = { body: {} };
+    const res = {
+      status() {},
+      send() {},
+    };
+
+    sinon.stub(res, 'status').returnsThis();
+
+    LessonController.searchLessons(req, res);
     res.status.should.have.callCount(1);
     done();
   });

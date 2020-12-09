@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const EnrolledCourseSchema = new mongoose.Schema(
   {
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'user',
     },
     status: {
@@ -11,11 +11,11 @@ const EnrolledCourseSchema = new mongoose.Schema(
       default: 'trial',
     },
     classId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'class',
     },
     courseId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'course',
     },
     duration: {
@@ -32,10 +32,6 @@ const EnrolledCourseSchema = new mongoose.Schema(
     },
   },
   { timestamps: true },
-  {
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
-  },
 );
 
 const EnrolledCourse = mongoose.model('enrolledCourse', EnrolledCourseSchema);

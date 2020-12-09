@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import CourseController from '../controllers/course.controller';
 import validateToken from '../middlewares/auth.middleware';
+import AddEnrolledCourseValidator from '../validations/courses/addEnrolledCourse.validator';
+// import authRouter from './auth.route';
 import SubjectProgressValidator from '../validations/course/subjectProgress.validator';
 
 const router = Router();
@@ -11,6 +13,8 @@ router.get('/:courseId/subjects', CourseController.getSubjectsForACourse);
 router.post(
   '/add-course',
   validateToken,
+  AddEnrolledCourseValidator.validateData(),
+  AddEnrolledCourseValidator.myValidationResult,
   CourseController.addCourseToEnrolledCourses,
 );
 router.post(
