@@ -50,12 +50,12 @@ const UserSchema = new mongoose.Schema(
     profilePhotoUrl: {
       type: String,
     },
-  },
-  { timestamps: true },
+  }, 
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
+  { timestamps: true },
 );
 
 UserSchema.virtual('enrolledCourse', {

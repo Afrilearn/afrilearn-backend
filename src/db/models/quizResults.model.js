@@ -5,7 +5,7 @@ const QuizResultsSchema = new mongoose.Schema(
     results: [
       {
         questionId: {
-          type: mongoose.Schema.Types.ObjectId,
+          type: mongoose.Schema.ObjectId,
           ref: 'question',
         },
         optionSelected: {
@@ -21,19 +21,19 @@ const QuizResultsSchema = new mongoose.Schema(
       },
     ],
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'user',
     },
     classId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'class',
     },
     courseId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'course',
     },
     lessonId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'lesson',
     },
     timeSpent: {
