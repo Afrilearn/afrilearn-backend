@@ -21,7 +21,7 @@ class SubjectProgressClass {
         .withMessage('userId is required')
         .not()
         .isEmpty()
-        .withMessage('userId cannot be empty'),       
+        .withMessage('userId cannot be empty'),
       check('subjectId')
         .exists()
         .withMessage('subjectId is required')
@@ -45,7 +45,7 @@ class SubjectProgressClass {
         .isEmpty()
         .withMessage('lessonId cannot be empty')
         .trim()
-        .escape()     
+        .escape(),
     ];
   }
 
@@ -79,18 +79,20 @@ class SubjectProgressClass {
    * @returns {JSON} - A JSON response.
    */
   static async progressExist(req, res, next) {
-    const {courseId, subjectId, lessonId, userId} = req.body;
-    const condition ={   
-      userId,     
+    const {
+      courseId, subjectId, lessonId, userId,
+    } = req.body;
+    const condition = {
+      userId,
       courseId,
       subjectId,
-      lessonId,         
+      lessonId,
+    };
+    if (req.body.classId) {
+      condition.classId = req.body.classId;
     }
-    if(req.body.classId){
-      condition['classId'] = req.body.classId
-    }  
-    const exist = await SubjectProgress.findOne(condition)
-   
+    const exist = await SubjectProgress.findOne(condition);
+
     if (exist) {
       return res.status(409).json({
         status: '409 Conflict',
@@ -99,6 +101,5 @@ class SubjectProgressClass {
     }
     return next();
   }
-
 }
 export default SubjectProgressClass;

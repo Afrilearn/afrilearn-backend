@@ -125,7 +125,8 @@ class CourseController {
       });
     }
   }
-   /**
+
+  /**
    * Submit subject progress
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
@@ -134,15 +135,14 @@ class CourseController {
    *
    */
   static async subjectProgress(req, res) {
-    try {   
-      const progress = await SubjectProgress.create(req.body) 
+    try {
+      const progress = await SubjectProgress.create(req.body);
       return res.status(201).json({
         status: 'success',
         data: {
-          progress
+          progress,
         },
       });
-
     } catch (error) {
       return res.status(500).json({
         status: '500 Internal server error',
@@ -152,5 +152,3 @@ class CourseController {
   }
 }
 export default CourseController;
-
-

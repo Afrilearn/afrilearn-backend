@@ -3,11 +3,11 @@ import mongoose from 'mongoose';
 const classMemberSchema = new mongoose.Schema(
   {
     classId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'class',
     },
     userId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'user',
     },
     status: {
