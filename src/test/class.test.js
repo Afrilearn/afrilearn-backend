@@ -61,13 +61,25 @@ describe('Classes ', () => {
       });
   });
 
+  it('should NOT return a class with status 400 when data is incomplete', (done) => {
+    chai
+      .request(app)
+      .post('/api/v1/classes/add-class')
+      .set('token', token)
+      .end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.be.an('object');
+        done();
+      });
+  });
+
   it('should return a classMember and message with status 200', (done) => {
     chai
       .request(app)
       .post('/api/v1/classes/send-class-request')
       .set('token', token)
       .send({
-        courseId: course_id,
+        classId: class_id,
       })
       .end((err, res) => {
         res.should.have.status(200);
@@ -76,6 +88,18 @@ describe('Classes ', () => {
         res.body.should.have.property('data');
         res.body.data.should.have.property('classMember');
         res.body.data.should.have.property('message');
+        done();
+      });
+  });
+
+  it('should NOT return a classMember and message with status 400', (done) => {
+    chai
+      .request(app)
+      .post('/api/v1/classes/send-class-request')
+      .set('token', token)
+      .end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.be.an('object');
         done();
       });
   });
@@ -96,6 +120,18 @@ describe('Classes ', () => {
         res.body.should.have.property('status').eql('success');
         res.body.should.have.property('data');
         res.body.data.should.have.property('classMember');
+        done();
+      });
+  });
+
+  it('should not return a classMember with updated status if class ID and User ID are not present with status 400', (done) => {
+    chai
+      .request(app)
+      .patch('/api/v1/classes/accept-reject-class-request')
+      .set('token', token)
+      .end((err, res) => {
+        res.should.have.status(400);
+        res.body.should.be.an('object');
         done();
       });
   });

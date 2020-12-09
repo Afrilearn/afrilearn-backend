@@ -58,18 +58,14 @@ describe('Courses ', () => {
       });
   });
 
-  it('should return array of enrolledCourses with status 200', (done) => {
+  it('should NOT return array of enrolledCourses with status 400 when data is incomplete', (done) => {
     chai
       .request(app)
       .post('/api/v1/courses/add-course')
       .set('token', token)
-      .send({ courseId: course_id })
       .end((err, res) => {
-        res.should.have.status(200);
+        res.should.have.status(400);
         res.body.should.be.an('object');
-        res.body.should.have.property('status').eql('success');
-        res.body.should.have.property('data');
-        res.body.data.should.have.property('course');
         done();
       });
   });

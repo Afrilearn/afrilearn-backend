@@ -28,7 +28,7 @@ const UserSchema = new mongoose.Schema(
       trim: true,
     },
     role: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'role',
     },
     googleUserId: {
@@ -40,7 +40,7 @@ const UserSchema = new mongoose.Schema(
       trim: true,
     },
     referee: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: mongoose.Schema.ObjectId,
       ref: 'user',
     },
     isActivated: {
@@ -57,6 +57,13 @@ const UserSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   },
 );
+
+UserSchema.virtual('enrolledCourse', {
+  ref: 'enrolledCourse',
+  localField: '_id',
+  foreignField: 'userId',
+  justOne: false,
+});
 
 const User = mongoose.model('user', UserSchema);
 

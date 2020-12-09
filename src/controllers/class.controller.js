@@ -89,7 +89,7 @@ class ClassController {
   static async acceptRejectRetractClassRequest(req, res) {
     try {
       const classMemberData = {
-        courseId: req.body.courseId,
+        classId: req.body.classId,
         userId: req.body.userId,
       };
       const newClassMember = await ClassMember.findOneAndUpdate(

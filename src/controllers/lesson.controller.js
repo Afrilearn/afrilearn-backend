@@ -1,5 +1,6 @@
 import Question from '../db/models/questions.model';
 import QuizResult from '../db/models/quizResults.model';
+import Lesson from '../db/models/lessons.model';
 /**
  *Contains Lesson Controller
  *
@@ -29,7 +30,37 @@ class LessonController {
     } catch (error) {
       return res.status(500).json({
         status: '500 Internal server error',
-        error: 'Error Loading courses',
+        error: 'Error Loading questions',
+      });
+    }
+  }
+
+  /**
+   * Seacrch for lessons
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof LessonController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async searchLessons(req, res) {
+    try {
+      const searchEntry = req.query.searchQuery ? req.query.searchQuery : '';
+      const searchQuery = new RegExp(`.*${searchEntry}.*`, 'i');
+      const lessons = await Lesson.find({
+        $or: [{ title: searchQuery }, { content: searchQuery }],
+      });
+
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          lessons,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error Loading lessons',
       });
     }
   }
@@ -78,7 +109,7 @@ class LessonController {
     } catch (error) {
       return res.status(500).json({
         status: '500 Internal server error',
-        error: 'Error Loading courses',
+        error: 'Error saving results',
       });
     }
   }
@@ -120,7 +151,7 @@ class LessonController {
     } catch (error) {
       return res.status(500).json({
         status: '500 Internal server error',
-        error: 'Error Loading courses',
+        error: 'Error Loading tests',
       });
     }
   }
