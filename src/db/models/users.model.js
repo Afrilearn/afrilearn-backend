@@ -72,6 +72,13 @@ UserSchema.virtual('classMembership', {
   justOne: false,
 });
 
+UserSchema.virtual('classOwnership', {
+  ref: 'class',
+  localField: '_id',
+  foreignField: 'userId',
+  justOne: false,
+});
+
 const User = mongoose.model('user', UserSchema);
 
 export default User;
