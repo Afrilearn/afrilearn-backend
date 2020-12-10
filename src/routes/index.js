@@ -5,12 +5,14 @@ import classRouter from './class.route';
 import lessonRouter from './lesson.route';
 import supportRouter from './support.route';
 import recentRouter from './recentActivity.route';
+import subjectRouter from './subject.route';
 
 const router = Router();
 
 router.use('/courses', courseRouter);
 router.use('/auth', authRouter);
 router.use('/recents', recentRouter);
+router.use('/subjects', subjectRouter);
 router.use('/supports', supportRouter);
 router.use('/lessons', lessonRouter);
 router.use('/classes', classRouter);

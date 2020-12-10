@@ -47,11 +47,14 @@ class CourseController {
    */
   static async addCourseToEnrolledCourses(req, res) {
     try {
-      const course = new EnrolledCourse({
+      const course = await EnrolledCourse.create({
         userId: req.data.id,
         courseId: req.body.courseId,
       });
-      await course.save();
+      await Course.findOneAndUpdate(
+        { _id: req.body.courseId },
+        { $inc: { enrollee: 1 } },
+      );
       await course
         .populate({ path: 'courseId', select: 'name' })
         .execPopulate();
