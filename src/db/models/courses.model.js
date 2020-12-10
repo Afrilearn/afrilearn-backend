@@ -13,6 +13,14 @@ const courseSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'courseCategory',
     },
+    enrollee: {
+      type: Number,
+      default: 0,
+    },
+    subjects: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true },
   {
