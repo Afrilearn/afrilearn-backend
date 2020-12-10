@@ -30,5 +30,6 @@ router.patch(
   ClassController.acceptRejectRetractClassRequest,
 );
 router.get('/:classId/students', ClassController.getStudentsInClass);
+router.get('/:classId', ClassController.getClassById);
 
 export default router;

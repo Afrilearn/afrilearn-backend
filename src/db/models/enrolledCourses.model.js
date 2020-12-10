@@ -34,7 +34,6 @@ const EnrolledCourseSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-
 const EnrolledCourse = mongoose.model('enrolledCourse', EnrolledCourseSchema);
 
 export default EnrolledCourse;

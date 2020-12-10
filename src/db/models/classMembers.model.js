@@ -16,7 +16,7 @@ const classMemberSchema = new mongoose.Schema(
       default: 'pending',
     },
   },
-  { timestamps: true } 
+  { timestamps: true },
 );
 
 const ClassMember = mongoose.model('classMember', classMemberSchema);
