@@ -2,6 +2,7 @@ import Auth from '../db/models/users.model';
 import EnrolledCourse from '../db/models/enrolledCourses.model';
 import ResetPassword from '../db/models/resetPassword.model';
 import ClassMembers from '../db/models/classMembers.model';
+import RecentActivity from '../db/models/recentActivities.model';
 
 export default {
   async emailExist(email, res) {
@@ -10,9 +11,27 @@ export default {
         email,
       };
       const user = await Auth.findOne(condition)
-        .populate({ path: 'enrolledCourses', model: EnrolledCourse, populate: { path: 'courseId', select: 'name imageUrl' } })
         .populate({
-          path: 'classMembership', select: '_id status', model: ClassMembers, populate: { path: 'classId', select: 'name classCode', populate: { path: 'courseId', select: 'name imageUrl' } },
+          path: 'enrolledCourses',
+          model: EnrolledCourse,
+          populate: { path: 'courseId', select: 'name imageUrl' },
+        })
+        .populate({
+          path: 'classMembership',
+          select: '_id status',
+          model: ClassMembers,
+          populate: {
+            path: 'classId',
+            select: 'name classCode',
+            populate: { path: 'courseId', select: 'name imageUrl' },
+          },
+        })
+        .populate({
+          path: 'recentActivities',
+          model: RecentActivity,
+          populate: {
+            path: 'userId classId lessonId questionId',
+          },
         });
       return user;
     } catch (err) {
@@ -44,5 +63,4 @@ export default {
       });
     }
   },
-
 };
