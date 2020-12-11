@@ -25,9 +25,13 @@ const LessonSchema = new mongoose.Schema(
     content: {
       type: String,
     },
-    videoUrl: {
-      type: String,
-    },
+    videoUrls: [
+      {
+        videoUrl: {
+          type: String,
+        },
+      },
+    ],
   },
   { timestamps: true },
   {

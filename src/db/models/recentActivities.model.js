@@ -6,6 +6,10 @@ const RecentActivitySchema = new mongoose.Schema(
       type: String,
       enum: ['quiz', 'lesson', 'class'],
     },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'user',
+    },
     lessonId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'lesson',
