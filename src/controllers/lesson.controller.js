@@ -1,6 +1,7 @@
 import Question from '../db/models/questions.model';
 import QuizResult from '../db/models/quizResults.model';
 import Lesson from '../db/models/lessons.model';
+import SubjectProgress from '../db/models/subjectProgresses.model';
 /**
  *Contains Lesson Controller
  *
@@ -20,7 +21,6 @@ class LessonController {
   static async loadTest(req, res) {
     try {
       const questions = await Question.find({ lessonId: req.params.lessonId });
-
       return res.status(200).json({
         status: 'success',
         data: {
@@ -155,5 +155,53 @@ class LessonController {
       });
     }
   }
+
+   /**
+   * Get subject lessons and progress
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof LessonController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getSubjectLessonsAndProgress(req, res) {
+    try {  
+      const { courseId, subjectId } =req.params
+      let subjectProgress = 0  
+      
+      const condition = {
+        courseId,     
+        subjectId   
+      };  
+
+      const lessons = await Lesson.find(condition);      
+     
+      if (req.body.userId) {
+        condition.userId = req.body.userId;
+      }  
+
+      if (req.body.classId) {
+        condition.classId = req.body.classId;
+      }  
+
+      const progress = await SubjectProgress.find(condition);
+
+      subjectProgress = (progress.length/ lessons.length) * 100
+
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          lessons,
+          subjectProgress
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error Loading lessons',
+      });
+    }
+  }
+  
 }
 export default LessonController;
