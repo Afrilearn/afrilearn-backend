@@ -3,6 +3,7 @@ import { config } from 'dotenv';
 import Auth from '../db/models/users.model';
 import Helper from '../utils/user.utils';
 import AuthServices from '../services/auth.services';
+import axios from 'axios';
 
 config();
 /**
@@ -55,11 +56,7 @@ class AuthController {
             user: myUser,
           },
         });
-      }
-      return res.status(200).json({
-        status: 'success',
-        data: {},
-      });
+      }     
     } catch (err) {
       return res.status(500).json({
         status: '500 Internal server error',
@@ -67,5 +64,66 @@ class AuthController {
       });
     }
   }
+
+  /**
+   * Login user through facebook.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async socialLoginFacebook(req, res) {
+    try {
+      const { token } = req.body;
+      const { data } = await axios({
+        url: 'https://graph.facebook.com/me',
+        method: 'get',
+        params: {
+          fields: ['id', 'email', 'first_name', 'last_name'].join(','),
+          access_token: token,
+        },
+      });
+      if(data){
+        const response = {
+          email: data.email,
+          fullName: data.last_name+' '+data.first_name,
+          isActivated: true,
+          googleUserId: data.id,
+        };
+        
+        let myUser = await AuthServices.emailExist(data.email, res);
+
+        // if the user does not have an account
+        if (!myUser) {
+          myUser = await Auth.create({ ...response });
+        }
+
+        const userToken = await Helper.generateToken(
+          myUser._id,
+          myUser.role,
+          myUser.fullName,
+        );
+        
+        return res.status(200).json({
+          status: 'success',
+          data: {
+            token: userToken,
+            user: myUser,
+          },
+        });
+
+      } 
+      return res.status(200).json({
+        status: 'success',
+        data
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error logging in user through facebook',
+      });
+    }
+  }
+
 }
 export default AuthController;

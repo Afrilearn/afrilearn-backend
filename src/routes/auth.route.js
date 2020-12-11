@@ -51,4 +51,10 @@ router.post(
   SocialLoginController.socialLoginGoogle,
 );
 
+router.post(
+  '/social_login/facebook',
+  SocialLoginValidator.validateData(),
+  SocialLoginValidator.myValidationResult,
+  SocialLoginController.socialLoginFacebook,
+);
 export default router;
