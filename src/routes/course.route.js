@@ -3,7 +3,7 @@ import CourseController from '../controllers/course.controller';
 import validateToken from '../middlewares/auth.middleware';
 import AddEnrolledCourseValidator from '../validations/courses/addEnrolledCourse.validator';
 // import authRouter from './auth.route';
-import SubjectProgressValidator from '../validations/course/subjectProgress.validator';
+import SubjectProgressValidator from '../validations/courses/subjectProgress.validator';
 
 const router = Router();
 

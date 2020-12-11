@@ -34,6 +34,10 @@ describe('Classes ', () => {
       'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco.',
     videoUrl: 'https://www.youtube.com/watch?v=kSdR1UIWh_s',
   };
+  const getSubject = {  
+    subjectId: '5fc8d2a4b55ab52a40d75a54',
+    courseId: '5fc8d2a4b55ab52a40d75a54'  
+  };
   const token = jwt.sign(
     {
       data: {
@@ -271,6 +275,37 @@ describe('Classes ', () => {
     sinon.stub(res, 'status').returnsThis();
 
     LessonController.searchLessons(req, res);
+    res.status.should.have.callCount(1);
+    done();
+  });
+
+  it('should return subject lessons and progress', (done) => {
+    chai
+      .request(app)
+      .post(`/api/v1/lessons/5fc8d2a4b55ab52a40d75a54/5fc8d2a4b55ab52a40d75a54/subject-lessons`)
+      .set('token', token)
+      .send(getSubject)
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('lessons');
+        res.body.data.should.have.property('subjectProgress');
+        done();
+      });
+  });
+  
+  it('fakes server error', (done) => {
+    const req = { body: {} };
+    const res = {
+      status() {},
+      send() {},
+    };
+
+    sinon.stub(res, 'status').returnsThis();
+
+    LessonController.getSubjectLessonsAndProgress(req, res);
     res.status.should.have.callCount(1);
     done();
   });

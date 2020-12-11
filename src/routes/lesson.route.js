@@ -2,7 +2,6 @@ import { Router } from 'express';
 import LessonController from '../controllers/lesson.controller';
 import verifyToken from '../middlewares/auth.middleware';
 import SaveQuizResults from '../validations/results/quizResults.validator';
-// import authRouter from './auth.route';
 
 const router = Router();
 
@@ -19,7 +18,8 @@ router.get(
   verifyToken,
   LessonController.getTestResult,
 );
-// /lessons?searchQuery=Radiaoactivity
 router.get('/', LessonController.searchLessons);
+router.post('/:courseId/:subjectId/subject-lessons', LessonController.getSubjectLessonsAndProgress);
+
 
 export default router;
