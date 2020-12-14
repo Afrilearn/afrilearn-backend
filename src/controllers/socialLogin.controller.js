@@ -1,9 +1,9 @@
 import { OAuth2Client } from 'google-auth-library';
 import { config } from 'dotenv';
+import axios from 'axios';
 import Auth from '../db/models/users.model';
 import Helper from '../utils/user.utils';
 import AuthServices from '../services/auth.services';
-import axios from 'axios';
 
 config();
 /**
@@ -56,7 +56,7 @@ class AuthController {
             user: myUser,
           },
         });
-      }     
+      }
     } catch (err) {
       return res.status(500).json({
         status: '500 Internal server error',
@@ -83,14 +83,14 @@ class AuthController {
           access_token: token,
         },
       });
-      if(data){
+      if (data) {
         const response = {
           email: data.email,
-          fullName: data.last_name+' '+data.first_name,
+          fullName: `${data.last_name} ${data.first_name}`,
           isActivated: true,
           googleUserId: data.id,
         };
-        
+
         let myUser = await AuthServices.emailExist(data.email, res);
 
         // if the user does not have an account
@@ -103,7 +103,7 @@ class AuthController {
           myUser.role,
           myUser.fullName,
         );
-        
+
         return res.status(200).json({
           status: 'success',
           data: {
@@ -111,11 +111,10 @@ class AuthController {
             user: myUser,
           },
         });
-
-      } 
+      }
       return res.status(200).json({
         status: 'success',
-        data
+        data,
       });
     } catch (err) {
       return res.status(500).json({
@@ -124,6 +123,5 @@ class AuthController {
       });
     }
   }
-
 }
 export default AuthController;

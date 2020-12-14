@@ -93,15 +93,18 @@ class ClassController {
         classId: req.body.classId,
         userId: req.body.userId,
       };
-      const newClassMember = await ClassMember.findOneAndUpdate(
+      const classMember = await ClassMember.findOneAndUpdate(
         { ...classMemberData },
         { status: req.body.status },
+        {
+          new: true,
+        },
       );
 
       return res.status(200).json({
         status: 'success',
         data: {
-          classMember: newClassMember,
+          classMember,
         },
       });
     } catch (error) {
