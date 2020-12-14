@@ -58,7 +58,7 @@ describe('Courses ', () => {
   it('should return array of enrolledCourses with status 200', (done) => {
     chai
       .request(app)
-      .post('/api/v1/courses/add-course')
+      .post('/api/v1/courses/enroll')
       .set('token', token)
       .send({ courseId: course_id })
       .end((err, res) => {
@@ -74,7 +74,7 @@ describe('Courses ', () => {
   it('should NOT return array of enrolledCourses with status 400 when data is incomplete', (done) => {
     chai
       .request(app)
-      .post('/api/v1/courses/add-course')
+      .post('/api/v1/courses/enroll')
       .set('token', token)
       .end((err, res) => {
         res.should.have.status(400);
