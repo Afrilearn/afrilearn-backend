@@ -30,6 +30,7 @@ class ClassController {
         courseId: req.body.courseId,
         userId: req.data.id,
         name: req.body.name,
+        classCode,
       };
       const newClass = await ClassModel.create({ ...classData });
 

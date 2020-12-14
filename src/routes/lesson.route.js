@@ -21,5 +21,4 @@ router.get(
 router.get('/', LessonController.searchLessons);
 router.post('/:courseId/:subjectId/subject-lessons', LessonController.getSubjectLessonsAndProgress);
 
-
 export default router;
