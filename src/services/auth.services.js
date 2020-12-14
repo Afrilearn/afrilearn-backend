@@ -28,9 +28,11 @@ export default {
         })
         .populate({
           path: 'recentActivities',
+          select: 'classId lessonId questionId type createdAt',
           model: RecentActivity,
           populate: {
-            path: 'userId classId lessonId questionId',
+            path: 'classId lessonId questionId',
+            select: 'name classCode title videoUrls question',
           },
         });
       return user;
