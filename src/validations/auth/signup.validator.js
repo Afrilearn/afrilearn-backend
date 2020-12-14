@@ -10,10 +10,10 @@ import AuthServices from '../../services/auth.services';
  */
 class SignUp {
   /**
-     * validate user data.
-     * @memberof SignUp
-     * @returns {null} - No response.
-     */
+   * validate user data.
+   * @memberof SignUp
+   * @returns {null} - No response.
+   */
   static validateData() {
     return [
       check('fullName')
