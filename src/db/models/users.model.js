@@ -19,6 +19,9 @@ const UserSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    dateOfBirth: {
+      type: String,
+    },
     country: {
       type: String,
       trim: true,
