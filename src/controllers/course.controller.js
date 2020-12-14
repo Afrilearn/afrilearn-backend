@@ -56,7 +56,7 @@ class CourseController {
         { $inc: { enrollee: 1 } },
       );
       await course
-        .populate({ path: 'courseId', select: 'name' })
+        .populate({ path: 'courseId', select: 'name imageUrl' })
         .execPopulate();
 
       return res.status(200).json({
