@@ -112,7 +112,7 @@ class CourseController {
         courseId: req.params.courseId,
       }).populate({
         path: 'mainSubjectId',
-        select: 'name',
+        select: 'name imageUrl classification -_id',
         model: MainSubject,
       });
       return res.status(200).json({
