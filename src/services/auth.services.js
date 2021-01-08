@@ -14,7 +14,18 @@ export default {
         .populate({
           path: 'enrolledCourses',
           model: EnrolledCourse,
-          populate: { path: 'courseId', select: 'name imageUrl' },
+          populate: {
+            path: 'courseId',
+            select: 'name imageUrl',
+            populate: {
+              path: 'relatedPastQuestions',
+              select: 'pastQuestionTypeId -courseId',
+              populate: {
+                path: 'pastQuestionTypes',
+                select: 'name categoryId',
+              },
+            },
+          },
         })
         .populate({
           path: 'classMembership',

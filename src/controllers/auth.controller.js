@@ -1,8 +1,8 @@
-import Auth from '../db/models/users.model';
-import Helper from '../utils/user.utils';
-import sendEmail from '../utils/email.utils';
-import AuthServices from '../services/auth.services';
-import ResetPassword from '../db/models/resetPassword.model';
+import Auth from "../db/models/users.model";
+import Helper from "../utils/user.utils";
+import sendEmail from "../utils/email.utils";
+import AuthServices from "../services/auth.services";
+import ResetPassword from "../db/models/resetPassword.model";
 
 /**
  *Contains Auth Controller
@@ -21,9 +21,7 @@ class AuthController {
    */
   static async signUp(req, res) {
     try {
-      const {
-        fullName, password, email, role,
-      } = req.body;
+      const { fullName, password, email, role } = req.body;
 
       const encryptpassword = await Helper.encrptPassword(password);
 
@@ -39,10 +37,10 @@ class AuthController {
       const token = await Helper.generateToken(result._id, role, fullName);
 
       const message = `Please verify your email address to complete your Afrilearn Account.<br/>Click the link https://www.myafrilearn.com/?token=${token}`;
-      sendEmail(email, 'Account Activation', message);
+      sendEmail(email, "Account Activation", message);
 
       return res.status(201).json({
-        status: 'success',
+        status: "success",
         data: {
           token,
           user: result,
@@ -50,8 +48,8 @@ class AuthController {
       });
     } catch (err) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error creating new user',
+        status: "500 Internal server error",
+        error: "Error creating new user",
       });
     }
   }
@@ -74,15 +72,15 @@ class AuthController {
       await Auth.findByIdAndUpdate(id, { ...newData });
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
-          message: 'Account activation successful',
+          message: "Account activation successful",
         },
       });
     } catch (err) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error activating user account',
+        status: "500 Internal server error",
+        error: "Error activating user account",
       });
     }
   }
@@ -101,31 +99,31 @@ class AuthController {
 
       if (!user) {
         return res.status(401).json({
-          status: '401 Unauthorized',
-          error: 'Invalid email address',
+          status: "401 Unauthorized",
+          error: "Invalid email address",
         });
       }
 
       const confirmPassword = await Helper.verifyPassword(
         password,
-        user.password,
+        user.password
       );
 
       if (!confirmPassword) {
         return res.status(401).json({
-          status: '401 Unauthorized',
-          error: 'Invalid password',
+          status: "401 Unauthorized",
+          error: "Invalid password",
         });
       }
 
       const token = await Helper.generateToken(
         user.id,
         user.role,
-        user.fullName,
+        user.fullName
       );
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           token,
           user,
@@ -133,8 +131,8 @@ class AuthController {
       });
     } catch (err) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error Logging in user',
+        status: "500 Internal server error",
+        error: "Error Logging in user",
       });
     }
   }
@@ -164,15 +162,15 @@ class AuthController {
 
       await ResetPassword.create({ ...data });
       const message = `Click on the link below to reset your password<br/>Click the link https://www.myafrilearn.com/?token=${token}&email=${email} <br/> Link Expires in 24 hours.`;
-      sendEmail(email, 'Password Reset', message);
+      sendEmail(email, "Password Reset", message);
       return res.status(201).json({
-        status: 'success',
-        message: 'Password reset link sent to your mail',
+        status: "success",
+        message: "Password reset link sent to your mail",
       });
     } catch (err) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error reseting password',
+        status: "500 Internal server error",
+        error: "Error reseting password",
       });
     }
   }
@@ -194,13 +192,13 @@ class AuthController {
       await Auth.findOneAndUpdate({ email }, { ...newData });
 
       return res.status(200).json({
-        status: 'success',
-        message: 'Password changed successfully',
+        status: "success",
+        message: "Password changed successfully",
       });
     } catch (err) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error changing password',
+        status: "500 Internal server error",
+        error: "Error changing password",
       });
     }
   }

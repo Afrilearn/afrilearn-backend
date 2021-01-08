@@ -22,12 +22,19 @@ const courseSchema = new mongoose.Schema(
       default: 0,
     },
   },
-  { timestamps: true },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
+  { timestamps: true },
 );
+
+courseSchema.virtual('relatedPastQuestions', {
+  ref: 'RelatedPastQuestion',
+  localField: '_id',
+  foreignField: 'courseId',
+  justOne: false,
+});
 
 const Course = mongoose.model('course', courseSchema);
 
