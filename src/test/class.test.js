@@ -194,6 +194,40 @@ describe("Classes ", () => {
       });
   });
 
+  it("should create and return an assignedContent with status 200", (done) => {
+    chai
+      .request(app)
+      .post(`/api/v1/classes/${class_id}/assign-content`)
+      .set("token", token)
+      .send({
+        description: "Attemp the last English test again",
+        lessonId: "5fc8e7134bfe993c34a9689c",
+      })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.an("object");
+        res.body.should.have.property("status").eql("success");
+        res.body.should.have.property("data");
+        res.body.data.should.have.property("content");
+        done();
+      });
+  });
+
+  it("should NOT create an assignedContent with status 400 when input is invalid", (done) => {
+    chai
+      .request(app)
+      .post(`/api/v1/classes/${class_id}/assign-content`)
+      .set("token", token)
+      .send({
+        description: "Attemp the last English test again",
+        lessonId: "0",
+      })
+      .end((err, res) => {
+        res.should.have.status(400);
+        done();
+      });
+  });
+
   it("fakes server error", (done) => {
     const req = { body: {} };
     const res = {
@@ -260,6 +294,20 @@ describe("Classes ", () => {
     sinon.stub(res, "status").returnsThis();
 
     ClassController.getClassById(req, res);
+    res.status.should.have.callCount(1);
+    done();
+  });
+
+  it("fakes server error", (done) => {
+    const req = { body: {} };
+    const res = {
+      status() {},
+      send() {},
+    };
+
+    sinon.stub(res, "status").returnsThis();
+
+    ClassController.assignContent(req, res);
     res.status.should.have.callCount(1);
     done();
   });
