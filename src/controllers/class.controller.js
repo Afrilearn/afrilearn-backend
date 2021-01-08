@@ -62,14 +62,17 @@ class ClassController {
         classId: req.body.classId,
         userId: req.data.id,
       };
-      const newClassMember = await ClassMember.create({ ...classMemberData });
+      if (Object.keys(req.body).includes('status')) {
+        classMemberData.status = req.body.status;
+      }
+      const classMember = await ClassMember.create({ ...classMemberData });
 
       return res.status(200).json({
         status: 'success',
         data: {
           message:
             'Your class request was sent, wait for teacher to let you in',
-          classMember: newClassMember,
+          classMember,
         },
       });
     } catch (error) {
