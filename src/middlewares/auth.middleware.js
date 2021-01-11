@@ -4,8 +4,9 @@ import jwt from 'jsonwebtoken';
 const validateToken = (req, res, next) => {
   const { token: headerToken = null } = req.headers;
   const { token: queryToken = null } = req.query;
+ 
   const token = queryToken || headerToken;
-
+  
   if (!token) {
     return res.status(401).json({
       status: '401 Unauthorized',
