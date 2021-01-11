@@ -1,7 +1,7 @@
-import ClassModel from "../db/models/classes.model";
-import ClassMember from "../db/models/classMembers.model";
-import TeacherAssignedContent from "../db/models/teacherAssignedContents.model";
-import Helper from "../utils/user.utils";
+import ClassModel from '../db/models/classes.model';
+import ClassMember from '../db/models/classMembers.model';
+import TeacherAssignedContent from '../db/models/teacherAssignedContents.model';
+import Helper from '../utils/user.utils';
 
 /**
  *Contains Class Controller
@@ -36,15 +36,15 @@ class ClassController {
       const newClass = await ClassModel.create({ ...classData });
 
       return res.status(200).json({
-        status: "success",
+        status: 'success',
         data: {
           class: newClass,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Loading class",
+        status: '500 Internal server error',
+        error: 'Error Loading class',
       });
     }
   }
@@ -63,23 +63,23 @@ class ClassController {
         classId: req.body.classId,
         userId: req.data.id,
       };
-      if (Object.keys(req.body).includes("status")) {
+      if (Object.keys(req.body).includes('status')) {
         classMemberData.status = req.body.status;
       }
       const classMember = await ClassMember.create({ ...classMemberData });
 
       return res.status(200).json({
-        status: "success",
+        status: 'success',
         data: {
           message:
-            "Your class request was sent, wait for teacher to let you in",
+            'Your class request was sent, wait for teacher to let you in',
           classMember,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Loading class",
+        status: '500 Internal server error',
+        error: 'Error Loading class',
       });
     }
   }
@@ -103,19 +103,19 @@ class ClassController {
         { status: req.body.status },
         {
           new: true,
-        }
+        },
       );
 
       return res.status(200).json({
-        status: "success",
+        status: 'success',
         data: {
           classMember,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Loading class",
+        status: '500 Internal server error',
+        error: 'Error Loading class',
       });
     }
   }
@@ -133,19 +133,19 @@ class ClassController {
       const classMembers = await ClassMember.find({
         classId: req.params.classId,
       })
-        .select("userId -_id")
-        .populate("userId", "fullName");
+        .select('userId -_id')
+        .populate('userId', 'fullName');
 
       return res.status(200).json({
-        status: "success",
+        status: 'success',
         data: {
           classMembers,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Loading class",
+        status: '500 Internal server error',
+        error: 'Error Loading class',
       });
     }
   }
@@ -162,15 +162,15 @@ class ClassController {
     try {
       const clazz = await ClassModel.findById(req.params.classId);
       return res.status(200).json({
-        status: "success",
+        status: 'success',
         data: {
           class: clazz,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Loading class",
+        status: '500 Internal server error',
+        error: 'Error Loading class',
       });
     }
   }
@@ -192,15 +192,15 @@ class ClassController {
         lessonId: req.body.lessonId,
       });
       return res.status(200).json({
-        status: "success",
+        status: 'success',
         data: {
           content,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Loading class",
+        status: '500 Internal server error',
+        error: 'Error Loading class',
       });
     }
   }

@@ -32,6 +32,10 @@ const QuizResultsSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'course',
     },
+    subjectId: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'subject',
+    },
     lessonId: {
       type: mongoose.Schema.ObjectId,
       ref: 'lesson',
