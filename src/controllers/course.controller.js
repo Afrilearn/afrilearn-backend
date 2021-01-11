@@ -3,6 +3,7 @@ import Subject from '../db/models/subjects.model';
 import EnrolledCourse from '../db/models/enrolledCourses.model';
 import MainSubject from '../db/models/mainSubjects.model';
 import SubjectProgress from '../db/models/subjectProgresses.model';
+import QuizResult from '../db/models/quizResults.model';
 /**
  *Contains Course Controller
  *
@@ -88,6 +89,92 @@ class CourseController {
         status: 'success',
         data: {
           course,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error Loading course',
+      });
+    }
+  }
+
+  /**
+   * Get progress and performance for a Cousre
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof CourseController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getCourseProgressAndPerformance(req, res) {
+    try {
+      const subjects = await Subject.find({
+        courseId: req.params.courseId,
+      }).populate({
+        path: 'mainSubjectId',
+        select: 'name imageUrl classification -_id',
+        model: MainSubject,
+      });
+      const subjectsList = [];
+      for (let index = 0; index < subjects.length; index++) {
+        const subject = subjects[index];
+
+        /* progress */
+        const subjectProgressData = {
+          userId: req.data.id,
+          courseId: req.params.courseId,
+          subjectId: subject._id,
+        };
+        if (req.body.classId) {
+          subjectProgressData.classId = req.body.classId;
+        }
+        const subjectProgress = await SubjectProgress.find(
+          subjectProgressData,
+        ).countDocuments();
+        /* progress */
+
+        /* performance */
+        const resultCondition = {
+          courseId: '5fc8d2a4b55ab52a40d75a54',
+          subjectId: '5fd304b5a3181bf4ca54f89c',
+        };
+        if (req.body.classId) {
+          resultCondition.classId = req.body.classId;
+        }
+        const results = await QuizResult.find(resultCondition);
+        let totalScore = 0;
+        let totalQuestionsCorrect = 0;
+        let totalQuestions = 0;
+        let totalTimeSpent = 0;
+        results.forEach((result) => {
+          totalScore += result.score;
+          totalQuestionsCorrect += result.numberOfCorrectAnswers;
+          totalQuestions
+            += result.numberOfCorrectAnswers
+            + result.numberOfWrongAnswers
+            + result.numberOfSkippedQuestions;
+          totalTimeSpent += result.timeSpent;
+        });
+        const performance = totalScore / results.length;
+        const averageTimePerTest = totalTimeSpent / results.length;
+        /* performance */
+
+        subjectsList.push({
+          subject: subject.mainSubjectId.name,
+          performance,
+          progress: subjectProgress,
+          totalQuestionsCorrect,
+          totalQuestions,
+          averageTimePerTest,
+        });
+      }
+
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          subjectsList,
+          remark: 'a function of performance',
         },
       });
     } catch (error) {

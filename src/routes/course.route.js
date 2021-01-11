@@ -9,6 +9,11 @@ const router = Router();
 
 router.get('/', CourseController.loadCourses);
 router.get('/:courseId', CourseController.getCourse);
+router.get(
+  '/:courseId/progress-and-performance',
+  validateToken,
+  CourseController.getCourseProgressAndPerformance,
+);
 router.get('/:courseId/subjects', CourseController.getSubjectsForACourse);
 router.post(
   '/enroll',

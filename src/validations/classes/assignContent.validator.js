@@ -1,4 +1,4 @@
-import { check, validationResult } from "express-validator";
+import { check, validationResult } from 'express-validator';
 
 /**
  *Contains AssignContent Validator
@@ -15,16 +15,16 @@ class AssignContent {
    */
   static validateData() {
     return [
-      check("lessonId")
+      check('lessonId')
         .exists()
-        .withMessage("Lesson ID is required")
+        .withMessage('Lesson ID is required')
         .isMongoId()
-        .withMessage("Lesson ID should be a mongoID"),
-      check("description")
+        .withMessage('Lesson ID should be a mongoID'),
+      check('description')
         .exists()
-        .withMessage("Description is required")
+        .withMessage('Description is required')
         .isString()
-        .withMessage("Description should be a String"),
+        .withMessage('Description should be a String'),
     ];
   }
 
@@ -41,8 +41,8 @@ class AssignContent {
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);
       return res.status(400).json({
-        status: "400 Invalid Request",
-        error: "Your request contains invalid parameters",
+        status: '400 Invalid Request',
+        error: 'Your request contains invalid parameters',
         errors: errArr,
       });
     }

@@ -1,22 +1,22 @@
-import chai from "chai";
-import chaiHttp from "chai-http";
-import Sinonchai from "sinon-chai";
-import sinon from "sinon";
-import mongoose from "mongoose";
-import jwt from "jsonwebtoken";
-import app from "../index";
+import chai from 'chai';
+import chaiHttp from 'chai-http';
+import Sinonchai from 'sinon-chai';
+import sinon from 'sinon';
+import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
+import app from '../index';
 // import logger from '../config';
 
-import ClassController from "../controllers/class.controller";
-import ClassMember from "../db/models/classMembers.model";
-import Class from "../db/models/classes.model";
+import ClassController from '../controllers/class.controller';
+import ClassMember from '../db/models/classMembers.model';
+import Class from '../db/models/classes.model';
 
 chai.should();
 chai.use(Sinonchai);
 chai.use(chaiHttp);
 // const { expect } = chai;
 
-describe("Classes ", () => {
+describe('Classes ', () => {
   const user_id = new mongoose.mongo.ObjectId();
   const class_id = new mongoose.mongo.ObjectId();
   const course_id = new mongoose.mongo.ObjectId();
@@ -24,20 +24,20 @@ describe("Classes ", () => {
     {
       data: {
         id: user_id,
-        role: "5fc8cc978e28fa50986ecac9",
-        fullName: "Testing fullName",
+        role: '5fc8cc978e28fa50986ecac9',
+        fullName: 'Testing fullName',
       },
     },
-    process.env.SECRET
+    process.env.SECRET,
   );
 
   before(async () => {
     await Class.create({
       _id: class_id,
       userId: user_id,
-      name: "Primary Testing",
+      name: 'Primary Testing',
       courseId: course_id,
-      classCode: "00000000",
+      classCode: '00000000',
     });
     await ClassMember.create({
       classId: class_id,
@@ -50,177 +50,177 @@ describe("Classes ", () => {
     await Class.findByIdAndDelete(class_id);
   });
 
-  it("should  save an EnrooledClass and return a class with status 200", (done) => {
+  it('should  save an EnrooledClass and return a class with status 200', (done) => {
     chai
       .request(app)
-      .post("/api/v1/classes/add-class")
-      .set("token", token)
+      .post('/api/v1/classes/add-class')
+      .set('token', token)
       .send({
-        name: "Class for testing",
+        name: 'Class for testing',
         courseId: course_id,
-        classCode: "00000000",
+        classCode: '00000000',
       })
       .end((err, res) => {
         res.should.have.status(200);
-        res.body.should.be.an("object");
-        res.body.should.have.property("status").eql("success");
-        res.body.should.have.property("data");
-        res.body.data.should.have.property("class");
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('class');
         done();
       });
   });
 
-  it("should NOT return a class with status 400 when data is incomplete", (done) => {
+  it('should NOT return a class with status 400 when data is incomplete', (done) => {
     chai
       .request(app)
-      .post("/api/v1/classes/add-class")
-      .set("token", token)
+      .post('/api/v1/classes/add-class')
+      .set('token', token)
       .end((err, res) => {
         res.should.have.status(400);
-        res.body.should.be.an("object");
+        res.body.should.be.an('object');
         done();
       });
   });
 
-  it("should return a classMember and message with status 200", (done) => {
+  it('should return a classMember and message with status 200', (done) => {
     chai
       .request(app)
-      .post("/api/v1/classes/send-class-request")
-      .set("token", token)
+      .post('/api/v1/classes/send-class-request')
+      .set('token', token)
       .send({
         classId: class_id,
       })
       .end((err, res) => {
         res.should.have.status(200);
-        res.body.should.be.an("object");
-        res.body.should.have.property("status").eql("success");
-        res.body.should.have.property("data");
-        res.body.data.should.have.property("classMember");
-        res.body.data.should.have.property("message");
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('classMember');
+        res.body.data.should.have.property('message');
         done();
       });
   });
 
-  it("should return a classMember and message with status 200 when it is auto approved", (done) => {
+  it('should return a classMember and message with status 200 when it is auto approved', (done) => {
     chai
       .request(app)
-      .post("/api/v1/classes/send-class-request")
-      .set("token", token)
+      .post('/api/v1/classes/send-class-request')
+      .set('token', token)
       .send({
         classId: class_id,
-        status: "approved",
+        status: 'approved',
       })
       .end((err, res) => {
         res.should.have.status(200);
-        res.body.should.be.an("object");
-        res.body.should.have.property("status").eql("success");
-        res.body.should.have.property("data");
-        res.body.data.should.have.property("classMember");
-        res.body.data.should.have.property("message");
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('classMember');
+        res.body.data.should.have.property('message');
         done();
       });
   });
 
-  it("should NOT return a classMember and message with status 400", (done) => {
+  it('should NOT return a classMember and message with status 400', (done) => {
     chai
       .request(app)
-      .post("/api/v1/classes/send-class-request")
-      .set("token", token)
+      .post('/api/v1/classes/send-class-request')
+      .set('token', token)
       .end((err, res) => {
         res.should.have.status(400);
-        res.body.should.be.an("object");
+        res.body.should.be.an('object');
         done();
       });
   });
 
-  it("should return a classMember with updated status with status 200", (done) => {
+  it('should return a classMember with updated status with status 200', (done) => {
     chai
       .request(app)
-      .patch("/api/v1/classes/accept-reject-class-request")
-      .set("token", token)
+      .patch('/api/v1/classes/accept-reject-class-request')
+      .set('token', token)
       .send({
         classId: class_id,
         userId: user_id,
-        status: "accept",
+        status: 'accept',
       })
       .end((err, res) => {
         res.should.have.status(200);
-        res.body.should.be.an("object");
-        res.body.should.have.property("status").eql("success");
-        res.body.should.have.property("data");
-        res.body.data.should.have.property("classMember");
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('classMember');
         done();
       });
   });
 
-  it("should not return a classMember with updated status if class ID and User ID are not present with status 400", (done) => {
+  it('should not return a classMember with updated status if class ID and User ID are not present with status 400', (done) => {
     chai
       .request(app)
-      .patch("/api/v1/classes/accept-reject-class-request")
-      .set("token", token)
+      .patch('/api/v1/classes/accept-reject-class-request')
+      .set('token', token)
       .end((err, res) => {
         res.should.have.status(400);
-        res.body.should.be.an("object");
+        res.body.should.be.an('object');
         done();
       });
   });
 
-  it("should return a students in a class with status 200", (done) => {
+  it('should return a students in a class with status 200', (done) => {
     chai
       .request(app)
       .get(`/api/v1/classes/${class_id}/students`)
-      .set("token", token)
+      .set('token', token)
       .end((err, res) => {
         res.should.have.status(200);
-        res.body.should.be.an("object");
-        res.body.should.have.property("status").eql("success");
-        res.body.should.have.property("data");
-        res.body.data.should.have.property("classMembers");
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('classMembers');
         done();
       });
   });
 
-  it("should return a class with status 200", (done) => {
+  it('should return a class with status 200', (done) => {
     chai
       .request(app)
       .get(`/api/v1/classes/${class_id}`)
       .end((err, res) => {
         res.should.have.status(200);
-        res.body.should.be.an("object");
-        res.body.should.have.property("status").eql("success");
-        res.body.should.have.property("data");
-        res.body.data.should.have.property("class");
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('class');
         done();
       });
   });
 
-  it("should create and return an assignedContent with status 200", (done) => {
+  it('should create and return an assignedContent with status 200', (done) => {
     chai
       .request(app)
       .post(`/api/v1/classes/${class_id}/assign-content`)
-      .set("token", token)
+      .set('token', token)
       .send({
-        description: "Attemp the last English test again",
-        lessonId: "5fc8e7134bfe993c34a9689c",
+        description: 'Attemp the last English test again',
+        lessonId: '5fc8e7134bfe993c34a9689c',
       })
       .end((err, res) => {
         res.should.have.status(200);
-        res.body.should.be.an("object");
-        res.body.should.have.property("status").eql("success");
-        res.body.should.have.property("data");
-        res.body.data.should.have.property("content");
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('content');
         done();
       });
   });
 
-  it("should NOT create an assignedContent with status 400 when input is invalid", (done) => {
+  it('should NOT create an assignedContent with status 400 when input is invalid', (done) => {
     chai
       .request(app)
       .post(`/api/v1/classes/${class_id}/assign-content`)
-      .set("token", token)
+      .set('token', token)
       .send({
-        description: "Attemp the last English test again",
-        lessonId: "0",
+        description: 'Attemp the last English test again',
+        lessonId: '0',
       })
       .end((err, res) => {
         res.should.have.status(400);
@@ -228,84 +228,84 @@ describe("Classes ", () => {
       });
   });
 
-  it("fakes server error", (done) => {
+  it('fakes server error', (done) => {
     const req = { body: {} };
     const res = {
       status() {},
       send() {},
     };
 
-    sinon.stub(res, "status").returnsThis();
+    sinon.stub(res, 'status').returnsThis();
 
     ClassController.addClass(req, res);
     res.status.should.have.callCount(0);
     done();
   });
 
-  it("fakes server error", (done) => {
+  it('fakes server error', (done) => {
     const req = { body: {} };
     const res = {
       status() {},
       send() {},
     };
 
-    sinon.stub(res, "status").returnsThis();
+    sinon.stub(res, 'status').returnsThis();
 
     ClassController.sendClassRequest(req, res);
     res.status.should.have.callCount(1);
     done();
   });
 
-  it("fakes server error", (done) => {
+  it('fakes server error', (done) => {
     const req = { body: {} };
     const res = {
       status() {},
       send() {},
     };
 
-    sinon.stub(res, "status").returnsThis();
+    sinon.stub(res, 'status').returnsThis();
 
     ClassController.acceptRejectRetractClassRequest(req, res);
     res.status.should.have.callCount(0);
     done();
   });
 
-  it("fakes server error", (done) => {
+  it('fakes server error', (done) => {
     const req = { body: {} };
     const res = {
       status() {},
       send() {},
     };
 
-    sinon.stub(res, "status").returnsThis();
+    sinon.stub(res, 'status').returnsThis();
 
     ClassController.getStudentsInClass(req, res);
     res.status.should.have.callCount(1);
     done();
   });
 
-  it("fakes server error", (done) => {
+  it('fakes server error', (done) => {
     const req = { body: {} };
     const res = {
       status() {},
       send() {},
     };
 
-    sinon.stub(res, "status").returnsThis();
+    sinon.stub(res, 'status').returnsThis();
 
     ClassController.getClassById(req, res);
     res.status.should.have.callCount(1);
     done();
   });
 
-  it("fakes server error", (done) => {
+  it('fakes server error', (done) => {
     const req = { body: {} };
     const res = {
       status() {},
       send() {},
     };
 
-    sinon.stub(res, "status").returnsThis();
+    sinon.stub(res, 'status').returnsThis();
 
     ClassController.assignContent(req, res);
     res.status.should.have.callCount(1);
