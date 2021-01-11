@@ -10,7 +10,7 @@ chai.use(Sinonchai);
 chai.use(chaiHttp);
 // const { expect } = chai;
 
-describe('Classes ', () => {
+describe('SUpport ', () => {
   it('should create a supportRequest with status 200', (done) => {
     chai
       .request(app)
