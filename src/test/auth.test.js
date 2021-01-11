@@ -108,6 +108,18 @@ describe('Auth Route Endpoints', () => {
           done();
         });
     });
+    it('should return available roles and classes', (done) => {
+      chai
+        .request(app)
+        .get('/api/v1/auth/roles')
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('object');
+          res.body.should.have.property('status').eql('success');
+          res.body.should.have.property('data');        
+          done();
+        });
+    });
     it('Should fake server error', (done) => {
       const req = { body: {} };
       const res = {

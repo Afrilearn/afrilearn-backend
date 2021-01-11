@@ -57,4 +57,9 @@ router.post(
   SocialLoginValidator.myValidationResult,
   SocialLoginController.socialLoginFacebook,
 );
+
+router.get(
+  '/roles',
+  AuthController.getRoles,
+);
 export default router;
