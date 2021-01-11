@@ -3,6 +3,8 @@ import Helper from "../utils/user.utils";
 import sendEmail from "../utils/email.utils";
 import AuthServices from "../services/auth.services";
 import ResetPassword from "../db/models/resetPassword.model";
+import Role from "../db/models/roles.model";
+import Course from "../db/models/courses.model";
 
 /**
  *Contains Auth Controller
@@ -194,6 +196,34 @@ class AuthController {
       return res.status(200).json({
         status: "success",
         message: "Password changed successfully",
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error changing password",
+      });
+    }
+  }
+
+  /**
+   * Return Roles and Classes
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async getRoles(req, res) {
+    try {
+     
+      const roles = await Role.find();     
+      const courses = await Course.find(); 
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          roles,
+          courses
+        },
       });
     } catch (err) {
       return res.status(500).json({
