@@ -8,6 +8,7 @@ import app from '../index';
 import Course from '../db/models/courses.model';
 import SubjectProgress from '../db/models/subjectProgresses.model';
 import CourseController from '../controllers/course.controller';
+import PastQuestionQuizResult from '../db/models/pastQuestionQuizResults.model';
 
 chai.should();
 chai.use(Sinonchai);
@@ -21,14 +22,44 @@ const subjectProgress = {
   lessonId: '5fcf78a4a26c8527bc8f423a',
   classId: '5fcf78a4a26c8527bc8f423a',
 };
+const pqResult = {
+  results: [
+    {
+      question_id: '5097',
+      optionSelected: 0,
+      correctOption: 2,
+      status: 'incorrect',
+    },
+    {
+      question_id: '5098',
+      optionSelected: 0,
+      correctOption: 1,
+      status: 'incorrect',
+    },
+  ],
+  userId: '5fd66fb678385d3c8098f880',
+  classId: '5fc8d2a4b55ab52a40d75a54',
+  courseId: '5fd12c70e74b15663c5f4c6e',
+  subjectId: '5fc8e7134bfe993c34a9689c',
+  subjectCategoryId: '113',
+  subjectName: 'Agriculture',
+  pastQuestionCategoryId: '1',
+  pastQuestionTypeId: '5fc8e7134bfe993c34a9689c',
+  timeSpent: '233',
+  numberOfCorrectAnswers: 2,
+  numberOfWrongAnswers: 3,
+  numberOfSkippedQuestions: 2,
+  score: 2,
+  remark: 'You can be better',
+};
 
 describe('Courses ', () => {
   const course_id = new mongoose.mongo.ObjectId();
-  const user_id = new mongoose.mongo.ObjectId();
+
   const token = jwt.sign(
     {
       data: {
-        id: user_id,
+        id: '5fd66fb678385d3c8098f880',
         role: '5fc8cc978e28fa50986ecac9',
         fullName: 'Testing fullName',
       },
@@ -43,6 +74,8 @@ describe('Courses ', () => {
     });
 
     await course.save();
+    const newPqResult = new PastQuestionQuizResult({ ...pqResult });
+    await newPqResult.save();
   });
 
   after(async () => {
@@ -140,8 +173,11 @@ describe('Courses ', () => {
   it('should return subjectsProgress with status 200', (done) => {
     chai
       .request(app)
-      .get(`/api/v1/courses/${course_id}/progress-and-performance`)
+      .get('/api/v1/courses/5fd12c70e74b15663c5f4c6e/progress-and-performance')
       .set('token', token)
+      .send({
+        classId: '5fc8d2a4b55ab52a40d75a54',
+      })
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.an('object');

@@ -19,7 +19,11 @@ const router = Router();
 //   verifyToken,
 //   LessonController.getTestResult,
 // );
-// router.get('/', LessonController.searchLessons);
+// router.get(
+//   "/:courseId/progress-and-performance",
+//   verifyToken,
+//   PastQuestionController.getPastQuestionProgressAndPerformance
+// );
 router.post(
   '/save-past-question-result',
   verifyToken,
