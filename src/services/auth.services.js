@@ -18,11 +18,9 @@ export default {
             path: 'courseId',
             select: 'name imageUrl',
             populate: {
-              path: 'relatedPastQuestions',
-              select: 'pastQuestionTypeId -courseId',
+              path: 'relatedPastQuestions relatedSubjects',
               populate: {
-                path: 'pastQuestionTypes',
-                select: 'name categoryId',
+                path: 'pastQuestionTypes mainSubjectId quizResults',
               },
             },
           },

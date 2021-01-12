@@ -3,6 +3,7 @@ import chaiHttp from 'chai-http';
 import Sinonchai from 'sinon-chai';
 import sinon from 'sinon';
 import sgMail from '@sendgrid/mail';
+import mongoose from 'mongoose';
 import app from '../index';
 import AuthController from '../controllers/auth.controller';
 import Email from '../utils/email.utils';
@@ -10,11 +11,16 @@ import AuthService from '../services/auth.services';
 import Helper from '../utils/user.utils';
 import Auth from '../db/models/users.model';
 import ResetPassword from '../db/models/resetPassword.model';
+import EnrolledCourse from '../db/models/enrolledCourses.model';
+import Course from '../db/models/courses.model';
 
 chai.should();
 chai.use(Sinonchai);
 chai.use(chaiHttp);
 const { expect } = chai;
+
+const user_id = new mongoose.mongo.ObjectId();
+const course_id = new mongoose.mongo.ObjectId();
 
 const incompleteUser = {
   email: 'hackerbay888@gmail.com',
@@ -24,6 +30,7 @@ const invalidEmail = {
   password: '86789789',
 };
 const user = {
+  _id: user_id,
   fullName: 'hackerbay',
   userName: 'jackson',
   email: 'okwuosachijioke56687@gmail.com',
@@ -40,6 +47,14 @@ const changePasswordInvalidCode = {
   email: 'okwuosachijioke56687@gmail.com',
   password: '12345678',
   code: '34534543',
+};
+const enrolledCourseOne = {
+  courseId: '5fc8cfbb81a55b4c3c19737d',
+  userId: user_id,
+};
+const courseOne = {
+  _id: course_id,
+  name: 'JSS2',
 };
 
 let myToken;
@@ -65,6 +80,8 @@ describe('Auth Route Endpoints', () => {
         done();
       }
     });
+    EnrolledCourse.create({ ...enrolledCourseOne });
+    Course.create({ ...courseOne });
   });
   describe('POST api/v1/auth/signup', () => {
     it('should not create account if the user supplies incomplete information', (done) => {
@@ -174,7 +191,9 @@ describe('Auth Route Endpoints', () => {
     it('should not activate account if the user supply invalid token', (done) => {
       chai
         .request(app)
-        .get('/api/v1/auth/activate_account?token=57576576thfcgfnfhfghfghfngfdtrd')
+        .get(
+          '/api/v1/auth/activate_account?token=57576576thfcgfnfhfghfghfngfdtrd',
+        )
         .end((err, res) => {
           res.should.have.status(401);
           res.body.should.be.an('object');
@@ -196,6 +215,12 @@ describe('Auth Route Endpoints', () => {
     });
   });
   describe('POST api/v1/auth/login', () => {
+    before(async () => {
+      await EnrolledCourse.create({
+        userId: user_id,
+        courseId: '5fc8cfbb81a55b4c3c19737d',
+      });
+    });
     it('should not login a user if the user supplies incomplete information', (done) => {
       chai
         .request(app)
@@ -316,6 +341,17 @@ describe('Auth Route Endpoints', () => {
           res.body.should.have.property('message');
           done();
         });
+    });
+    it('Should fake server error', (done) => {
+      const req = { body: {} };
+      const res = {
+        status() {},
+        send() {},
+      };
+      sinon.stub(res, 'status').returnsThis();
+      AuthController.getRoles(req, res);
+      res.status.should.have.callCount(0);
+      done();
     });
     it('Should fake server error', (done) => {
       const req = { body: {} };

@@ -35,6 +35,12 @@ courseSchema.virtual('relatedPastQuestions', {
   foreignField: 'courseId',
   justOne: false,
 });
+courseSchema.virtual('relatedSubjects', {
+  ref: 'subject',
+  localField: '_id',
+  foreignField: 'courseId',
+  justOne: false,
+});
 
 const Course = mongoose.model('course', courseSchema);
 
