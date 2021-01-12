@@ -1,9 +1,14 @@
+import axios from 'axios';
 import Course from '../db/models/courses.model';
 import Subject from '../db/models/subjects.model';
 import EnrolledCourse from '../db/models/enrolledCourses.model';
 import MainSubject from '../db/models/mainSubjects.model';
 import SubjectProgress from '../db/models/subjectProgresses.model';
 import QuizResult from '../db/models/quizResults.model';
+import PastQuestionProgress from '../db/models/pastQuestionProgresses.model';
+import PastQuestionQuizResult from '../db/models/pastQuestionQuizResults.model';
+import RelatedPastQuestion from '../db/models/relatedPastQuestions.model';
+import PastQuestionType from '../db/models/pastQuestionTypes.model';
 /**
  *Contains Course Controller
  *
@@ -109,6 +114,90 @@ class CourseController {
    */
   static async getCourseProgressAndPerformance(req, res) {
     try {
+      /* pq */
+      const relatedPq = await RelatedPastQuestion.find({
+        courseId: req.params.courseId,
+      }).populate({
+        path: 'pastQuestionTypes',
+        select: 'name categoryId',
+        model: PastQuestionType,
+      });
+      const examsList = [];
+      for (
+        let index = 0;
+        index < relatedPq[0].pastQuestionTypes.length;
+        index++
+      ) {
+        const item = relatedPq[0].pastQuestionTypes[index];
+
+        /* Total performance */
+        const pastQuestionResultCondition = {
+          userId: req.data.id,
+          courseId: req.params.courseId,
+        };
+        if (req.body.classId) {
+          pastQuestionResultCondition.classId = req.body.classId;
+        }
+        const pastQuestionResults = await PastQuestionQuizResult.find(
+          pastQuestionResultCondition,
+        );
+        let pqTotalScore = 0;
+        let totalTimeSpentOnQuestion = 0;
+        pastQuestionResults.forEach((result) => {
+          pqTotalScore += result.score;
+          totalTimeSpentOnQuestion += parseInt(result.timeSpent, 10);
+        });
+        const pqPerformance = pqTotalScore / pastQuestionResults.length;
+        const averageTimePerSubject = totalTimeSpentOnQuestion / pastQuestionResults.length;
+        /* Total performance */
+
+        /* subjectIDs */
+        const subjectIds = [];
+        const perSubjectResults = [];
+        pastQuestionResults.forEach((result) => {
+          subjectIds.push(result.subjectCategoryId);
+          perSubjectResults.push({
+            name: result.subjectName,
+            score: result.score,
+          });
+        });
+        /* subjectIDs */
+
+        /* progress */
+        const { data: totalSubjects } = await axios.get(
+          'https://api.exambly.com/adminpanel/v2/getMySubjects/1',
+          {
+            headers: {
+              'Content-type': 'application/json',
+              authorization:
+                'F0c7ljTmi25e7LMIF0Wz01lZlkHX9b57DFTqUHFyWeVOlKAsKR0E5JdBOvdunpqv',
+            },
+          },
+        );
+        const pastQuestionProgressData = {
+          userId: req.data.id,
+          courseId: req.params.courseId,
+        };
+        if (req.body.classId) {
+          pastQuestionProgressData.classId = req.body.classId;
+        }
+        const pqSubjectProgress = await PastQuestionProgress.find({
+          ...pastQuestionProgressData,
+          subjectCategoryId: { $in: subjectIds },
+        }).countDocuments();
+        //   /* progress */
+
+        examsList.push({
+          name: item.name,
+          exam_id: item.categoryId,
+          performance: pqPerformance,
+          averageTimePerSubject,
+          subjectsAttempted: pqSubjectProgress,
+          totalSubjectsCount: totalSubjects.subjects.length,
+          perSubjectResults,
+        });
+      }
+      /* pq */
       const subjects = await Subject.find({
         courseId: req.params.courseId,
       }).populate({
@@ -174,7 +263,7 @@ class CourseController {
         status: 'success',
         data: {
           subjectsList,
-          remark: 'a function of performance',
+          examsList,
         },
       });
     } catch (error) {

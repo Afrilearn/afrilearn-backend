@@ -48,7 +48,7 @@ class PastQuestionController {
 
       req.body.results.forEach((result) => {
         results.push({
-          questionId: result.questionId,
+          questionId: result.question_id,
           optionSelected: result.optionSelected,
           correctOption: result.correctOption,
           status: result.status,
@@ -60,8 +60,10 @@ class PastQuestionController {
         classId: req.body.classId,
         courseId: req.body.courseId,
         subjectId: req.params.subjectId,
-        pastQuestionCategoryId: req.params.pastQuestionCategoryId,
-        pastQuestionTypeId: req.params.pastQuestionTypeId,
+        subjectCategoryId: req.body.subjectCategoryId,
+        subjectName: req.body.subjectName,
+        pastQuestionCategoryId: req.body.pastQuestionCategoryId,
+        pastQuestionTypeId: req.body.pastQuestionTypeId,
         timeSpent: req.body.timeSpent,
         numberOfCorrectAnswers: req.body.numberOfCorrectAnswers,
         numberOfWrongAnswers: req.body.numberOfWrongAnswers,

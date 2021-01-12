@@ -14,6 +14,12 @@ const PastQuestionProgressSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'pastQuestionType',
     },
+    subjectCategoryId: {
+      type: Number, // subject_id on exam platform
+    },
+    pastQuestionCategoryId: {
+      type: Number, // exam_id on exam platform
+    },
     courseId: {
       type: mongoose.Schema.ObjectId,
       ref: 'course',

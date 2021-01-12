@@ -5,8 +5,7 @@ const PastQuestionQuizResultsSchema = new mongoose.Schema(
     results: [
       {
         questionId: {
-          type: mongoose.Schema.ObjectId,
-          ref: 'question',
+          type: Number, // question_id on exam platform
         },
         optionSelected: {
           type: Number,
@@ -36,8 +35,14 @@ const PastQuestionQuizResultsSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'subject',
     },
+    subjectCategoryId: {
+      type: Number, // subject_id on exam platform
+    },
+    subjectName: {
+      type: String, // subject_id on exam platform
+    },
     pastQuestionCategoryId: {
-      type: Number,
+      type: Number, // exam_id on exam platform
     },
     pastQuestionTypeId: {
       type: mongoose.Schema.ObjectId,

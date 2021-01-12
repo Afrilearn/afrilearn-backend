@@ -7,7 +7,7 @@ const pastQuestionTypeSchema = new mongoose.Schema(
       required: true,
     },
     categoryId: {
-      type: String,
+      type: String, // exam_id on exam platform
     },
   },
   {
