@@ -9,6 +9,9 @@ const mainSubjectSchema = new mongoose.Schema(
     imageUrl: {
       type: String,
     },
+    introText: {
+      type: String,
+    },
     classification: {
       type: String,
     },

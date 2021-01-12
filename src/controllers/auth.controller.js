@@ -136,7 +136,6 @@ class AuthController {
           const entr = {
             _id: subject._id,
             name: subject.mainSubjectId.name,
-            imageUrl: subject.mainSubjectId.imageUrl,
             score: 0,
           };
           subject.quizResults.forEach((result) => {
