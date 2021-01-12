@@ -17,11 +17,7 @@ router.post(
   AuthController.signUp,
 );
 
-router.get(
-  '/activate_account',
-  verifyToken,
-  AuthController.activateAccount,
-);
+router.get('/activate_account', verifyToken, AuthController.activateAccount);
 
 router.post(
   '/login',
@@ -58,8 +54,7 @@ router.post(
   SocialLoginController.socialLoginFacebook,
 );
 
-router.get(
-  '/roles',
-  AuthController.getRoles,
-);
+router.patch('/profile-update', verifyToken, AuthController.updateProfile);
+
+router.get('/roles', AuthController.getRoles);
 export default router;
