@@ -1,10 +1,10 @@
-import Auth from "../db/models/users.model";
-import Helper from "../utils/user.utils";
-import sendEmail from "../utils/email.utils";
-import AuthServices from "../services/auth.services";
-import ResetPassword from "../db/models/resetPassword.model";
-import Role from "../db/models/roles.model";
-import Course from "../db/models/courses.model";
+import Auth from '../db/models/users.model';
+import Helper from '../utils/user.utils';
+import sendEmail from '../utils/email.utils';
+import AuthServices from '../services/auth.services';
+import ResetPassword from '../db/models/resetPassword.model';
+import Role from '../db/models/roles.model';
+import Course from '../db/models/courses.model';
 
 /**
  *Contains Auth Controller
@@ -216,21 +216,20 @@ class AuthController {
    */
   static async getRoles(req, res) {
     try {
-     
-      const roles = await Role.find();     
-      const courses = await Course.find(); 
+      const roles = await Role.find();
+      const courses = await Course.find();
 
       return res.status(200).json({
-        status: "success",
+        status: 'success',
         data: {
           roles,
-          courses
+          courses,
         },
       });
     } catch (err) {
       return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error changing password",
+        status: '500 Internal server error',
+        error: 'Error changing password',
       });
     }
   }

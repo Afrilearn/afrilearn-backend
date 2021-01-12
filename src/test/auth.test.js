@@ -116,7 +116,7 @@ describe('Auth Route Endpoints', () => {
           res.should.have.status(200);
           res.body.should.be.an('object');
           res.body.should.have.property('status').eql('success');
-          res.body.should.have.property('data');        
+          res.body.should.have.property('data');
           done();
         });
     });

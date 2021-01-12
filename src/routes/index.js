@@ -7,6 +7,7 @@ import supportRouter from './support.route';
 import recentRouter from './recentActivity.route';
 import subjectRouter from './subject.route';
 import countRouter from './count.route';
+import pastQuestionRouter from './pastQuestion.route';
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use('/subjects', subjectRouter);
 router.use('/supports', supportRouter);
 router.use('/lessons', lessonRouter);
 router.use('/classes', classRouter);
+router.use('/past-questions', pastQuestionRouter);
 
 export default router;
