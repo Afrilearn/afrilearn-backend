@@ -27,7 +27,10 @@ class CourseController {
    */
   static async loadCourses(req, res) {
     try {
-      const courses = await Course.find({});
+      const courses = await Course.find({}).populate({
+        path: 'relatedSubjects',
+        populate: { path: 'mainSubjectId relatedLessons' },
+      });
 
       return res.status(200).json({
         status: 'success',
