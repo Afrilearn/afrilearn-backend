@@ -57,13 +57,9 @@ class CourseController {
   static async addCourseToEnrolledCourses(req, res) {
     try {
       const course = await EnrolledCourse.create({
-        userId: req.data.id,
+        userId: req.body.userId,
         courseId: req.body.courseId,
       });
-      await Course.findOneAndUpdate(
-        { _id: req.body.courseId },
-        { $inc: { enrollee: 1 } },
-      );
       await course
         .populate({ path: 'courseId', select: 'name imageUrl' })
         .execPopulate();
@@ -92,7 +88,10 @@ class CourseController {
    */
   static async getCourse(req, res) {
     try {
-      const course = await Course.findById(req.params.courseId);
+      const course = await Course.findById(req.params.courseId).populate({
+        path: 'relatedSubjects',
+        populate: { path: 'mainSubjectId relatedLessons' },
+      });
       return res.status(200).json({
         status: 'success',
         data: {

@@ -15,11 +15,16 @@ class AddEnrolledCourseValidator {
    */
   static validateData() {
     return [
+      check('userId')
+        .exists()
+        .withMessage('User ID is required')
+        .isMongoId()
+        .withMessage('User ID should be a mongoID'),
       check('courseId')
         .exists()
-        .withMessage('Class ID is required')
+        .withMessage('Course ID is required')
         .isMongoId()
-        .withMessage('Class ID should be a mongoID'),
+        .withMessage('Course ID should be a mongoID'),
     ];
   }
 
