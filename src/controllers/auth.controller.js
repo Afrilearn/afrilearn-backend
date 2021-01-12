@@ -125,12 +125,34 @@ class AuthController {
         user.role,
         user.fullName,
       );
+      const subjectList = [];
+      user.enrolledCourses.forEach((enrolledCourse) => {
+        const courseEntr = {
+          _id: enrolledCourse.courseId._id,
+          name: enrolledCourse.courseId.name,
+          subjects: [],
+        };
+        enrolledCourse.courseId.relatedSubjects.forEach((subject) => {
+          const entr = {
+            _id: subject._id,
+            name: subject.mainSubjectId.name,
+            imageUrl: subject.mainSubjectId.imageUrl,
+            score: 0,
+          };
+          subject.quizResults.forEach((result) => {
+            entr.score += result.score;
+          });
+          courseEntr.subjects.push(entr);
+        });
+        subjectList.push(courseEntr);
+      });
 
       return res.status(200).json({
         status: 'success',
         data: {
           token,
           user,
+          subjectList,
         },
       });
     } catch (err) {

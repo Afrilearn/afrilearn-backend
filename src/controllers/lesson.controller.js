@@ -90,6 +90,7 @@ class LessonController {
         userId: req.data.id,
         classId: req.body.classId,
         courseId: req.body.courseId,
+        subjectId: req.body.subjectId,
         lessonId: req.params.lessonId,
         timeSpent: req.body.timeSpent,
         numberOfCorrectAnswers: req.body.numberOfCorrectAnswers,
