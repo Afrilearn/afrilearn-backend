@@ -4,6 +4,7 @@ import Sinonchai from 'sinon-chai';
 import sinon from 'sinon';
 import sgMail from '@sendgrid/mail';
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
 import app from '../index';
 import AuthController from '../controllers/auth.controller';
 import Email from '../utils/email.utils';
@@ -20,7 +21,19 @@ chai.use(chaiHttp);
 const { expect } = chai;
 
 const user_id = new mongoose.mongo.ObjectId();
+const user_one = new mongoose.mongo.ObjectId();
 const course_id = new mongoose.mongo.ObjectId();
+
+const token = jwt.sign(
+  {
+    data: {
+      id: user_one,
+      role: '5fc8cc978e28fa50986ecac9',
+      fullName: 'Testing fullName',
+    },
+  },
+  process.env.SECRET,
+);
 
 const incompleteUser = {
   email: 'hackerbay888@gmail.com',
@@ -493,6 +506,59 @@ describe('Auth Route Endpoints', () => {
           res.body.should.have.property('error');
           done();
         });
+    });
+  });
+  describe('PATCH api/v1/auth/profile-update', () => {
+    before(async () => {
+      await Auth.create({
+        _id: user_one,
+        role: '5fc8cc978e28fa50986ecac9',
+        fullName: 'Testing fullName',
+        email: 'email@test.com',
+      });
+    });
+
+    after(async () => {
+      await Auth.findByIdAndDelete(user_one);
+    });
+
+    it('should update user profile if user is Authenticated', (done) => {
+      chai
+        .request(app)
+        .patch('/api/v1/auth/profile-update')
+        .set('token', token)
+        .send({ fullName: 'Updated Name' })
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.an('object');
+          res.body.should.have.property('status').eql('success');
+          res.body.should.have.property('user');
+          done();
+        });
+    });
+
+    it('should NOT update user profile if update is Invalid', (done) => {
+      chai
+        .request(app)
+        .patch('/api/v1/auth/profile-update')
+        .set('token', token)
+        .send({ password: 'Updated Name' })
+        .end((err, res) => {
+          res.should.have.status(400);
+          done();
+        });
+    });
+
+    it('Should fake server error', (done) => {
+      const req = { body: {} };
+      const res = {
+        status() {},
+        send() {},
+      };
+      sinon.stub(res, 'status').returnsThis();
+      AuthController.updateProfile(req, res);
+      res.status.should.have.callCount(1);
+      done();
     });
   });
 });

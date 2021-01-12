@@ -229,6 +229,49 @@ class AuthController {
   }
 
   /**
+   * Update Profile
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async updateProfile(req, res) {
+    const updates = Object.keys(req.body);
+    const allowedUpdates = [
+      'fullName',
+      'phoneNumber',
+      'dateOfBirth',
+      'country',
+      'state',
+      'role',
+    ];
+    const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
+    if (!isValidOperation) {
+      return res.status(400).json({
+        status: '400 Invalid Updates',
+        error: 'Error updating profile',
+      });
+    }
+    try {
+      const user = await Auth.findOne({ _id: req.data.id });
+      updates.forEach((update) => {
+        user[update] = req.body[update];
+      });
+      await user.save();
+      return res.status(200).json({
+        status: 'success',
+        message: 'Profile Updated successfully',
+        user,
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error updating profile',
+      });
+    }
+  }
+
+  /**
    * Return Roles and Classes
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
