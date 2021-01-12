@@ -1,16 +1,16 @@
 import { check, validationResult } from 'express-validator';
 
 /**
- *Contains SaveQuizResults Validator
+ *Contains SavePastQuestionResults Validator
  *
  *
  *
- * @class SaveQuizResults
+ * @class SavePastQuestionResults
  */
-class SaveQuizResults {
+class SavePastQuestionResults {
   /**
-   * validate SaveQuizResults data.
-   * @memberof SaveQuizResults
+   * validate SavePastQuestionResults data.
+   * @memberof SavePastQuestionResults
    * @returns {null} - No response.
    */
   static validateData() {
@@ -28,16 +28,26 @@ class SaveQuizResults {
         .withMessage('User ID is required')
         .isMongoId()
         .withMessage('User ID should be a mongoID'),
+      check('subjectId')
+        .exists()
+        .withMessage('Subbject ID is required')
+        .isMongoId()
+        .withMessage('Subbject ID should be a mongoID'),
       check('courseId')
         .exists()
         .withMessage('Course ID is required')
         .isMongoId()
         .withMessage('Course ID should be a mongoID'),
-      check('lessonId')
+      check('pastQuestionCategoryId')
         .exists()
-        .withMessage('Lesson ID is required')
+        .withMessage('Past Question Category ID is required')
+        .isInt()
+        .withMessage('Past Question Category ID should be a number'),
+      check('pastQuestionTypeId')
+        .exists()
+        .withMessage('Past Question Type ID is required')
         .isMongoId()
-        .withMessage('Lesson ID should be a mongoID'),
+        .withMessage('Past Question Type ID should be a mongoID'),
       check('timeSpent')
         .exists()
         .withMessage('Time spent is required')
@@ -82,7 +92,7 @@ class SaveQuizResults {
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
    * @param {Response} next - The next parameter.
-   * @memberof SaveQuizResults
+   * @memberof SavePastQuestionResults
    * @returns {JSON} - A JSON success response.
    */
   static async myValidationResult(req, res, next) {
@@ -98,4 +108,4 @@ class SaveQuizResults {
     return next();
   }
 }
-export default SaveQuizResults;
+export default SavePastQuestionResults;
