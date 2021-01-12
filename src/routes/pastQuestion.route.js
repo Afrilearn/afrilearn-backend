@@ -2,6 +2,7 @@ import { Router } from 'express';
 import PastQuestionController from '../controllers/pastQuestion.countroller';
 import verifyToken from '../middlewares/auth.middleware';
 import AddPastQuestionProgressValidator from '../validations/pastQuestions/addPastQuestionsProgress.validator';
+import SavePastQuestionResults from '../validations/results/pastQuestionResults.validator';
 
 const router = Router();
 
@@ -19,6 +20,13 @@ const router = Router();
 //   LessonController.getTestResult,
 // );
 // router.get('/', LessonController.searchLessons);
+router.post(
+  '/save-past-question-result',
+  verifyToken,
+  SavePastQuestionResults.validateData(),
+  SavePastQuestionResults.myValidationResult,
+  PastQuestionController.savePastQuestionResult,
+);
 router.post(
   '/add-progress',
   verifyToken,
