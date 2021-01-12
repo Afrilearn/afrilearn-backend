@@ -17,7 +17,6 @@ router.get(
 router.get('/:courseId/subjects', CourseController.getSubjectsForACourse);
 router.post(
   '/enroll',
-  validateToken,
   AddEnrolledCourseValidator.validateData(),
   AddEnrolledCourseValidator.myValidationResult,
   CourseController.addCourseToEnrolledCourses,
