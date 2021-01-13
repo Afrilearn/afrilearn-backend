@@ -21,6 +21,42 @@ class PaymentController {
    *
    */
   static async verifyPayment(req, res) {
+    /* It is a good idea to log all events received. Add code *
+     * here to log the signature and body to db or file       */
+
+    // retrieve the signature from the header
+    const hash = req.headers['verif-hash'];
+
+    if (!hash) {
+      // discard the request,only a post with the right Flutterwave signature
+      // header gets our attention
+      return res.status(401).json({
+        status: '401 wrong signature',
+        error: 'Hash not found',
+      });
+    }
+
+    // Get signature stored as env variable on your server
+    const secret_hash = process.env.MY_HASH;
+
+    // check if signatures match
+
+    if (hash !== secret_hash) {
+      // silently exit, or check that you are passing the right hash on your server.
+      return res.status(404).json({
+        status: '404 hash not found',
+        error: 'Hash is not a match',
+      });
+    }
+
+    // Retrieve the request's body
+    // var request_json = JSON.parse(request.body);
+
+    // Give value to your customer but don't give any output
+    // Remember that this is a call from rave's servers and
+    // Your customer is not seeing the response here at all
+
+    // response.send(200);
     try {
       if (req.body.data.status !== 'successful') {
         return res.status(500).json({
