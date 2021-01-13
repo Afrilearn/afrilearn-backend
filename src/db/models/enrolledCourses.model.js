@@ -18,10 +18,6 @@ const EnrolledCourseSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'course',
     },
-    duration: {
-      type: Number,
-      default: 0,
-    },
     startDate: {
       type: Date,
       default: Date.now(),
