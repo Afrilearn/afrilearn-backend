@@ -276,5 +276,46 @@ class AuthController {
       });
     }
   }
+
+   /**
+   * Load user.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async loadUser(req, res) {
+    try {
+      const owner = await AuthServices.getEmail(req.data.id, res);
+      const roles = await Role.find();
+      const courses = await Course.find();
+      if (!owner) {
+        return res.status(404).json({
+          status: '400 Not found',
+          error: 'User does not exist',
+        });
+      }     
+      const user = await AuthServices.emailExist(owner.email, res);   
+      const token = await Helper.generateToken(
+        user._id,
+        user.role,
+        user.fullName,
+      );
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          token,
+          user,
+          roles,
+          courses,
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error Loading user',
+      });
+    }
+  }
 }
 export default AuthController;

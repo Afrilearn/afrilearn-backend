@@ -57,4 +57,5 @@ router.post(
 router.patch('/profile-update', verifyToken, AuthController.updateProfile);
 
 router.get('/roles', AuthController.getRoles);
+router.get('/load-user', verifyToken, AuthController.loadUser);
 export default router;

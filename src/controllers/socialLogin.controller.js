@@ -24,10 +24,10 @@ class AuthController {
   static async socialLoginGoogle(req, res) {
     try {
       const { token } = req.body;
-      const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID2);
+      const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
       const ticket = await client.verifyIdToken({
         idToken: token,
-        audience: process.env.GOOGLE_CLIENT_ID2,
+        audience: process.env.GOOGLE_CLIENT_ID,
       });
       if (ticket) {
         const payload = ticket.getPayload();
