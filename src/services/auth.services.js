@@ -50,7 +50,7 @@ export default {
   async getEmail(id, res) {
     try {
       const condition = {
-        _id:id,
+        _id: id,
       };
       const user = await Auth.findOne(condition);
       return user;

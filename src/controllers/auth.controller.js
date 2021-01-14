@@ -277,7 +277,7 @@ class AuthController {
     }
   }
 
-   /**
+  /**
    * Load user.
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
@@ -294,8 +294,8 @@ class AuthController {
           status: '400 Not found',
           error: 'User does not exist',
         });
-      }     
-      const user = await AuthServices.emailExist(owner.email, res);   
+      }
+      const user = await AuthServices.emailExist(owner.email, res);
       const token = await Helper.generateToken(
         user._id,
         user.role,

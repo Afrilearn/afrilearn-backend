@@ -1,8 +1,8 @@
-import moment from "moment";
+import moment from 'moment';
 
-import EnrolledCourse from "../db/models/enrolledCourses.model";
-import PaymentPlan from "../db/models/paymentPlans.model";
-import Transaction from "../db/models/transaction.model";
+import EnrolledCourse from '../db/models/enrolledCourses.model';
+import PaymentPlan from '../db/models/paymentPlans.model';
+import Transaction from '../db/models/transaction.model';
 
 /**
  *Contains Payment Controller
@@ -25,14 +25,14 @@ class PaymentController {
      * here to log the signature and body to db or file       */
 
     // retrieve the signature from the header
-    const hash = req.headers["verif-hash"];
+    const hash = req.headers['verif-hash'];
 
     if (!hash) {
       // discard the request,only a post with the right Flutterwave signature
       // header gets our attention
       return res.status(401).json({
-        status: "401 wrong signature",
-        error: "Hash not found",
+        status: '401 wrong signature',
+        error: 'Hash not found',
       });
     }
 
@@ -44,8 +44,8 @@ class PaymentController {
     if (hash !== secret_hash) {
       // silently exit, or check that you are passing the right hash on your server.
       return res.status(404).json({
-        status: "404 hash not found",
-        error: "Hash is not a match",
+        status: '404 hash not found',
+        error: 'Hash is not a match',
       });
     }
 
@@ -58,66 +58,66 @@ class PaymentController {
 
     // response.send(200);
     try {
-      if (req.body.data.status !== "successful") {
+      if (req.body.data.status !== 'successful') {
         return res.status(500).json({
-          status: "500 Internal server error",
-          error: "Unsuccesful Payment",
+          status: '500 Internal server error',
+          error: 'Unsuccesful Payment',
         });
       }
       // check if an equivalent payment ref exists
       const ref = await Transaction.findOne({
         tx_ref: req.body.data.tx_ref,
-      }).populate({ path: "paymentPlanId", model: PaymentPlan });
+      }).populate({ path: 'paymentPlanId', model: PaymentPlan });
       if (!ref) {
         return res.status(404).json({
-          status: "404 Payment Ref not found",
-          error: "Error Loading Payment Ref",
+          status: '404 Payment Ref not found',
+          error: 'Error Loading Payment Ref',
         });
       }
 
       // update enrolled course; status, startDate and endDate
-      const startdate = moment().format("DD-MM-YYYY");
-      const endDate = moment(startdate, "DD-MM-YYYY")
-        .add(ref.paymentPlanId.duration, "months")
+      const startdate = moment().format('DD-MM-YYYY');
+      const endDate = moment(startdate, 'DD-MM-YYYY')
+        .add(ref.paymentPlanId.duration, 'months')
         .toDate();
 
       const enrolledCourse = await EnrolledCourse.findOne({
         _id: ref.enrolledCourseId,
       });
-      await enrolledCourse.update({ status: "paid", startdate, endDate });
+      await enrolledCourse.update({ status: 'paid', startdate, endDate });
 
       return res.status(200).json({
-        status: "success",
+        status: 'success',
         enrolledCourse,
       });
     } catch (error) {
       return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Loading class",
+        status: '500 Internal server error',
+        error: 'Error Loading class',
       });
     }
   }
 
   /**
-   * Get Student payment plans
+   * Get payment plans
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
    * @memberof PaymentController
    * @returns {JSON} - A JSON success response.
    *
    */
-  static async getStudentPlans(req, res) {
+  static async getPaymentPlans(req, res) {
     try {
-      const studentPlans = await PaymentPlan.find({ category: "student" });
+      const paymentPlans = await PaymentPlan.find({});
 
       return res.status(200).json({
-        status: "success",
-        studentPlans,
+        status: 'success',
+        paymentPlans,
       });
     } catch (error) {
       return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Loading class",
+        status: '500 Internal server error',
+        error: 'Error Loading class',
       });
     }
   }
