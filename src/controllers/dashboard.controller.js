@@ -21,84 +21,93 @@ class DashboardController {
    */
   static async getUserDashboard(req, res) {
     try {
-      const enrolledCourse = await EnrolledCourse.find({
-        _id: req.body.enrolledCourseId,
-        userId: req.data.id,
-      }).populate({
-        path: 'courseId',
-        populate: {
-          path: 'relatedPastQuestions relatedSubjects',
-          populate: {
-            path: 'pastQuestionTypes mainSubjectId quizResults relatedLessons',
-          },
-        },
-      });
-
       const classMembership = await ClassMember.find({ userId: req.data.id });
       const recentActivities = await RecentActivity.find({
         userId: req.data.id,
       });
-
-      const subjectsList = [];
-      for (
-        let index = 0;
-        index < enrolledCourse[0].courseId.relatedSubjects.length;
-        index++
-      ) {
-        const subject = enrolledCourse[0].courseId.relatedSubjects[index];
-
-        /* progress */
-        const subjectProgressData = {
+      const data = {
+        classMembership,
+        recentActivities,
+      };
+      if (req.body.enrolledCourseId) {
+        const enrolledCourse = await EnrolledCourse.find({
+          _id: req.body.enrolledCourseId,
           userId: req.data.id,
-          courseId: enrolledCourse[0].courseId._id,
-          subjectId: subject._id,
-        };
-        const subjectProgress = await SubjectProgress.find(
-          subjectProgressData,
-        ).countDocuments();
-        /* progress */
-
-        /* performance */
-        const resultCondition = {
-          courseId: enrolledCourse[0].courseId._id,
-          subjectId: subject._id,
-        };
-        const results = await QuizResult.find(resultCondition);
-        let totalScore = 0;
-        let totalQuestionsCorrect = 0;
-        let totalQuestions = 0;
-        let totalTimeSpent = 0;
-        results.forEach((result) => {
-          totalScore += result.score;
-          totalQuestionsCorrect += result.numberOfCorrectAnswers;
-          totalQuestions
-            += result.numberOfCorrectAnswers
-            + result.numberOfWrongAnswers
-            + result.numberOfSkippedQuestions;
-          totalTimeSpent += result.timeSpent;
+        }).populate({
+          path: 'courseId',
+          populate: {
+            path: 'relatedPastQuestions relatedSubjects',
+            populate: {
+              path:
+                'pastQuestionTypes mainSubjectId quizResults relatedLessons',
+            },
+          },
         });
-        const performance = totalScore / results.length;
-        const averageTimePerTest = totalTimeSpent / results.length;
-        /* performance */
 
-        subjectsList.push({
-          subject: subject.mainSubjectId.name,
-          performance,
-          progress: subjectProgress,
-          totalQuestionsCorrect,
-          totalQuestions,
-          averageTimePerTest,
-        });
+        const subjectsList = [];
+        for (
+          let index = 0;
+          index < enrolledCourse[0].courseId.relatedSubjects.length;
+          index++
+        ) {
+          const subject = enrolledCourse[0].courseId.relatedSubjects[index];
+
+          /* progress */
+          const subjectProgressData = {
+            userId: req.data.id,
+            courseId: enrolledCourse[0].courseId._id,
+            subjectId: subject._id,
+          };
+          const subjectProgress = await SubjectProgress.find(
+            subjectProgressData,
+          ).countDocuments();
+          /* progress */
+
+          /* performance */
+          const resultCondition = {
+            courseId: enrolledCourse[0].courseId._id,
+            subjectId: subject._id,
+          };
+          const results = await QuizResult.find(resultCondition);
+          let totalScore = 0;
+          let totalQuestionsCorrect = 0;
+          let totalQuestions = 0;
+          let totalTimeSpent = 0;
+          results.forEach((result) => {
+            totalScore += result.score;
+            totalQuestionsCorrect += result.numberOfCorrectAnswers;
+            totalQuestions
+              += result.numberOfCorrectAnswers
+              + result.numberOfWrongAnswers
+              + result.numberOfSkippedQuestions;
+            totalTimeSpent += result.timeSpent;
+          });
+          const performance = totalScore / results.length;
+          const averageTimePerTest = totalTimeSpent / results.length;
+          /* performance */
+
+          subjectsList.push({
+            subject: subject.mainSubjectId.name,
+            performance,
+            progress: subjectProgress,
+            totalQuestionsCorrect,
+            totalQuestions,
+            averageTimePerTest,
+          });
+        }
+        data.enrolledCourse = enrolledCourse;
+        data.subjectsList = subjectsList;
       }
 
       return res.status(200).json({
         status: 'success',
-        data: {
-          enrolledCourse,
-          classMembership,
-          recentActivities,
-          subjectsList,
-        },
+        // data: {
+        //   enrolledCourse,
+        //   classMembership,
+        //   recentActivities,
+        //   subjectsList,
+        // },
+        data,
       });
     } catch (error) {
       return res.status(500).json({

@@ -1,15 +1,12 @@
 import { Router } from 'express';
 import DashboardController from '../controllers/dashboard.controller';
 import validateToken from '../middlewares/auth.middleware';
-import GetUserDashboard from '../validations/dashboard/getUserDashboard.validator';
 
 const router = Router();
 
 router.get(
   '/',
   validateToken,
-  GetUserDashboard.validateData(),
-  GetUserDashboard.myValidationResult,
   DashboardController.getUserDashboard,
 );
 // router.get('/:courseId', CourseController.getCourse);
