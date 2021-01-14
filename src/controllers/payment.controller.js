@@ -135,6 +135,30 @@ class PaymentController {
       });
     }
   }
+
+  /**
+   * Add transaction
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof PaymentController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async addTransaction(req, res) {
+    try {
+      const transaction = await Transaction.create(req.body);
+
+      return res.status(201).json({
+        status: "success",
+        transaction,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error saving transaction",
+      });
+    }
+  }
   //   }
 }
 export default PaymentController;
