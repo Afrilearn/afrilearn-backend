@@ -96,18 +96,6 @@ describe('Dashboard ', () => {
       });
   });
 
-  it('should NOT return an object containing user data when input is invalid', (done) => {
-    chai
-      .request(app)
-      .get('/api/v1/dashboard')
-      .set('token', token)
-      .send({ enrolledCourseId: 'enrolled_course_id' })
-      .end((err, res) => {
-        res.should.have.status(400);
-        done();
-      });
-  });
-
   it('fakes server error', (done) => {
     const req = { body: {} };
     const res = {

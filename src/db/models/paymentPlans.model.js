@@ -12,8 +12,8 @@ const PaymentPlanSchema = new mongoose.Schema(
       type: Number,
     },
     category: {
-      type: String,
-      enum: ['student', 'teacher'],
+      type: mongoose.Schema.ObjectId,
+      ref: 'role',
     },
   },
   {

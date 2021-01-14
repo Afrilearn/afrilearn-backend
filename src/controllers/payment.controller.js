@@ -108,7 +108,7 @@ class PaymentController {
    */
   static async getPaymentPlans(req, res) {
     try {
-      const paymentPlans = await PaymentPlan.find({});
+      const paymentPlans = await PaymentPlan.find({}).populate('category');
 
       return res.status(200).json({
         status: 'success',
