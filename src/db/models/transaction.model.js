@@ -5,6 +5,10 @@ const TransactionSchema = new mongoose.Schema(
     tx_ref: {
       type: String,
     },
+    status: {
+      type: String,
+      enum: ['pending', 'successful', 'failed'],
+    },
     userId: {
       type: mongoose.Schema.ObjectId,
       ref: 'user',
