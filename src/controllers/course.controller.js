@@ -115,7 +115,7 @@ class CourseController {
    *
    */
   static async getCourseProgressAndPerformance(req, res) {
-    try { 
+    try {
       /* pq */
       const relatedPq = await RelatedPastQuestion.find({
         courseId: req.params.courseId,
