@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node -r esm src/",
     "dev": "nodemon -r esm src/",
-    "test": "nyc --reporter=html --reporter=text mocha src/**/*.test.js -r esm  --timeout 90000  --recursive --exit",
+    "test": "env-cmd ./test.env nyc --reporter=html --reporter=text mocha src/**/*.test.js -r esm  --timeout 90000  --recursive --exit",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "lint": "eslint src/**/* --ext js --fix --ignore-pattern src/logs/*"
   },
@@ -29,7 +29,7 @@
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "coveralls": "^3.1.0",
-    "dotenv": "^8.2.0",
+    "env-cmd": "^8.0.2",
     "esm": "^3.2.25",
     "express": "^4.17.1",
     "express-validator": "^6.6.1",
@@ -46,6 +46,7 @@
     "babel-eslint": "^10.1.0",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
+    "dotenv": "^8.2.0",
     "eslint": "^7.14.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-config-prettier": "^6.11.0",

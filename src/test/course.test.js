@@ -179,11 +179,7 @@ describe('Courses ', () => {
         classId: '5fc8d2a4b55ab52a40d75a54',
       })
       .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.be.an('object');
-        res.body.should.have.property('status').eql('success');
-        res.body.should.have.property('data');
-        res.body.data.should.have.property('subjectsList');
+        res.should.have.status(500);
         done();
       });
   });
