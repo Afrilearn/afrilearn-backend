@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const PaymentPlanSchema = new mongoose.Schema(
   {
@@ -13,16 +13,16 @@ const PaymentPlanSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      enum: ["student", "teacher"],
+      enum: ['student', 'teacher'],
     },
   },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-const PaymentPlan = mongoose.model("paymentPlan", PaymentPlanSchema);
+const PaymentPlan = mongoose.model('paymentPlan', PaymentPlanSchema);
 
 export default PaymentPlan;

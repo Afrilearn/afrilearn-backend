@@ -561,7 +561,7 @@ describe('Auth Route Endpoints', () => {
       done();
     });
   });
-  describe('GET api/v1/auth/load-user', () => {    
+  describe('GET api/v1/auth/load-user', () => {
     it('should not load a user if there is no token', (done) => {
       chai
         .request(app)
