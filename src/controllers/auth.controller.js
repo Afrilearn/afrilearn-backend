@@ -287,7 +287,8 @@ class AuthController {
   static async loadUser(req, res) {
     try {
       const owner = await AuthServices.getEmail(req.data.id, res);
-      
+      const roles = await Role.find();
+      const courses = await Course.find();
       if (!owner) {
         return res.status(404).json({
           status: '400 Not found',
@@ -300,33 +301,13 @@ class AuthController {
         user.role,
         user.fullName,
       );
-      const subjectList = [];
-      user.enrolledCourses.forEach((enrolledCourse) => {
-        const courseEntr = {
-          _id: enrolledCourse.courseId._id,
-          name: enrolledCourse.courseId.name,
-          subjects: [],
-        };
-        // enrolledCourse.courseId.relatedSubjects.forEach((subject) => {
-        //   const entr = {
-        //     _id: subject._id,
-        //     name: subject.mainSubjectId.name,
-        //     score: 0,
-        //   };
-        //   subject.quizResults.forEach((result) => {
-        //     entr.score += result.score;
-        //   });
-        //   courseEntr.subjects.push(entr);
-        // });
-        subjectList.push(courseEntr);
-      });
-
       return res.status(200).json({
         status: 'success',
         data: {
           token,
           user,
-          subjectList,
+          roles,
+          courses,
         },
       });
     } catch (err) {
