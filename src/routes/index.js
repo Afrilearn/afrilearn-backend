@@ -9,6 +9,7 @@ import subjectRouter from './subject.route';
 import countRouter from './count.route';
 import pastQuestionRouter from './pastQuestion.route';
 import paymentRouter from './payment.route';
+import dashboardRouter from './dashboard.route';
 
 const router = Router();
 
@@ -21,6 +22,7 @@ router.use('/supports', supportRouter);
 router.use('/lessons', lessonRouter);
 router.use('/classes', classRouter);
 router.use('/past-questions', pastQuestionRouter);
+router.use('/dashboard', dashboardRouter);
 router.use('/payments', paymentRouter);
 
 export default router;

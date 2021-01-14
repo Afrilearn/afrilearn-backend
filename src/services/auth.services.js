@@ -1,8 +1,6 @@
 import Auth from '../db/models/users.model';
 import EnrolledCourse from '../db/models/enrolledCourses.model';
 import ResetPassword from '../db/models/resetPassword.model';
-import ClassMembers from '../db/models/classMembers.model';
-import RecentActivity from '../db/models/recentActivities.model';
 
 export default {
   async emailExist(email, res) {
@@ -10,40 +8,15 @@ export default {
       const condition = {
         email,
       };
-      const user = await Auth.findOne(condition)
-        .populate({
-          path: 'enrolledCourses',
-          model: EnrolledCourse,
-          populate: {
-            path: 'courseId',
-            select: 'name imageUrl',
-            populate: {
-              path: 'relatedPastQuestions relatedSubjects',
-              populate: {
-                path: 'pastQuestionTypes mainSubjectId quizResults',
-              },
-            },
-          },
-        })
-        .populate({
-          path: 'classMembership',
-          select: '_id status',
-          model: ClassMembers,
-          populate: {
-            path: 'classId',
-            select: 'name classCode',
-            populate: { path: 'courseId', select: 'name imageUrl' },
-          },
-        })
-        .populate({
-          path: 'recentActivities',
-          select: 'classId lessonId questionId type createdAt',
-          model: RecentActivity,
-          populate: {
-            path: 'classId lessonId questionId',
-            select: 'name classCode title videoUrls question',
-          },
-        });
+      const user = await Auth.findOne(condition).populate({
+        path: 'enrolledCourses',
+        model: EnrolledCourse,
+        populate: {
+          path: 'courseId',
+          select: 'name imageUrl',
+        },
+      });
+
       return user;
     } catch (err) {
       return res.status(500).json({
