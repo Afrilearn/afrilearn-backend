@@ -14,6 +14,7 @@ const TransactionSchema = new mongoose.Schema(
     status: {
       type: String,
       enum: ["pending", "successful", "failed"],
+      default: "pending",
     },
     userId: {
       type: mongoose.Schema.ObjectId,
