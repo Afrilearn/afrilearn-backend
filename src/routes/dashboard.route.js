@@ -4,7 +4,7 @@ import validateToken from '../middlewares/auth.middleware';
 
 const router = Router();
 
-router.get(
+router.post(
   '/',
   validateToken,
   DashboardController.getUserDashboard,
