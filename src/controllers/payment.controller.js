@@ -59,32 +59,46 @@ class PaymentController {
     // response.send(200);
     try {
       if (req.body.data.status !== 'successful') {
+        const ref = await Transaction.findOneAndUpdate(
+          {
+            tx_ref: req.body.data.tx_ref,
+          },
+          { status: req.body.data.status },
+          { new: true },
+        ).populate('paymentPlanId');
         return res.status(500).json({
+          ref,
           status: '500 Internal server error',
           error: 'Unsuccesful Payment',
         });
       }
       // check if an equivalent payment ref exists
-      const ref = await Transaction.findOne({
-        tx_ref: req.body.data.tx_ref,
-      }).populate({ path: 'paymentPlanId', model: PaymentPlan });
+      const ref = await Transaction.findOneAndUpdate(
+        {
+          tx_ref: req.body.data.tx_ref,
+        },
+        { status: 'successful' },
+        { new: true },
+      ).populate('paymentPlanId');
       if (!ref) {
         return res.status(404).json({
           status: '404 Payment Ref not found',
           error: 'Error Loading Payment Ref',
         });
       }
-
       // update enrolled course; status, startDate and endDate
       const startdate = moment().format('DD-MM-YYYY');
       const endDate = moment(startdate, 'DD-MM-YYYY')
         .add(ref.paymentPlanId.duration, 'months')
         .toDate();
-
-      const enrolledCourse = await EnrolledCourse.findOne({
-        _id: ref.enrolledCourseId,
-      });
-      await enrolledCourse.update({ status: 'paid', startdate, endDate });
+      const enrolledCourse = await EnrolledCourse.findOneAndUpdate(
+        {
+          _id: ref.enrolledCourseId,
+        },
+        { status: 'paid', startdate, endDate },
+        { new: true },
+      );
+      // await enrolledCourse.update({ status: "paid", startdate, endDate });
 
       return res.status(200).json({
         status: 'success',
@@ -93,7 +107,7 @@ class PaymentController {
     } catch (error) {
       return res.status(500).json({
         status: '500 Internal server error',
-        error: 'Error Loading class',
+        error: 'Error Verifying payment',
       });
     }
   }
