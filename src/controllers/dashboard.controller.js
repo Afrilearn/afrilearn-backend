@@ -2,6 +2,7 @@ import ClassMember from '../db/models/classMembers.model';
 import EnrolledCourse from '../db/models/enrolledCourses.model';
 import QuizResult from '../db/models/quizResults.model';
 import RecentActivity from '../db/models/recentActivities.model';
+import Recommendation from '../db/models/recommendation.model';
 import SubjectProgress from '../db/models/subjectProgresses.model';
 /**
  *Contains Dashboard Controller
@@ -25,9 +26,15 @@ class DashboardController {
       const recentActivities = await RecentActivity.find({
         userId: req.data.id,
       });
+      const recommendation = await Recommendation.find({
+        userId: req.data.id,
+      })
+        .populate({ path: 'reason', select: 'title' })
+        .populate({ path: 'recommended', select: 'title videoUrls' });
       const data = {
         classMembership,
         recentActivities,
+        recommendation,
       };
       if (req.body.enrolledCourseId) {
         const enrolledCourse = await EnrolledCourse.findOne({
@@ -112,7 +119,7 @@ class DashboardController {
     } catch (error) {
       return res.status(500).json({
         status: '500 Internal server error',
-        error: 'Error Loading counts',
+        error: 'Error Loading Dashboard',
       });
     }
   }

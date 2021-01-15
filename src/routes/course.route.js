@@ -26,7 +26,7 @@ router.post(
   validateToken,
   SubjectProgressValidator.validateData(),
   SubjectProgressValidator.myValidationResult,
-  SubjectProgressValidator.progressExist,
+  // SubjectProgressValidator.progressExist,
   CourseController.subjectProgress,
 );
 

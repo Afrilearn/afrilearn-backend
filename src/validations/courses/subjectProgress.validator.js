@@ -70,36 +70,5 @@ class SubjectProgressClass {
     return next();
   }
 
-  /**
-   * Check whether progress has been recorded.
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @param {Response} next - The next parameter.
-   * @memberof SignUp
-   * @returns {JSON} - A JSON response.
-   */
-  static async progressExist(req, res, next) {
-    const {
-      courseId, subjectId, lessonId, userId,
-    } = req.body;
-    const condition = {
-      userId,
-      courseId,
-      subjectId,
-      lessonId,
-    };
-    if (req.body.classId) {
-      condition.classId = req.body.classId;
-    }
-    const exist = await SubjectProgress.findOne(condition);
-
-    if (exist) {
-      return res.status(409).json({
-        status: '409 Conflict',
-        error: 'Progress already exist',
-      });
-    }
-    return next();
-  }
 }
 export default SubjectProgressClass;

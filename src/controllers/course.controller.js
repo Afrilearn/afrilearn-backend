@@ -9,6 +9,7 @@ import PastQuestionProgress from '../db/models/pastQuestionProgresses.model';
 import PastQuestionQuizResult from '../db/models/pastQuestionQuizResults.model';
 import RelatedPastQuestion from '../db/models/relatedPastQuestions.model';
 import PastQuestionType from '../db/models/pastQuestionTypes.model';
+import Recommendation from '../db/models/recommendation.model';
 /**
  *Contains Course Controller
  *
@@ -317,12 +318,33 @@ class CourseController {
    */
   static async subjectProgress(req, res) {
     try {
-      const progress = await SubjectProgress.create(req.body);
+      await Recommendation.create({
+        userId: req.data.id,
+        type: req.body.type,
+        recommended: req.body.recommended,
+        reason: req.body.reason,
+      });
+      const {
+        courseId, subjectId, lessonId, userId,
+      } = req.body;
+      const condition = {
+        userId,
+        courseId,
+        subjectId,
+        lessonId,
+      };
+      if (req.body.classId) {
+        condition.classId = req.body.classId;
+      }
+      const exist = await SubjectProgress.findOne(condition);
+      if (!exist) {
+        await SubjectProgress.create({
+          ...req.body,
+          userID: req.data.id,
+        });
+      }
       return res.status(201).json({
         status: 'success',
-        data: {
-          progress,
-        },
       });
     } catch (error) {
       return res.status(500).json({
