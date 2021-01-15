@@ -40,7 +40,6 @@ class PaymentController {
 
       // Get signature stored as env variable on your server
       const secret_hash = process.env.MY_HASH;
-      console.log('MY_HASH', secret_hash);
       // check if signatures match
 
       if (hash !== secret_hash) {
