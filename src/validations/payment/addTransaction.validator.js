@@ -1,4 +1,4 @@
-import { check, validationResult } from "express-validator";
+import { check, validationResult } from 'express-validator';
 
 /**
  *Contains AddTransaction Validator
@@ -15,32 +15,32 @@ class AddTransaction {
    */
   static validateData() {
     return [
-      check("tx_ref")
+      check('tx_ref')
         .exists()
-        .withMessage("tx_ref is required")
+        .withMessage('tx_ref is required')
         .not()
         .isEmpty()
-        .withMessage("tx_ref cannot be empty")
+        .withMessage('tx_ref cannot be empty')
         .isString()
-        .withMessage("tx_ref should be a string"),
-      check("amount")
+        .withMessage('tx_ref should be a string'),
+      check('amount')
         .exists()
-        .withMessage("amount is required")
+        .withMessage('amount is required')
         .not()
         .isEmpty()
-        .withMessage("amount cannot be empty")
+        .withMessage('amount cannot be empty')
         .isInt()
-        .withMessage("amount should be a number"),
-      check("userId")
+        .withMessage('amount should be a number'),
+      check('userId')
         .exists()
-        .withMessage("User ID is required")
+        .withMessage('User ID is required')
         .isMongoId()
-        .withMessage("User ID should be a mongoID"),
-      check("paymentPlanId")
+        .withMessage('User ID should be a mongoID'),
+      check('paymentPlanId')
         .exists()
-        .withMessage("paymentPlan ID is required")
+        .withMessage('paymentPlan ID is required')
         .isMongoId()
-        .withMessage("paymentPlan ID should be a mongoID"),
+        .withMessage('paymentPlan ID should be a mongoID'),
     ];
   }
 
@@ -57,8 +57,8 @@ class AddTransaction {
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);
       return res.status(400).json({
-        status: "400 Invalid Request",
-        error: "Your request contains invalid parameters",
+        status: '400 Invalid Request',
+        error: 'Your request contains invalid parameters',
         errors: errArr,
       });
     }
