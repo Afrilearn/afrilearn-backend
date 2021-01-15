@@ -15,11 +15,11 @@ class SendClassRequest {
    */
   static validateData() {
     return [
-      check('classId')
+      check('classCode')
         .exists()
-        .withMessage('Class ID is required')
-        .isMongoId()
-        .withMessage('Class ID should be a mongoID'),
+        .withMessage('classCode is required')
+        .isString()
+        .withMessage('classCode should be a String'),
     ];
   }
 

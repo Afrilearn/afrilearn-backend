@@ -88,7 +88,7 @@ describe('Classes ', () => {
       .post('/api/v1/classes/send-class-request')
       .set('token', token)
       .send({
-        classId: class_id,
+        classCode: '00000000',
       })
       .end((err, res) => {
         res.should.have.status(200);
@@ -107,7 +107,7 @@ describe('Classes ', () => {
       .post('/api/v1/classes/send-class-request')
       .set('token', token)
       .send({
-        classId: class_id,
+        classCode: '00000000',
         status: 'approved',
       })
       .end((err, res) => {
@@ -184,6 +184,7 @@ describe('Classes ', () => {
     chai
       .request(app)
       .get(`/api/v1/classes/${class_id}`)
+      .set('token', token)
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.an('object');
@@ -252,7 +253,7 @@ describe('Classes ', () => {
     sinon.stub(res, 'status').returnsThis();
 
     ClassController.sendClassRequest(req, res);
-    res.status.should.have.callCount(1);
+    res.status.should.have.callCount(0);
     done();
   });
 

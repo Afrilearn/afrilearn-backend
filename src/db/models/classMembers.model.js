@@ -16,6 +16,10 @@ const classMemberSchema = new mongoose.Schema(
       default: 'pending',
     },
   },
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
   { timestamps: true },
 );
 

@@ -67,19 +67,19 @@ describe('RecentActivities ', () => {
       });
   });
 
-  it('fakes server error', (done) => {
-    const req = { body: {} };
-    const res = {
-      status() {},
-      send() {},
-    };
+  // it('fakes server error', (done) => {
+  //   const req = { body: {} };
+  //   const res = {
+  //     status() {},
+  //     send() {},
+  //   };
 
-    sinon.stub(res, 'status').returnsThis();
+  //   sinon.stub(res, 'status').returnsThis();
 
-    RecentActivityController.addItemToRecentActivity(req, res);
-    res.status.should.have.callCount(2);
-    done();
-  });
+  //   RecentActivityController.addItemToRecentActivity(req, res);
+  //   res.status.should.have.callCount(2);
+  //   done();
+  // });
 
   it('fakes server error', (done) => {
     const req = { body: {} };
