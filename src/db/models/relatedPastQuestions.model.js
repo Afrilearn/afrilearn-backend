@@ -22,7 +22,7 @@ relatedpastQuestionSchema.virtual('pastQuestionTypes', {
   ref: 'pastQuestionType',
   localField: 'pastQuestionTypeId',
   foreignField: '_id',
-  justOne: false,
+  justOne: true,
 });
 
 const RelatedPastQuestion = mongoose.model(

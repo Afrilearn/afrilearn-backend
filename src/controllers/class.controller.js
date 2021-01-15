@@ -61,8 +61,15 @@ class ClassController {
    */
   static async sendClassRequest(req, res) {
     try {
+      const clazz = await ClassModel.findOne({ classCode: req.body.classCode });
+      if (!clazz) {
+        return res.status(404).json({
+          status: '404 not found',
+          error: 'Class not found',
+        });
+      }
       const classMemberData = {
-        classId: req.body.classId,
+        classId: clazz._id,
         userId: req.data.id,
       };
       if (Object.keys(req.body).includes('status')) {
@@ -162,11 +169,22 @@ class ClassController {
    */
   static async getClassById(req, res) {
     try {
-      const clazz = await ClassModel.findById(req.params.classId);
+      // if classmember with userId, and classId exist, allow, else deny
+      const clazz = await ClassModel.findById(req.params.classId).populate({
+        path: 'classAnnouncements relatedSubjects relatedPastQuestions',
+        populate: 'comments mainSubjectId relatedLessons pastQuestionTypeId',
+      });
+      const classMembers = await ClassMember.find({
+        classId: req.params.classId,
+      })
+        .populate('userId')
+        .select('status userId fullName email role');
+
       return res.status(200).json({
         status: 'success',
         data: {
           class: clazz,
+          classMembers,
         },
       });
     } catch (error) {

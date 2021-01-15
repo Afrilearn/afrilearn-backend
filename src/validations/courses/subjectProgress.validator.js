@@ -1,5 +1,4 @@
 import { check, validationResult } from 'express-validator';
-import SubjectProgress from '../../db/models/subjectProgresses.model';
 
 /**
  *Contains Login Validator
@@ -69,6 +68,5 @@ class SubjectProgressClass {
     }
     return next();
   }
-
 }
 export default SubjectProgressClass;
