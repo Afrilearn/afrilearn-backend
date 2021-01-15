@@ -46,7 +46,7 @@ class ClassController {
     } catch (error) {
       return res.status(500).json({
         status: '500 Internal server error',
-        error: 'Error Loading class',
+        error: 'Error Adding class',
       });
     }
   }
@@ -81,7 +81,7 @@ class ClassController {
     } catch (error) {
       return res.status(500).json({
         status: '500 Internal server error',
-        error: 'Error Loading class',
+        error: 'Error creating class request',
       });
     }
   }
@@ -117,7 +117,7 @@ class ClassController {
     } catch (error) {
       return res.status(500).json({
         status: '500 Internal server error',
-        error: 'Error Loading class',
+        error: 'Error Upadating request status',
       });
     }
   }
@@ -147,7 +147,7 @@ class ClassController {
     } catch (error) {
       return res.status(500).json({
         status: '500 Internal server error',
-        error: 'Error Loading class',
+        error: 'Error getting student list',
       });
     }
   }
@@ -202,7 +202,7 @@ class ClassController {
     } catch (error) {
       return res.status(500).json({
         status: '500 Internal server error',
-        error: 'Error Loading class',
+        error: 'Error Assigning content',
       });
     }
   }
@@ -231,7 +231,7 @@ class ClassController {
     } catch (error) {
       return res.status(500).json({
         status: '500 Internal server error',
-        error: 'Error Loading class',
+        error: 'Error creating announcement',
       });
     }
   }
@@ -260,7 +260,40 @@ class ClassController {
     } catch (error) {
       return res.status(500).json({
         status: '500 Internal server error',
-        error: 'Error Loading class',
+        error: 'Error creating comment',
+      });
+    }
+  }
+
+  /**
+   * get class announcements
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getClassAnnouncements(req, res) {
+    try {
+      const announcements = await Announcement.find({
+        classId: req.params.classId,
+      })
+        .populate({
+          path: 'comments',
+          model: Comment,
+          populate: { path: 'student' },
+        })
+        .populate('teacher');
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          announcements,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error getting announcements',
       });
     }
   }

@@ -4,7 +4,7 @@ const RecentActivitySchema = new mongoose.Schema(
   {
     type: {
       type: String,
-      enum: ['quiz', 'lesson', 'class'],
+      enum: ['quiz', 'lesson'],
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -13,14 +13,6 @@ const RecentActivitySchema = new mongoose.Schema(
     lessonId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'lesson',
-    },
-    questionId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'question',
-    },
-    classId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'class',
     },
   },
   { timestamps: true },

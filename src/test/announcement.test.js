@@ -87,6 +87,7 @@ describe('Classes ', () => {
     chai
       .request(app)
       .post(`/api/v1/classes/${class_id}/announce`)
+      .send('text', 2)
       .set('token', token)
       .end((err, res) => {
         res.should.have.status(400);
@@ -125,13 +126,28 @@ describe('Classes ', () => {
       });
   });
 
-  it('should NOT create a commet and if input is invalid', (done) => {
+  it('should NOT create a comment and if input is invalid', (done) => {
     chai
       .request(app)
       .post(`/api/v1/classes/${announcement_id}/comment`)
       .set('token', token)
+      .send('text', 2)
       .end((err, res) => {
         res.should.have.status(400);
+        done();
+      });
+  });
+
+  it('should return a list of announcement with status 200', (done) => {
+    chai
+      .request(app)
+      .get(`/api/v1/classes/${class_id}/announcements`)
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('announcements');
         done();
       });
   });
@@ -146,6 +162,20 @@ describe('Classes ', () => {
     sinon.stub(res, 'status').returnsThis();
 
     ClassController.makeComment(req, res);
+    res.status.should.have.callCount(1);
+    done();
+  });
+
+  it('fakes server error', (done) => {
+    const req = { body: {} };
+    const res = {
+      status() {},
+      send() {},
+    };
+
+    sinon.stub(res, 'status').returnsThis();
+
+    ClassController.getClassAnnouncements(req, res);
     res.status.should.have.callCount(1);
     done();
   });

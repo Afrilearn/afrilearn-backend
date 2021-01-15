@@ -22,7 +22,9 @@ class DashboardController {
    */
   static async getUserDashboard(req, res) {
     try {
-      const classMembership = await ClassMember.find({ userId: req.data.id });
+      const classMembership = await ClassMember.find({
+        userId: req.data.id,
+      }).populate('classId userId');
       const recentActivities = await RecentActivity.find({
         userId: req.data.id,
       });
@@ -108,12 +110,6 @@ class DashboardController {
 
       return res.status(200).json({
         status: 'success',
-        // data: {
-        //   enrolledCourse,
-        //   classMembership,
-        //   recentActivities,
-        //   subjectsList,
-        // },
         data,
       });
     } catch (error) {
