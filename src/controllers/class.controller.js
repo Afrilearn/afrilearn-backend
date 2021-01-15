@@ -1,5 +1,7 @@
+import Announcement from '../db/models/announcement.model';
 import ClassModel from '../db/models/classes.model';
 import ClassMember from '../db/models/classMembers.model';
+import Comment from '../db/models/comment.model';
 import TeacherAssignedContent from '../db/models/teacherAssignedContents.model';
 import Helper from '../utils/user.utils';
 
@@ -195,6 +197,64 @@ class ClassController {
         status: 'success',
         data: {
           content,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error Loading class',
+      });
+    }
+  }
+
+  /**
+   * Teacher make announcement to Student
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async makeAnnouncement(req, res) {
+    try {
+      const announcement = await Announcement.create({
+        teacher: req.data.id,
+        classId: req.params.classId,
+        text: req.body.text,
+      });
+      return res.status(201).json({
+        status: 'success',
+        data: {
+          announcement,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error Loading class',
+      });
+    }
+  }
+
+  /**
+   * comment on an announcement
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async makeComment(req, res) {
+    try {
+      const comment = await Comment.create({
+        student: req.data.id,
+        announcementId: req.params.announcementId,
+        text: req.body.text,
+      });
+      return res.status(201).json({
+        status: 'success',
+        data: {
+          comment,
         },
       });
     } catch (error) {

@@ -30,7 +30,7 @@ class DashboardController {
         recentActivities,
       };
       if (req.body.enrolledCourseId) {
-        const enrolledCourse = await EnrolledCourse.find({
+        const enrolledCourse = await EnrolledCourse.findOne({
           _id: req.body.enrolledCourseId,
           userId: req.data.id,
         }).populate({
@@ -47,15 +47,15 @@ class DashboardController {
         const subjectsList = [];
         for (
           let index = 0;
-          index < enrolledCourse[0].courseId.relatedSubjects.length;
+          index < enrolledCourse.courseId.relatedSubjects.length;
           index++
         ) {
-          const subject = enrolledCourse[0].courseId.relatedSubjects[index];
+          const subject = enrolledCourse.courseId.relatedSubjects[index];
 
           /* progress */
           const subjectProgressData = {
             userId: req.data.id,
-            courseId: enrolledCourse[0].courseId._id,
+            courseId: enrolledCourse.courseId._id,
             subjectId: subject._id,
           };
           const subjectProgress = await SubjectProgress.find(
@@ -65,7 +65,7 @@ class DashboardController {
 
           /* performance */
           const resultCondition = {
-            courseId: enrolledCourse[0].courseId._id,
+            courseId: enrolledCourse.courseId._id,
             subjectId: subject._id,
           };
           const results = await QuizResult.find(resultCondition);
