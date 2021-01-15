@@ -1,9 +1,9 @@
-import ClassMember from '../db/models/classMembers.model';
-import EnrolledCourse from '../db/models/enrolledCourses.model';
-import QuizResult from '../db/models/quizResults.model';
-import RecentActivity from '../db/models/recentActivities.model';
-import Recommendation from '../db/models/recommendation.model';
-import SubjectProgress from '../db/models/subjectProgresses.model';
+import ClassMember from "../db/models/classMembers.model";
+import EnrolledCourse from "../db/models/enrolledCourses.model";
+import QuizResult from "../db/models/quizResults.model";
+import RecentActivity from "../db/models/recentActivities.model";
+import Recommendation from "../db/models/recommendation.model";
+import SubjectProgress from "../db/models/subjectProgresses.model";
 /**
  *Contains Dashboard Controller
  *
@@ -24,15 +24,25 @@ class DashboardController {
     try {
       const classMembership = await ClassMember.find({
         userId: req.data.id,
-      }).populate('classId userId');
+      }).populate("classId userId");
       const recentActivities = await RecentActivity.find({
         userId: req.data.id,
-      });
+      })
+        .sort({ createdAt: -1 })
+        .populate({
+          path: "lessonId",
+          select: "title subjectId",
+          populate: {
+            path: "subjectId",
+            populate: "mainSubjectId",
+          },
+        });
       const recommendation = await Recommendation.find({
         userId: req.data.id,
       })
-        .populate({ path: 'reason', select: 'title' })
-        .populate({ path: 'recommended', select: 'title videoUrls' });
+        .sort({ createdAt: -1 })
+        .populate({ path: "reason", select: "title" })
+        .populate({ path: "recommended", select: "title videoUrls" });
       const data = {
         classMembership,
         recentActivities,
@@ -43,12 +53,12 @@ class DashboardController {
           _id: req.body.enrolledCourseId,
           userId: req.data.id,
         }).populate({
-          path: 'courseId',
+          path: "courseId",
           populate: {
-            path: 'relatedPastQuestions relatedSubjects',
+            path: "relatedPastQuestions relatedSubjects",
             populate: {
               path:
-                'pastQuestionTypes mainSubjectId quizResults relatedLessons',
+                "pastQuestionTypes mainSubjectId quizResults relatedLessons",
             },
           },
         });
@@ -68,7 +78,7 @@ class DashboardController {
             subjectId: subject._id,
           };
           const subjectProgress = await SubjectProgress.find(
-            subjectProgressData,
+            subjectProgressData
           ).countDocuments();
           /* progress */
 
@@ -85,10 +95,10 @@ class DashboardController {
           results.forEach((result) => {
             totalScore += result.score;
             totalQuestionsCorrect += result.numberOfCorrectAnswers;
-            totalQuestions
-              += result.numberOfCorrectAnswers
-              + result.numberOfWrongAnswers
-              + result.numberOfSkippedQuestions;
+            totalQuestions +=
+              result.numberOfCorrectAnswers +
+              result.numberOfWrongAnswers +
+              result.numberOfSkippedQuestions;
             totalTimeSpent += result.timeSpent;
           });
           const performance = totalScore / results.length;
@@ -109,13 +119,13 @@ class DashboardController {
       }
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data,
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error Loading Dashboard',
+        status: "500 Internal server error",
+        error: "Error Loading Dashboard",
       });
     }
   }
