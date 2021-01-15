@@ -47,6 +47,7 @@ router.post(
   AddCommentValidator.myValidationResult,
   ClassController.makeComment,
 );
+router.get('/:classId/announcements', ClassController.getClassAnnouncements);
 router.get('/:classId', ClassController.getClassById);
 router.post(
   '/:classId/assign-content',

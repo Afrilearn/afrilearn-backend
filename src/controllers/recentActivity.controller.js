@@ -17,15 +17,14 @@ class RecentActivityController {
    */
   static async addItemToRecentActivity(req, res) {
     try {
-      const bodyContainsExpectedIds = Object.keys(req.body).includes('questionId')
-        || Object.keys(req.body).includes('lessonId')
-        || Object.keys(req.body).includes('classId');
-      if (!bodyContainsExpectedIds) {
-        return res.status(400).json({
-          status: '400 bad request',
-          error: 'ID not sent',
-        });
-      }
+      // const bodyContainsExpectedIds = Object.keys(req.body).includes('questionId')
+      //   || Object.keys(req.body).includes('lessonId')
+      // if (!bodyContainsExpectedIds) {
+      //   return res.status(400).json({
+      //     status: '400 bad request',
+      //     error: 'ID not sent',
+      //   });
+      // }
 
       const recentActivity = await RecentActivity.create({
         ...req.body,
