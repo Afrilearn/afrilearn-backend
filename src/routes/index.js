@@ -9,6 +9,7 @@ import subjectRouter from './subject.route';
 import countRouter from './count.route';
 import pastQuestionRouter from './pastQuestion.route';
 import paymentRouter from './payment.route';
+import termRouter from './term.route';
 import dashboardRouter from './dashboard.route';
 
 const router = Router();
@@ -23,6 +24,7 @@ router.use('/lessons', lessonRouter);
 router.use('/classes', classRouter);
 router.use('/past-questions', pastQuestionRouter);
 router.use('/dashboard', dashboardRouter);
+router.use('/terms', termRouter);
 router.use('/payments', paymentRouter);
 
 export default router;

@@ -41,7 +41,7 @@ class AuthController {
 
       await EnrolledCourse.create({
         userId: result._id,
-        courseId: req.body.courseId
+        courseId: req.body.courseId,
       });
 
       const user = await AuthServices.emailExist(email, res);
@@ -54,10 +54,9 @@ class AuthController {
         status: 'success',
         data: {
           token,
-          user        
-        }
+          user,
+        },
       });
-
     } catch (err) {
       return res.status(500).json({
         status: '500 Internal server error',
