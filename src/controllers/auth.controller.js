@@ -5,6 +5,7 @@ import AuthServices from '../services/auth.services';
 import ResetPassword from '../db/models/resetPassword.model';
 import Role from '../db/models/roles.model';
 import Course from '../db/models/courses.model';
+import EnrolledCourse from '../db/models/enrolledCourses.model';
 
 /**
  *Contains Auth Controller
@@ -38,18 +39,25 @@ class AuthController {
 
       const result = await Auth.create({ ...newUser });
 
+      await EnrolledCourse.create({
+        userId: result._id,
+        courseId: req.body.courseId
+      });
+
+      const user = await AuthServices.emailExist(email, res);
       const token = await Helper.generateToken(result._id, role, fullName);
 
-      const message = `Please verify your email address to complete your Afrilearn Account.<br/>Click the link https://www.myafrilearn.com/?token=${token}`;
-      sendEmail(email, 'Account Activation', message);
+      // const message = `Please verify your email address to complete your Afrilearn Account.<br/>Click the link https://www.myafrilearn.com/?token=${token}`;
+      // sendEmail(email, 'Account Activation', message);
 
       return res.status(201).json({
         status: 'success',
         data: {
           token,
-          user: result,
-        },
+          user        
+        }
       });
+
     } catch (err) {
       return res.status(500).json({
         status: '500 Internal server error',
