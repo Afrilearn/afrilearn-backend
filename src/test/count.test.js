@@ -12,7 +12,7 @@ chai.use(Sinonchai);
 chai.use(chaiHttp);
 // const { expect } = chai;
 
-describe('Classes ', () => {
+describe('Counts ', () => {
   const main_subject_id = new mongoose.mongo.ObjectId();
   const course_id = new mongoose.mongo.ObjectId();
   const subject_id = new mongoose.mongo.ObjectId();
