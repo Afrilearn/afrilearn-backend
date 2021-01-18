@@ -171,7 +171,7 @@ class LessonController {
       const subject = await Subject.findOne({
         _id: req.params.subjectId,
         courseId: req.params.courseId,
-      }).populate("relatedLessons mainSubjectId");
+      }).populate("relatedLessons mainSubjectId courseId");
 
       return res.status(200).json({
         status: "success",
