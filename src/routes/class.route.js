@@ -5,6 +5,7 @@ import AcceptRejectClassRequest from '../validations/classes/acceptClassRequest.
 import AddAnnouncementValidator from '../validations/classes/addAnnouncement.validator';
 import AddClassValidator from '../validations/classes/addClass.validator';
 import AddCommentValidator from '../validations/classes/addComment.validator';
+import AddCommentToAssignedContentValidator from '../validations/classes/addCommentToAssignedContent.validator';
 import AssignContent from '../validations/classes/assignContent.validator';
 import SendClassRequest from '../validations/classes/sendClassRequest.validator';
 // import authRouter from './auth.route';
@@ -46,6 +47,13 @@ router.post(
   AddCommentValidator.validateData(),
   AddCommentValidator.myValidationResult,
   ClassController.makeComment,
+);
+router.post(
+  '/:teacherAssignedContentId/comment-on-content',
+  validateToken,
+  AddCommentToAssignedContentValidator.validateData(),
+  AddCommentToAssignedContentValidator.myValidationResult,
+  ClassController.makeCommentOnAssignedContent,
 );
 router.get('/:classId/announcements', ClassController.getClassAnnouncements);
 router.get('/:classId', ClassController.getClassById);

@@ -1,15 +1,15 @@
-import axios from "axios";
-import Course from "../db/models/courses.model";
-import Subject from "../db/models/subjects.model";
-import EnrolledCourse from "../db/models/enrolledCourses.model";
-import MainSubject from "../db/models/mainSubjects.model";
-import SubjectProgress from "../db/models/subjectProgresses.model";
-import QuizResult from "../db/models/quizResults.model";
-import PastQuestionProgress from "../db/models/pastQuestionProgresses.model";
-import PastQuestionQuizResult from "../db/models/pastQuestionQuizResults.model";
-import RelatedPastQuestion from "../db/models/relatedPastQuestions.model";
-import PastQuestionType from "../db/models/pastQuestionTypes.model";
-import Recommendation from "../db/models/recommendation.model";
+import axios from 'axios';
+import Course from '../db/models/courses.model';
+import Subject from '../db/models/subjects.model';
+import EnrolledCourse from '../db/models/enrolledCourses.model';
+import MainSubject from '../db/models/mainSubjects.model';
+import SubjectProgress from '../db/models/subjectProgresses.model';
+import QuizResult from '../db/models/quizResults.model';
+import PastQuestionProgress from '../db/models/pastQuestionProgresses.model';
+import PastQuestionQuizResult from '../db/models/pastQuestionQuizResults.model';
+import RelatedPastQuestion from '../db/models/relatedPastQuestions.model';
+import PastQuestionType from '../db/models/pastQuestionTypes.model';
+import Recommendation from '../db/models/recommendation.model';
 /**
  *Contains Course Controller
  *
@@ -29,20 +29,20 @@ class CourseController {
   static async loadCourses(req, res) {
     try {
       const courses = await Course.find({}).populate({
-        path: "relatedSubjects",
-        populate: { path: "mainSubjectId relatedLessons" },
+        path: 'relatedSubjects',
+        populate: { path: 'mainSubjectId relatedLessons' },
       });
 
       return res.status(200).json({
-        status: "success",
+        status: 'success',
         data: {
           courses,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Loading courses",
+        status: '500 Internal server error',
+        error: 'Error Loading courses',
       });
     }
   }
@@ -62,19 +62,19 @@ class CourseController {
         courseId: req.body.courseId,
       });
       await course
-        .populate({ path: "courseId", select: "name imageUrl" })
+        .populate({ path: 'courseId', select: 'name imageUrl' })
         .execPopulate();
 
       return res.status(200).json({
-        status: "success",
+        status: 'success',
         data: {
           course,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Loading course",
+        status: '500 Internal server error',
+        error: 'Error Loading course',
       });
     }
   }
@@ -90,19 +90,19 @@ class CourseController {
   static async getCourse(req, res) {
     try {
       const course = await Course.findById(req.params.courseId).populate({
-        path: "relatedSubjects",
-        populate: { path: "mainSubjectId relatedLessons" },
+        path: 'relatedSubjects',
+        populate: { path: 'mainSubjectId relatedLessons' },
       });
       return res.status(200).json({
-        status: "success",
+        status: 'success',
         data: {
           course,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Loading course",
+        status: '500 Internal server error',
+        error: 'Error Loading course',
       });
     }
   }
@@ -121,8 +121,8 @@ class CourseController {
       const relatedPq = await RelatedPastQuestion.find({
         courseId: req.params.courseId,
       }).populate({
-        path: "pastQuestionTypes",
-        select: "name categoryId",
+        path: 'pastQuestionTypes',
+        select: 'name categoryId',
         model: PastQuestionType,
       });
       const examsList = [];
@@ -142,7 +142,7 @@ class CourseController {
           pastQuestionResultCondition.classId = req.body.classId;
         }
         const pastQuestionResults = await PastQuestionQuizResult.find(
-          pastQuestionResultCondition
+          pastQuestionResultCondition,
         );
         let pqTotalScore = 0;
         let totalTimeSpentOnQuestion = 0;
@@ -151,8 +151,7 @@ class CourseController {
           totalTimeSpentOnQuestion += parseInt(result.timeSpent, 10);
         });
         const pqPerformance = pqTotalScore / pastQuestionResults.length;
-        const averageTimePerSubject =
-          totalTimeSpentOnQuestion / pastQuestionResults.length;
+        const averageTimePerSubject = totalTimeSpentOnQuestion / pastQuestionResults.length;
         /* Total performance */
 
         /* subjectIDs */
@@ -169,14 +168,14 @@ class CourseController {
 
         /* progress */
         const { data: totalSubjects } = await axios.get(
-          "https://api.exambly.com/adminpanel/v2/getMySubjects/1",
+          'https://api.exambly.com/adminpanel/v2/getMySubjects/1',
           {
             headers: {
-              "Content-type": "application/json",
+              'Content-type': 'application/json',
               authorization:
-                "F0c7ljTmi25e7LMIF0Wz01lZlkHX9b57DFTqUHFyWeVOlKAsKR0E5JdBOvdunpqv",
+                'F0c7ljTmi25e7LMIF0Wz01lZlkHX9b57DFTqUHFyWeVOlKAsKR0E5JdBOvdunpqv',
             },
-          }
+          },
         );
         const pastQuestionProgressData = {
           userId: req.data.id,
@@ -205,8 +204,8 @@ class CourseController {
       const subjects = await Subject.find({
         courseId: req.params.courseId,
       }).populate({
-        path: "mainSubjectId",
-        select: "name imageUrl classification -_id",
+        path: 'mainSubjectId',
+        select: 'name imageUrl classification -_id',
         model: MainSubject,
       });
       const subjectsList = [];
@@ -223,7 +222,7 @@ class CourseController {
           subjectProgressData.classId = req.body.classId;
         }
         const subjectProgress = await SubjectProgress.find(
-          subjectProgressData
+          subjectProgressData,
         ).countDocuments();
         /* progress */
 
@@ -244,10 +243,10 @@ class CourseController {
         results.forEach((result) => {
           totalScore += result.score;
           totalQuestionsCorrect += result.numberOfCorrectAnswers;
-          totalQuestions +=
-            result.numberOfCorrectAnswers +
-            result.numberOfWrongAnswers +
-            result.numberOfSkippedQuestions;
+          totalQuestions
+            += result.numberOfCorrectAnswers
+            + result.numberOfWrongAnswers
+            + result.numberOfSkippedQuestions;
           totalTimeSpent += result.timeSpent;
         });
         const performance = totalScore / results.length;
@@ -265,7 +264,7 @@ class CourseController {
       }
 
       return res.status(200).json({
-        status: "success",
+        status: 'success',
         data: {
           subjectsList,
           examsList,
@@ -273,8 +272,8 @@ class CourseController {
       });
     } catch (error) {
       return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Loading course",
+        status: '500 Internal server error',
+        error: 'Error Loading course',
       });
     }
   }
@@ -292,20 +291,20 @@ class CourseController {
       const subjects = await Subject.find({
         courseId: req.params.courseId,
       }).populate({
-        path: "mainSubjectId",
-        select: "name imageUrl classification -_id",
+        path: 'mainSubjectId',
+        select: 'name imageUrl classification -_id',
         model: MainSubject,
       });
       return res.status(200).json({
-        status: "success",
+        status: 'success',
         data: {
           subjects,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Loading subjects",
+        status: '500 Internal server error',
+        error: 'Error Loading subjects',
       });
     }
   }
@@ -326,7 +325,9 @@ class CourseController {
         recommended: req.body.recommended,
         reason: req.body.reason,
       });
-      const { courseId, subjectId, lessonId, userId } = req.body;
+      const {
+        courseId, subjectId, lessonId, userId,
+      } = req.body;
       const condition = {
         userId,
         courseId,
@@ -344,12 +345,12 @@ class CourseController {
         });
       }
       return res.status(201).json({
-        status: "success",
+        status: 'success',
       });
     } catch (error) {
       return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error submitting progress",
+        status: '500 Internal server error',
+        error: 'Error submitting progress',
       });
     }
   }
