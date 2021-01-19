@@ -33,7 +33,7 @@ SubjectSchema.virtual('relatedLessons', {
   ref: 'lesson',
   localField: '_id',
   foreignField: 'subjectId',
-}); 
+});
 
 const Subject = mongoose.model('subject', SubjectSchema);
 

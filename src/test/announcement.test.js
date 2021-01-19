@@ -10,6 +10,7 @@ import app from '../index';
 import ClassController from '../controllers/class.controller';
 import Class from '../db/models/classes.model';
 import Announcement from '../db/models/announcement.model';
+import TeacherAssignedContent from '../db/models/teacherAssignedContents.model';
 
 chai.should();
 chai.use(Sinonchai);
@@ -21,6 +22,7 @@ describe('Classes ', () => {
   const class_id = new mongoose.mongo.ObjectId();
   const course_id = new mongoose.mongo.ObjectId();
   const announcement_id = new mongoose.mongo.ObjectId();
+  const assigned_id = new mongoose.mongo.ObjectId();
   const token = jwt.sign(
     {
       data: {
@@ -42,6 +44,12 @@ describe('Classes ', () => {
     await Announcement.create({
       _id: announcement_id,
       text: 'Hi class',
+      teacher: user_id,
+      classId: class_id,
+    });
+    await TeacherAssignedContent.create({
+      _id: assigned_id,
+      description: 'Hi class',
       teacher: user_id,
       classId: class_id,
     });
@@ -162,6 +170,62 @@ describe('Classes ', () => {
     sinon.stub(res, 'status').returnsThis();
 
     ClassController.makeComment(req, res);
+    res.status.should.have.callCount(1);
+    done();
+  });
+  it('should create a assignedComment and return a comment with status 200', (done) => {
+    chai
+      .request(app)
+      .post(`/api/v1/classes/${assigned_id}/comment-on-content`)
+      .set('token', token)
+      .send({
+        text: 'Thank you instructor',
+      })
+      .end((err, res) => {
+        res.should.have.status(201);
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('comment');
+        done();
+      });
+  });
+
+  it('should NOT create a assignedComment if user is not authenticated', (done) => {
+    chai
+      .request(app)
+      .post(`/api/v1/classes/${assigned_id}/comment-on-content`)
+      .send({
+        text: 'Thank you Instructor',
+      })
+      .end((err, res) => {
+        res.should.have.status(401);
+        done();
+      });
+  });
+
+  it('should NOT create a assignedComment and if input is invalid', (done) => {
+    chai
+      .request(app)
+      .post(`/api/v1/classes/${assigned_id}/comment-on-content`)
+      .set('token', token)
+      .send('text', 2)
+      .end((err, res) => {
+        res.should.have.status(400);
+        done();
+      });
+  });
+
+  it('fakes server error', (done) => {
+    const req = { body: {} };
+    const res = {
+      status() {},
+      send() {},
+    };
+
+    sinon.stub(res, 'status').returnsThis();
+
+    ClassController.makeCommentOnAssignedContent(req, res);
     res.status.should.have.callCount(1);
     done();
   });
