@@ -1,33 +1,36 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const teacherAssignedContentSchema = new mongoose.Schema(
   {
     teacher: {
       type: mongoose.Schema.ObjectId,
-      ref: 'User',
+      ref: "User",
     },
     description: {
       type: String,
     },
     lessonId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'lesson',
+      ref: "lesson",
+    },
+    subjectId: {
+      type: mongoose.Schema.ObjectId,
+      ref: "subject",
     },
     classId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'class',
+      ref: "class",
+    },
+    dueDate: {
+      type: Date,
     },
   },
-  {
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
-  },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 const TeacherAssignedContent = mongoose.model(
-  'teacherAssignedContent',
-  teacherAssignedContentSchema,
+  "teacherAssignedContent",
+  teacherAssignedContentSchema
 );
 
 export default TeacherAssignedContent;

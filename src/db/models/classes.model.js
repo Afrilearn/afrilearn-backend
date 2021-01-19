@@ -1,17 +1,17 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const ClassSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'user',
+      ref: "user",
     },
     name: {
       type: String,
     },
     courseId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'course',
+      ref: "course",
     },
     classCode: {
       type: String,
@@ -21,37 +21,44 @@ const ClassSchema = new mongoose.Schema(
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-ClassSchema.virtual('classAnnouncements', {
-  ref: 'announcement',
-  localField: '_id',
-  foreignField: 'classId',
+ClassSchema.virtual("classAnnouncements", {
+  ref: "announcement",
+  localField: "_id",
+  foreignField: "classId",
   justOne: false,
 });
 
-ClassSchema.virtual('relatedSubjects', {
-  ref: 'subject',
-  localField: 'courseId',
-  foreignField: 'courseId',
+ClassSchema.virtual("relatedSubjects", {
+  ref: "subject",
+  localField: "courseId",
+  foreignField: "courseId",
   justOne: false,
 });
 
-ClassSchema.virtual('classMembers', {
-  ref: 'classMember',
-  localField: '_id',
-  foreignField: 'classId',
+ClassSchema.virtual("classMembers", {
+  ref: "classMember",
+  localField: "_id",
+  foreignField: "classId",
   justOne: false,
 });
 
-ClassSchema.virtual('relatedPastQuestions', {
-  ref: 'RelatedPastQuestion',
-  localField: 'courseId',
-  foreignField: 'courseId',
+ClassSchema.virtual("relatedPastQuestions", {
+  ref: "RelatedPastQuestion",
+  localField: "courseId",
+  foreignField: "courseId",
   justOne: false,
 });
 
-const Class = mongoose.model('class', ClassSchema);
+ClassSchema.virtual("teacherAssignedContents", {
+  ref: "teacherAssignedContent",
+  localField: "_id",
+  foreignField: "classId",
+  justOne: false,
+});
+
+const Class = mongoose.model("class", ClassSchema);
 
 export default Class;
