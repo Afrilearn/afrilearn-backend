@@ -62,7 +62,6 @@ class DashboardController {
             },
           },
         });
-
         const subjectsList = [];
         if (enrolledCourse) {
           for (
@@ -85,6 +84,7 @@ class DashboardController {
 
             /* performance */
             const resultCondition = {
+              userId: req.data.id,
               courseId: enrolledCourse.courseId._id,
               subjectId: subject._id,
             };

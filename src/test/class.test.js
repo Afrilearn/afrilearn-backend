@@ -19,6 +19,7 @@ chai.use(chaiHttp);
 describe('Classes ', () => {
   const user_id = new mongoose.mongo.ObjectId();
   const class_id = new mongoose.mongo.ObjectId();
+  const new_class_id = new mongoose.mongo.ObjectId();
   const course_id = new mongoose.mongo.ObjectId();
   const token = jwt.sign(
     {
@@ -47,6 +48,7 @@ describe('Classes ', () => {
 
   after(async () => {
     await ClassMember.findByIdAndDelete(class_id);
+    await ClassMember.findOneAndDelete({ classId: new_class_id, userId: user_id });
     await Class.findByIdAndDelete(class_id);
   });
 
@@ -129,6 +131,86 @@ describe('Classes ', () => {
       .end((err, res) => {
         res.should.have.status(400);
         res.body.should.be.an('object');
+        done();
+      });
+  });
+
+  it('should return a success status and message with status 200', (done) => {
+    chai
+      .request(app)
+      .post('/api/v1/classes/send-class-invite')
+      .set('token', token)
+      .send({
+        link: 'www.afri.com',
+        email: 'ayobamiu@gmail.com',
+      })
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('message');
+        done();
+      });
+  });
+
+  it('should NOT return a success status with 400 when input is invalid', (done) => {
+    chai
+      .request(app)
+      .post('/api/v1/classes/send-class-invite')
+      .set('token', token)
+      .send({
+        link: '00000000',
+      })
+      .end((err, res) => {
+        res.should.have.status(400);
+        done();
+      });
+  });
+
+  it('should NOT return a classMember and message with status 401 when user is not authenticated', (done) => {
+    chai
+      .request(app)
+      .post('/api/v1/classes/send-class-invite')
+      .end((err, res) => {
+        res.should.have.status(401);
+        done();
+      });
+  });
+
+  it('should return a classMember and message with status 200', (done) => {
+    chai
+      .request(app)
+      .post(`/api/v1/classes/${new_class_id}/join-class`)
+      .set('token', token)
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('classMember');
+        res.body.data.should.have.property('message');
+        done();
+      });
+  });
+
+  it('should NOT return a classMember and message with status 400 when classMember already exist', (done) => {
+    chai
+      .request(app)
+      .post(`/api/v1/classes/${class_id}/join-class`)
+      .set('token', token)
+      .end((err, res) => {
+        res.should.have.status(400);
+        done();
+      });
+  });
+
+  it('should NOT return a classMember and message with status 401 when user is not authenticated', (done) => {
+    chai
+      .request(app)
+      .post(`/api/v1/classes/${class_id}/join-class`)
+      .end((err, res) => {
+        res.should.have.status(401);
         done();
       });
   });
@@ -227,6 +309,33 @@ describe('Classes ', () => {
         res.should.have.status(400);
         done();
       });
+  });
+
+  it('fakes server error', (done) => {
+    const req = { body: {} };
+    const res = {
+      status() {},
+      send() {},
+    };
+
+    sinon.stub(res, 'status').returnsThis();
+
+    ClassController.sendClassEmailInvite(req, res);
+    res.status.should.have.callCount(2);
+    done();
+  });
+  it('fakes server error', (done) => {
+    const req = { body: {} };
+    const res = {
+      status() {},
+      send() {},
+    };
+
+    sinon.stub(res, 'status').returnsThis();
+
+    ClassController.joinClassApproved(req, res);
+    res.status.should.have.callCount(1);
+    done();
   });
 
   it('fakes server error', (done) => {

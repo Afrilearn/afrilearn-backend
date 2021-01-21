@@ -43,11 +43,6 @@ class SavePastQuestionResults {
         .withMessage('Past Question Category ID is required')
         .isInt()
         .withMessage('Past Question Category ID should be a number'),
-      check('pastQuestionTypeId')
-        .exists()
-        .withMessage('Past Question Type ID is required')
-        .isMongoId()
-        .withMessage('Past Question Type ID should be a mongoID'),
       check('timeSpent')
         .exists()
         .withMessage('Time spent is required')

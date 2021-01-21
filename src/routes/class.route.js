@@ -7,6 +7,7 @@ import AddClassValidator from '../validations/classes/addClass.validator';
 import AddCommentValidator from '../validations/classes/addComment.validator';
 import AddCommentToAssignedContentValidator from '../validations/classes/addCommentToAssignedContent.validator';
 import AssignContent from '../validations/classes/assignContent.validator';
+import SendClassInvite from '../validations/classes/sendClassInvite.validator';
 import SendClassRequest from '../validations/classes/sendClassRequest.validator';
 // import authRouter from './auth.route';
 
@@ -18,6 +19,18 @@ router.post(
   AddClassValidator.validateData(),
   AddClassValidator.myValidationResult,
   ClassController.addClass,
+);
+router.post(
+  '/send-class-invite',
+  validateToken,
+  SendClassInvite.validateData(),
+  SendClassInvite.myValidationResult,
+  ClassController.sendClassEmailInvite,
+);
+router.post(
+  '/:classId/join-class',
+  validateToken,
+  ClassController.joinClassApproved,
 );
 router.post(
   '/send-class-request',
