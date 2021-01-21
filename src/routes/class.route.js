@@ -1,82 +1,78 @@
-import { Router } from 'express';
-import ClassController from '../controllers/class.controller';
-import validateToken from '../middlewares/auth.middleware';
-import AcceptRejectClassRequest from '../validations/classes/acceptClassRequest.validator';
-import AddAnnouncementValidator from '../validations/classes/addAnnouncement.validator';
-import AddClassValidator from '../validations/classes/addClass.validator';
-import AddCommentValidator from '../validations/classes/addComment.validator';
-import AddCommentToAssignedContentValidator from '../validations/classes/addCommentToAssignedContent.validator';
-import AssignContent from '../validations/classes/assignContent.validator';
-import SendClassInvite from '../validations/classes/sendClassInvite.validator';
-import SendClassRequest from '../validations/classes/sendClassRequest.validator';
+import { Router } from "express";
+import ClassController from "../controllers/class.controller";
+import validateToken from "../middlewares/auth.middleware";
+import AcceptRejectClassRequest from "../validations/classes/acceptClassRequest.validator";
+import AddAnnouncementValidator from "../validations/classes/addAnnouncement.validator";
+import AddClassValidator from "../validations/classes/addClass.validator";
+import AddCommentValidator from "../validations/classes/addComment.validator";
+import AddCommentToAssignedContentValidator from "../validations/classes/addCommentToAssignedContent.validator";
+import AssignContent from "../validations/classes/assignContent.validator";
+import SendClassInvite from "../validations/classes/sendClassInvite.validator";
+import SendClassRequest from "../validations/classes/sendClassRequest.validator";
 // import authRouter from './auth.route';
 
 const router = Router();
 
 router.post(
-  '/add-class',
+  "/add-class",
   validateToken,
   AddClassValidator.validateData(),
   AddClassValidator.myValidationResult,
-  ClassController.addClass,
+  ClassController.addClass
 );
 router.post(
-  '/send-class-invite',
+  "/send-class-invite",
   validateToken,
   SendClassInvite.validateData(),
   SendClassInvite.myValidationResult,
-  ClassController.sendClassEmailInvite,
+  ClassController.sendClassEmailInvite
 );
+router.post("/:classId/join-class", ClassController.joinClassApproved);
 router.post(
-  '/:classId/join-class',
-  validateToken,
-  ClassController.joinClassApproved,
-);
-router.post(
-  '/send-class-request',
+  "/send-class-request",
   validateToken,
   SendClassRequest.validateData(),
   SendClassRequest.myValidationResult,
-  ClassController.sendClassRequest,
+  ClassController.sendClassRequest
 );
 router.patch(
-  '/accept-reject-class-request',
+  "/accept-reject-class-request",
   AcceptRejectClassRequest.validateData(),
   AcceptRejectClassRequest.myValidationResult,
   validateToken,
-  ClassController.acceptRejectRetractClassRequest,
+  ClassController.acceptRejectRetractClassRequest
 );
-router.get('/:classId/students', ClassController.getStudentsInClass);
+router.get("/:classId/students", ClassController.getStudentsInClass);
 router.post(
-  '/:classId/announce',
+  "/:classId/announce",
   validateToken,
   AddAnnouncementValidator.validateData(),
   AddAnnouncementValidator.myValidationResult,
-  ClassController.makeAnnouncement,
+  ClassController.makeAnnouncement
 );
 router.post(
-  '/:announcementId/comment',
+  "/:announcementId/comment",
   validateToken,
   AddCommentValidator.validateData(),
   AddCommentValidator.myValidationResult,
-  ClassController.makeComment,
+  ClassController.makeComment
 );
 router.post(
-  '/:teacherAssignedContentId/comment-on-content',
+  "/:teacherAssignedContentId/comment-on-content",
   validateToken,
   AddCommentToAssignedContentValidator.validateData(),
   AddCommentToAssignedContentValidator.myValidationResult,
-  ClassController.makeCommentOnAssignedContent,
+  ClassController.makeCommentOnAssignedContent
 );
-router.get('/:classId/announcements', ClassController.getClassAnnouncements);
-router.get('/:classId', ClassController.getClassById);
-router.get('/', ClassController.getClasses);
+router.get("/:classId/announcements", ClassController.getClassAnnouncements);
+router.get("/:classId", ClassController.getClassById);
+router.get("/", ClassController.getClasses);
 router.post(
-  '/:classId/assign-content',
+  "/:classId/assign-content",
   validateToken,
   AssignContent.validateData(),
   AssignContent.myValidationResult,
-  ClassController.assignContent,
+  ClassController.assignContent
 );
 
 export default router;

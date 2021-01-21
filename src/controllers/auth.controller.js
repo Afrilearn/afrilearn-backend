@@ -1,11 +1,12 @@
-import Auth from '../db/models/users.model';
-import Helper from '../utils/user.utils';
-import sendEmail from '../utils/email.utils';
-import AuthServices from '../services/auth.services';
-import ResetPassword from '../db/models/resetPassword.model';
-import Role from '../db/models/roles.model';
-import Course from '../db/models/courses.model';
-import EnrolledCourse from '../db/models/enrolledCourses.model';
+import Auth from "../db/models/users.model";
+import Helper from "../utils/user.utils";
+import sendEmail from "../utils/email.utils";
+import AuthServices from "../services/auth.services";
+import ResetPassword from "../db/models/resetPassword.model";
+import Role from "../db/models/roles.model";
+import Course from "../db/models/courses.model";
+import EnrolledCourse from "../db/models/enrolledCourses.model";
+import ClassMember from "../db/models/classMembers.model";
 
 /**
  *Contains Auth Controller
@@ -24,9 +25,7 @@ class AuthController {
    */
   static async signUp(req, res) {
     try {
-      const {
-        fullName, password, email, role,
-      } = req.body;
+      const { fullName, password, email, role } = req.body;
 
       const encryptpassword = await Helper.encrptPassword(password);
 
@@ -51,7 +50,7 @@ class AuthController {
       // sendEmail(email, 'Account Activation', message);
 
       return res.status(201).json({
-        status: 'success',
+        status: "success",
         data: {
           token,
           user,
@@ -59,8 +58,8 @@ class AuthController {
       });
     } catch (err) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error creating new user',
+        status: "500 Internal server error",
+        error: "Error creating new user",
       });
     }
   }
@@ -83,15 +82,15 @@ class AuthController {
       await Auth.findByIdAndUpdate(id, { ...newData });
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
-          message: 'Account activation successful',
+          message: "Account activation successful",
         },
       });
     } catch (err) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error activating user account',
+        status: "500 Internal server error",
+        error: "Error activating user account",
       });
     }
   }
@@ -110,31 +109,31 @@ class AuthController {
 
       if (!user) {
         return res.status(401).json({
-          status: '401 Unauthorized',
-          error: 'Invalid email address',
+          status: "401 Unauthorized",
+          error: "Invalid email address",
         });
       }
 
       const confirmPassword = await Helper.verifyPassword(
         password,
-        user.password,
+        user.password
       );
 
       if (!confirmPassword) {
         return res.status(401).json({
-          status: '401 Unauthorized',
-          error: 'Invalid password',
+          status: "401 Unauthorized",
+          error: "Invalid password",
         });
       }
 
       const token = await Helper.generateToken(
         user.id,
         user.role,
-        user.fullName,
+        user.fullName
       );
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           token,
           user,
@@ -142,8 +141,8 @@ class AuthController {
       });
     } catch (err) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error Logging in user',
+        status: "500 Internal server error",
+        error: "Error Logging in user",
       });
     }
   }
@@ -173,15 +172,15 @@ class AuthController {
 
       await ResetPassword.create({ ...data });
       const message = `Click on the link below to reset your password<br/>Click the link https://www.myafrilearn.com/?token=${token}&email=${email} <br/> Link Expires in 24 hours.`;
-      sendEmail(email, 'Password Reset', message);
+      sendEmail(email, "Password Reset", message);
       return res.status(201).json({
-        status: 'success',
-        message: 'Password reset link sent to your mail',
+        status: "success",
+        message: "Password reset link sent to your mail",
       });
     } catch (err) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error reseting password',
+        status: "500 Internal server error",
+        error: "Error reseting password",
       });
     }
   }
@@ -203,13 +202,13 @@ class AuthController {
       await Auth.findOneAndUpdate({ email }, { ...newData });
 
       return res.status(200).json({
-        status: 'success',
-        message: 'Password changed successfully',
+        status: "success",
+        message: "Password changed successfully",
       });
     } catch (err) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error changing password',
+        status: "500 Internal server error",
+        error: "Error changing password",
       });
     }
   }
@@ -224,18 +223,20 @@ class AuthController {
   static async updateProfile(req, res) {
     const updates = Object.keys(req.body);
     const allowedUpdates = [
-      'fullName',
-      'phoneNumber',
-      'dateOfBirth',
-      'country',
-      'state',
-      'role',
+      "fullName",
+      "phoneNumber",
+      "dateOfBirth",
+      "country",
+      "state",
+      "role",
     ];
-    const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
+    const isValidOperation = updates.every((update) =>
+      allowedUpdates.includes(update)
+    );
     if (!isValidOperation) {
       return res.status(400).json({
-        status: '400 Invalid Updates',
-        error: 'Error updating profile',
+        status: "400 Invalid Updates",
+        error: "Error updating profile",
       });
     }
     try {
@@ -245,14 +246,14 @@ class AuthController {
       });
       await user.save();
       return res.status(200).json({
-        status: 'success',
-        message: 'Profile Updated successfully',
+        status: "success",
+        message: "Profile Updated successfully",
         user,
       });
     } catch (err) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error updating profile',
+        status: "500 Internal server error",
+        error: "Error updating profile",
       });
     }
   }
@@ -270,7 +271,7 @@ class AuthController {
       const courses = await Course.find();
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           roles,
           courses,
@@ -278,8 +279,8 @@ class AuthController {
       });
     } catch (err) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error changing password',
+        status: "500 Internal server error",
+        error: "Error changing password",
       });
     }
   }
@@ -298,18 +299,18 @@ class AuthController {
       const courses = await Course.find();
       if (!owner) {
         return res.status(404).json({
-          status: '400 Not found',
-          error: 'User does not exist',
+          status: "400 Not found",
+          error: "User does not exist",
         });
       }
       const user = await AuthServices.emailExist(owner.email, res);
       const token = await Helper.generateToken(
         user._id,
         user.role,
-        user.fullName,
+        user.fullName
       );
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           token,
           user,
@@ -319,8 +320,58 @@ class AuthController {
       });
     } catch (err) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error Loading user',
+        status: "500 Internal server error",
+        error: "Error Loading user",
+      });
+    }
+  }
+
+  /**
+   * check if  user exist and join class
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async checkUserExistAndJoin(req, res) {
+    try {
+      //user lands on join class page with email and classid
+      //if user exists
+      const user = await Auth.findOne({ email: req.body.email });
+      if (user) {
+        const existingClassMember = await ClassMember.findOne({
+          classId: req.body.classId,
+          userId: user._id,
+        });
+        if (existingClassMember) {
+          return res.status(400).json({
+            status: "400 Bad request",
+            error: "Classmember already exist",
+          });
+        } else {
+          const classMember = await ClassMember.create({
+            classId: req.body.classId,
+            userId: user._id,
+            status: "approved",
+          });
+          return res.status(200).json({
+            status: "success",
+            data: {
+              message: "Your class request was approved.",
+              classMember,
+              user,
+            },
+          });
+        }
+      }
+      return res.status(404).json({
+        status: "success",
+        data: { message: "User not found" },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading user",
       });
     }
   }
