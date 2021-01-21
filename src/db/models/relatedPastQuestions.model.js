@@ -1,33 +1,33 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const relatedpastQuestionSchema = new mongoose.Schema(
   {
     courseId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'course',
+      ref: "course",
     },
     pastQuestionTypeId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'pastQuestionType',
+      ref: "pastQuestionType",
     },
   },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-relatedpastQuestionSchema.virtual('pastQuestionTypes', {
-  ref: 'pastQuestionType',
-  localField: 'pastQuestionTypeId',
-  foreignField: '_id',
-  justOne: true,
+relatedpastQuestionSchema.virtual("pastQuestionTypes", {
+  ref: "pastQuestionType",
+  localField: "pastQuestionTypeId",
+  foreignField: "_id",
+  justOne: false,
 });
 
 const RelatedPastQuestion = mongoose.model(
-  'RelatedPastQuestion',
-  relatedpastQuestionSchema,
+  "RelatedPastQuestion",
+  relatedpastQuestionSchema
 );
 
 export default RelatedPastQuestion;
