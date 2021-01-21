@@ -5,7 +5,10 @@ const CommentForAssignedContentSchema = new mongoose.Schema(
     student: {
       type: mongoose.Schema.ObjectId,
       ref: 'user',
-      required: true,
+    },
+    sender: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'user',
     },
     text: {
       type: String,

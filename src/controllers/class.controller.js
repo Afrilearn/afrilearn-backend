@@ -5,6 +5,7 @@ import Comment from '../db/models/comment.model';
 import CommentForAssignedContent from '../db/models/commentForAssignedContent.model';
 import TeacherAssignedContent from '../db/models/teacherAssignedContents.model';
 import User from '../db/models/users.model';
+import sendEmail from '../utils/email.utils';
 import Helper from '../utils/user.utils';
 
 /**
@@ -84,6 +85,73 @@ class ClassController {
         data: {
           message:
             'Your class request was sent, wait for teacher to let you in',
+          classMember,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error creating class request',
+      });
+    }
+  }
+
+  /**
+   * send a Class invite by Email
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async sendClassEmailInvite(req, res) {
+    try {
+      const message = `Click this link to join the class ${req.body.link}`;
+      sendEmail(req.body.email, 'Class Invite', message);
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          message: 'Your class Invite was sent to your email',
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error creating class request',
+      });
+    }
+  }
+
+  /**
+   * Student send a Class request(approved)
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async joinClassApproved(req, res) {
+    try {
+      const existingClassMember = await ClassMember.findOne({
+        classId: req.params.classId,
+        userId: req.data.id,
+      });
+      if (existingClassMember) {
+        return res.status(400).json({
+          status: '400 Bad request',
+          error: 'Classmember already exist',
+        });
+      }
+      const classMember = await ClassMember.create({
+        classId: req.params.classId,
+        userId: req.data.id,
+        status: 'approved',
+      });
+
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          message: 'Your class request was approved.',
           classMember,
         },
       });
@@ -186,7 +254,7 @@ class ClassController {
           populate: [
             { path: 'teacher', model: User },
             { path: 'subjectId', populate: 'mainSubjectId' },
-            'comments',
+            { path: 'comments', populate: 'sender' },
           ],
         });
       const classMembers = await ClassMember.find({
@@ -311,7 +379,8 @@ class ClassController {
   static async makeCommentOnAssignedContent(req, res) {
     try {
       const comment = await CommentForAssignedContent.create({
-        student: req.data.id,
+        student: req.body.student,
+        sender: req.data.id,
         teacherAssignedContentId: req.params.teacherAssignedContentId,
         text: req.body.text,
       });
