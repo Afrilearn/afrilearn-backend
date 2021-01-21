@@ -279,6 +279,32 @@ class ClassController {
   }
 
   /**
+   * Get classes
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getClasses(req, res) {
+    try {
+      const classes = await ClassModel.find({});
+
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          classes,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: '500 Internal server error',
+        error: 'Error Loading class',
+      });
+    }
+  }
+
+  /**
    * Teacher Assign Content to Student
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.

@@ -48,7 +48,10 @@ describe('Classes ', () => {
 
   after(async () => {
     await ClassMember.findByIdAndDelete(class_id);
-    await ClassMember.findOneAndDelete({ classId: new_class_id, userId: user_id });
+    await ClassMember.findOneAndDelete({
+      classId: new_class_id,
+      userId: user_id,
+    });
     await Class.findByIdAndDelete(class_id);
   });
 
@@ -311,6 +314,34 @@ describe('Classes ', () => {
       });
   });
 
+  it('should return classes with status 200 ', (done) => {
+    chai
+      .request(app)
+      .get('/api/v1/classes')
+      .end((err, res) => {
+        res.should.have.status(200);
+        res.body.should.be.an('object');
+        res.body.should.have.property('status').eql('success');
+        res.body.should.have.property('data');
+        res.body.data.should.have.property('classes');
+        done();
+      });
+  });
+
+  it('fakes server error', (done) => {
+    const req = { body: {} };
+    const res = {
+      status() {},
+      send() {},
+    };
+
+    sinon.stub(res, 'status').returnsThis();
+
+    ClassController.getClasses(req, res);
+    res.status.should.have.callCount(0);
+    done();
+  });
+
   it('fakes server error', (done) => {
     const req = { body: {} };
     const res = {
@@ -324,6 +355,7 @@ describe('Classes ', () => {
     res.status.should.have.callCount(2);
     done();
   });
+
   it('fakes server error', (done) => {
     const req = { body: {} };
     const res = {

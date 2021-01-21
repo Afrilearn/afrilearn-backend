@@ -70,6 +70,7 @@ router.post(
 );
 router.get('/:classId/announcements', ClassController.getClassAnnouncements);
 router.get('/:classId', ClassController.getClassById);
+router.get('/', ClassController.getClasses);
 router.post(
   '/:classId/assign-content',
   validateToken,
