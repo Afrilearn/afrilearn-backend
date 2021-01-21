@@ -1,4 +1,4 @@
-import { check, validationResult } from "express-validator";
+import { check, validationResult } from 'express-validator';
 
 /**
  *Contains AddPastQuestionProgressValidator Validator
@@ -15,11 +15,11 @@ class AddPastQuestionProgressValidator {
    */
   static validateData() {
     return [
-      check("courseId")
+      check('courseId')
         .exists()
-        .withMessage("Course ID is required")
+        .withMessage('Course ID is required')
         .isMongoId()
-        .withMessage("Course ID should be a mongoID"),
+        .withMessage('Course ID should be a mongoID'),
     ];
   }
 
@@ -36,8 +36,8 @@ class AddPastQuestionProgressValidator {
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);
       return res.status(400).json({
-        status: "400 Invalid Request",
-        error: "Your request contains invalid parameters",
+        status: '400 Invalid Request',
+        error: 'Your request contains invalid parameters',
         errors: errArr,
       });
     }
