@@ -170,7 +170,8 @@ class ClassController {
       } else {
         const user = await User.create({
           email: req.body.email,
-          fullName: req.body.name,
+          fullName: req.body.fullName,
+          password: req.body.password,
           role: "5fd08fba50964811309722d5",
         });
         const classMember = await ClassMember.create({
