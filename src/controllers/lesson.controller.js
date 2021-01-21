@@ -49,6 +49,9 @@ class LessonController {
       const searchQuery = new RegExp(`.*${searchEntry}.*`, "i");
       const lessons = await Lesson.find({
         $or: [{ title: searchQuery }, { content: searchQuery }],
+      }).populate({
+        path: "subjectId courseId termId",
+        populate: "mainSubjectId",
       });
 
       return res.status(200).json({
