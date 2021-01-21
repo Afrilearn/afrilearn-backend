@@ -1,56 +1,28 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const QuestionSchema = new mongoose.Schema(
   {
     lessonId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'lesson',
+      ref: "lesson",
       required: true,
     },
     creatorId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'user',
+      ref: "user",
     },
     question: {
       type: String,
     },
-    questionImage: {
+    question_image: {
       type: String,
     },
-    imagePosition: {
+    question_position: {
       type: String,
     },
-    optionA: {
-      type: String,
-    },
-    optionAImage: {
-      type: String,
-    },
-    optionB: {
-      type: String,
-    },
-    optionBImage: {
-      type: String,
-    },
-    optionC: {
-      type: String,
-    },
-    optionCImage: {
-      type: String,
-    },
-    optionD: {
-      type: String,
-    },
-    optionDImage: {
-      type: String,
-    },
-    optionE: {
-      type: String,
-    },
-    optionEImage: {
-      type: String,
-    },
-    correctOption: {
+    options: { type: Array },
+    images: { type: Array },
+    correct_option: {
       type: Number,
     },
     explanation: {
@@ -61,9 +33,9 @@ const QuestionSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  },
+  }
 );
 
-const Question = mongoose.model('question', QuestionSchema);
+const Question = mongoose.model("question", QuestionSchema);
 
 export default Question;
