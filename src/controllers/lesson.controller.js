@@ -1,7 +1,7 @@
-import Question from '../db/models/questions.model';
-import QuizResult from '../db/models/quizResults.model';
-import Lesson from '../db/models/lessons.model';
-import Subject from '../db/models/subjects.model';
+import Question from "../db/models/questions.model";
+import QuizResult from "../db/models/quizResults.model";
+import Lesson from "../db/models/lessons.model";
+import Subject from "../db/models/subjects.model";
 /**
  *Contains Lesson Controller
  *
@@ -22,15 +22,15 @@ class LessonController {
     try {
       const questions = await Question.find({ lessonId: req.params.lessonId });
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           questions,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error Loading questions',
+        status: "500 Internal server error",
+        error: "Error Loading questions",
       });
     }
   }
@@ -45,22 +45,22 @@ class LessonController {
    */
   static async searchLessons(req, res) {
     try {
-      const searchEntry = req.query.searchQuery ? req.query.searchQuery : '';
-      const searchQuery = new RegExp(`.*${searchEntry}.*`, 'i');
+      const searchEntry = req.query.searchQuery ? req.query.searchQuery : "";
+      const searchQuery = new RegExp(`.*${searchEntry}.*`, "i");
       const lessons = await Lesson.find({
         $or: [{ title: searchQuery }, { content: searchQuery }],
       });
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           lessons,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error Loading lessons',
+        status: "500 Internal server error",
+        error: "Error Loading lessons",
       });
     }
   }
@@ -102,15 +102,15 @@ class LessonController {
       const quizResult = await QuizResult.create({ ...quizResultData });
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           results: quizResult,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error saving results',
+        status: "500 Internal server error",
+        error: "Error saving results",
       });
     }
   }
@@ -129,7 +129,7 @@ class LessonController {
         lessonId: req.params.lessonId,
         userId: req.data.id,
       });
-      if (Object.keys(req.body).includes('classId')) {
+      if (Object.keys(req.body).includes("classId")) {
         quizResult = await QuizResult.findOne({
           lessonId: req.params.lessonId,
           userId: req.data.id,
@@ -138,21 +138,21 @@ class LessonController {
       }
       if (!quizResult) {
         return res.status(404).json({
-          status: '404 error not found',
-          error: 'Result not found',
+          status: "404 error not found",
+          error: "Result not found",
         });
       }
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           results: quizResult,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error Loading tests',
+        status: "500 Internal server error",
+        error: "Error Loading tests",
       });
     }
   }
@@ -170,16 +170,19 @@ class LessonController {
       const subject = await Subject.findOne({
         _id: req.params.subjectId,
         courseId: req.params.courseId,
-      }).populate('relatedLessons mainSubjectId courseId');
+      }).populate({
+        path: "relatedLessons mainSubjectId courseId",
+        populate: "questions",
+      });
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: { subject },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error Loading lessons',
+        status: "500 Internal server error",
+        error: "Error Loading lessons",
       });
     }
   }
