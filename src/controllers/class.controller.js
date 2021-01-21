@@ -243,7 +243,10 @@ class ClassController {
       const clazz = await ClassModel.findById(req.params.classId)
         .populate({
           path: 'relatedSubjects relatedPastQuestions userId courseId',
-          populate: 'mainSubjectId relatedLessons pastQuestionTypeId',
+          populate: {
+            path: 'mainSubjectId relatedLessons pastQuestionTypeId',
+            populate: 'questions',
+          },
         })
         .populate({
           path: 'classAnnouncements',
