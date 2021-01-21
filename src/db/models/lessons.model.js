@@ -33,12 +33,19 @@ const LessonSchema = new mongoose.Schema(
       },
     ],
   },
-  { timestamps: true },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
+  { timestamps: true },
 );
+
+LessonSchema.virtual('questions', {
+  ref: 'question',
+  localField: '_id',
+  foreignField: 'lessonId',
+  justOne: false,
+});
 
 const Lesson = mongoose.model('lesson', LessonSchema);
 
