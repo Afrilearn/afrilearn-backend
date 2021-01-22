@@ -157,21 +157,9 @@ class CourseController {
             totalTimeSpentOnQuestion / pastQuestionResults.length;
           /* Total performance */
 
-          /* subjectIDs */
-          const subjectIds = [];
-          const perSubjectResults = [];
-          pastQuestionResults.forEach((result) => {
-            subjectIds.push(result.subjectCategoryId);
-            perSubjectResults.push({
-              name: result.subjectName,
-              score: result.score,
-            });
-          });
-          /* subjectIDs */
-
           /* progress */
           const { data: totalSubjects } = await axios.get(
-            "https://api.exambly.com/adminpanel/v2/getMySubjects/1",
+            `https://api.exambly.com/adminpanel/v2/getMySubjects/${item.categoryId}`,
             {
               headers: {
                 "Content-type": "application/json",
@@ -180,6 +168,20 @@ class CourseController {
               },
             }
           );
+
+          /* subjectIDs */
+          const subjectIds = [];
+          const perSubjectResults = [];
+          totalSubjects.subjects.forEach((subject) => {
+            const result = pastQuestionResults.find(
+              (rslt) => rslt.subjectCategoryId === subject.id
+            );
+            perSubjectResults.push({
+              name: subject.subject,
+              score: result ? result.score : 0,
+            });
+          });
+
           const pastQuestionProgressData = {
             userId: req.data.id,
             courseId: req.params.courseId,
@@ -207,11 +209,15 @@ class CourseController {
       /* pq */
       const subjects = await Subject.find({
         courseId: req.params.courseId,
-      }).populate({
-        path: "mainSubjectId",
-        select: "name imageUrl classification -_id",
-        model: MainSubject,
-      });
+      })
+        .populate({
+          path: "mainSubjectId",
+          select: "name imageUrl classification -_id",
+          model: MainSubject,
+        })
+        .populate({
+          path: "relatedLessons",
+        });
       const subjectsList = [];
       for (let index = 0; index < subjects.length; index++) {
         const subject = subjects[index];
@@ -264,6 +270,8 @@ class CourseController {
           totalQuestionsCorrect,
           totalQuestions,
           averageTimePerTest,
+          numberOfTests: results.length,
+          totalTests: subject.relatedLessons.length,
         });
       }
 
