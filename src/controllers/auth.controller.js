@@ -46,8 +46,8 @@ class AuthController {
       const user = await AuthServices.emailExist(email, res);
       const token = await Helper.generateToken(result._id, role, fullName);
 
-      // const message = `Please verify your email address to complete your Afrilearn Account.<br/>Click the link https://www.myafrilearn.com/?token=${token}`;
-      // sendEmail(email, 'Account Activation', message);
+      const message = `Please verify your email address to complete your Afrilearn Account.<br/>Click the link https://www.myafrilearn.com/?token=${token}`;
+      sendEmail(email, 'Account Activation', message);
 
       return res.status(201).json({
         status: "success",
@@ -229,6 +229,7 @@ class AuthController {
       "country",
       "state",
       "role",
+      "courseId"
     ];
     const isValidOperation = updates.every((update) =>
       allowedUpdates.includes(update)
@@ -244,16 +245,28 @@ class AuthController {
       updates.forEach((update) => {
         user[update] = req.body[update];
       });
-      await user.save();
+      await user.save();     
+      if(req.body.courseId){      
+         await EnrolledCourse.create({
+          userId: user._id,
+          courseId: req.body.courseId,
+        });
+      }
+      const token = await Helper.generateToken(user._id, user.role, user.fullName);
+     
+      let user2 = await AuthServices.emailExist(user.email, res);      
+
       return res.status(200).json({
         status: "success",
-        message: "Profile Updated successfully",
-        user,
+        data: {
+          token,
+          user:user2
+        },
       });
     } catch (err) {
       return res.status(500).json({
         status: "500 Internal server error",
-        error: "Error updating profile",
+        error: err.message,
       });
     }
   }
