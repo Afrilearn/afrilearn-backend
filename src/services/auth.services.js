@@ -8,6 +8,7 @@ export default {
       const condition = {
         email,
       };
+      
       const user = await Auth.findOne(condition).populate({
         path: 'enrolledCourses',
         model: EnrolledCourse,
@@ -15,8 +16,7 @@ export default {
           path: 'courseId',
           select: 'name imageUrl',
         },
-      });
-
+      });     
       return user;
     } catch (err) {
       return res.status(500).json({
