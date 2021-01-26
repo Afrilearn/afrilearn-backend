@@ -1,15 +1,15 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const QuestionSchema = new mongoose.Schema(
   {
     lessonId: {
       type: mongoose.Schema.ObjectId,
-      ref: "lesson",
+      ref: 'lesson',
       required: true,
     },
     creatorId: {
       type: mongoose.Schema.ObjectId,
-      ref: "user",
+      ref: 'user',
     },
     question: {
       type: String,
@@ -33,9 +33,9 @@ const QuestionSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  }
+  },
 );
 
-const Question = mongoose.model("question", QuestionSchema);
+const Question = mongoose.model('question', QuestionSchema);
 
 export default Question;

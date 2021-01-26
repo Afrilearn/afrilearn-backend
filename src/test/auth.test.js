@@ -14,6 +14,7 @@ import Auth from '../db/models/users.model';
 import ResetPassword from '../db/models/resetPassword.model';
 import EnrolledCourse from '../db/models/enrolledCourses.model';
 import Course from '../db/models/courses.model';
+import ClassMember from '../db/models/classMembers.model';
 
 chai.should();
 chai.use(Sinonchai);
@@ -23,6 +24,8 @@ const { expect } = chai;
 const user_id = new mongoose.mongo.ObjectId();
 const user_one = new mongoose.mongo.ObjectId();
 const course_id = new mongoose.mongo.ObjectId();
+const class_id = new mongoose.mongo.ObjectId();
+const class_member_id = new mongoose.mongo.ObjectId();
 
 const token = jwt.sign(
   {
@@ -52,6 +55,16 @@ const user = {
   gender: 'male',
   role: '5fc8f4b99d1e3023e4942152',
 };
+// const userOne = {
+//   _id: user_one,
+//   fullName: 'hackerbay',
+//   userName: 'jackson',
+//   email: 'userone@gmail.com',
+//   password: '123456',
+//   confirmPassword: '123456',
+//   gender: 'male',
+//   role: '5fc8f4b99d1e3023e4942152',
+// };
 const wrongPasscode = {
   email: 'okwuosachijioke56687@gmail.com',
   password: '1234560',
@@ -94,7 +107,16 @@ describe('Auth Route Endpoints', () => {
       }
     });
     EnrolledCourse.create({ ...enrolledCourseOne });
+    ClassMember.create({
+      _id: class_member_id,
+      classId: class_id,
+      userId: user_one,
+    });
     Course.create({ ...courseOne });
+  });
+  after((done) => {
+    ClassMember.findByIdAndDelete(class_member_id);
+    done();
   });
   describe('POST api/v1/auth/signup', () => {
     it('should not create account if the user supplies incomplete information', (done) => {
@@ -612,5 +634,60 @@ describe('Auth Route Endpoints', () => {
       res.status.should.have.callCount(1);
       done();
     });
+  });
+
+  describe('GET api/v1/auth/check-join-class', () => {
+    it("should not load a user if it doesn't ", (done) => {
+      chai
+        .request(app)
+        .get('/api/v1/auth/check-join-class')
+        .send({
+          email: 'strang@email.com',
+          classId: '600fd9316b97f8283045b201',
+        })
+        .end((err, res) => {
+          res.should.have.status(404);
+          done();
+        });
+    });
+
+    // it('should not load a user if the token is invalid', (done) => {
+    //   chai
+    //     .request(app)
+    //     .get('/api/v1/auth/load-user')
+    //     .set('token', 'invalid token')
+    //     .end((err, res) => {
+    //       res.should.have.status(401);
+    //       res.body.should.be.an('object');
+    //       res.body.should.have.property('status').eql('401 Unauthorized');
+    //       res.body.should.have.property('error').eql('Access token is Invalid');
+    //       done();
+    //     });
+    // });
+    // it('should load a user if valid token is supplied', (done) => {
+    //   chai
+    //     .request(app)
+    //     .get('/api/v1/auth/load-user')
+    //     .set('token', myToken)
+    //     .end((err, res) => {
+    //       res.should.have.status(200);
+    //       res.body.should.be.an('object');
+    //       res.body.should.have.property('status').eql('success');
+    //       res.body.should.have.property('data');
+    //       done();
+    //     });
+    // });
+
+    // it('Should fake server error', (done) => {
+    //   const req = { body: {} };
+    //   const res = {
+    //     status() {},
+    //     send() {},
+    //   };
+    //   sinon.stub(res, 'status').returnsThis();
+    //   AuthController.loadUser(req, res);
+    //   res.status.should.have.callCount(1);
+    //   done();
+    // });
   });
 });

@@ -181,7 +181,6 @@ describe('Classes ', () => {
       });
   });
 
-
   it('should return a classMember with updated status with status 200', (done) => {
     chai
       .request(app)

@@ -1,4 +1,4 @@
-import { check, validationResult } from "express-validator";
+import { check, validationResult } from 'express-validator';
 
 /**
  *Contains CheckUserAndJoin Validator
@@ -15,19 +15,19 @@ class CheckUserAndJoin {
    */
   static validateData() {
     return [
-      check("email")
+      check('email')
         .exists()
-        .withMessage("Email is required")
+        .withMessage('Email is required')
         .not()
         .isEmpty()
-        .withMessage("Email cannot be empty")
+        .withMessage('Email cannot be empty')
         .isEmail()
-        .withMessage("Email should be a valid email address"),
-      check("classId")
+        .withMessage('Email should be a valid email address'),
+      check('classId')
         .exists()
-        .withMessage("classId is required")
+        .withMessage('classId is required')
         .isMongoId()
-        .withMessage("classId should be a MongoID"),
+        .withMessage('classId should be a MongoID'),
     ];
   }
 
@@ -44,8 +44,8 @@ class CheckUserAndJoin {
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);
       return res.status(400).json({
-        status: "400 Invalid Request",
-        error: "Your request contains invalid parameters",
+        status: '400 Invalid Request',
+        error: 'Your request contains invalid parameters',
         errors: errArr,
       });
     }

@@ -28,11 +28,6 @@ class SavePastQuestionResults {
         .withMessage('User ID is required')
         .isMongoId()
         .withMessage('User ID should be a mongoID'),
-      check('subjectId')
-        .exists()
-        .withMessage('Subbject ID is required')
-        .isMongoId()
-        .withMessage('Subbject ID should be a mongoID'),
       check('courseId')
         .exists()
         .withMessage('Course ID is required')
