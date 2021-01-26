@@ -59,6 +59,13 @@ ClassSchema.virtual('teacherAssignedContents', {
   justOne: false,
 });
 
+ClassSchema.virtual('enrolledCourse', {
+  ref: 'enrolledCourse',
+  localField: '_id',
+  foreignField: 'classId',
+  justOne: true,
+});
+
 const Class = mongoose.model('class', ClassSchema);
 
 export default Class;

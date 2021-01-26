@@ -24,7 +24,7 @@ class DashboardController {
     try {
       const classMembership = await ClassMember.find({
         userId: req.data.id,
-      }).populate('classId userId');
+      }).populate({ path: 'classId userId', populate: 'userId' });
       const recentActivities = await RecentActivity.find({
         userId: req.data.id,
       })

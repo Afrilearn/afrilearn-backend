@@ -24,10 +24,6 @@ const PastQuestionProgressSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'course',
     },
-    subjectId: {
-      type: mongoose.Schema.ObjectId,
-      ref: 'subject',
-    },
   },
   {
     toJSON: { virtuals: true },

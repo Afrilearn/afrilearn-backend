@@ -9,18 +9,12 @@ import { check, validationResult } from 'express-validator';
  */
 class SubjectProgressClass {
   /**
-     * validate user data.
-     * @memberof Login
-     * @returns {null} - No response.
-     */
+   * validate user data.
+   * @memberof Login
+   * @returns {null} - No response.
+   */
   static validateData() {
     return [
-      check('userId')
-        .exists()
-        .withMessage('userId is required')
-        .not()
-        .isEmpty()
-        .withMessage('userId cannot be empty'),
       check('subjectId')
         .exists()
         .withMessage('subjectId is required')
