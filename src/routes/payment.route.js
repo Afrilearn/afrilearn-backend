@@ -14,5 +14,9 @@ router.post(
   PaymentController.addTransaction,
 );
 router.post('/verify-payment', PaymentController.verifyPayment);
+router.post(
+  '/verify-paystack-payment',
+  PaymentController.verifyPaystackPayment,
+);
 
 export default router;
