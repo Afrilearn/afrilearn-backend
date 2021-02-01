@@ -553,7 +553,7 @@ describe('Auth Route Endpoints', () => {
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.an('object');
-          res.body.should.have.property('status').eql('success');         
+          res.body.should.have.property('status').eql('success');
           done();
         });
     });
