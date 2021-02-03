@@ -41,8 +41,16 @@ class DashboardController {
         userId: req.data.id,
       })
         .sort({ createdAt: -1 })
-        .populate({ path: 'reason', select: 'title' })
-        .populate({ path: 'recommended', select: 'title videoUrls' });
+        .populate({
+          path: 'reason',
+          select: 'title',
+          populate: { path: '_id' },
+        })
+        .populate({
+          path: 'recommended',
+          select: 'title videoUrls',
+          populate: { path: '_id' },
+        });
       const data = {
         classMembership,
         recentActivities,
