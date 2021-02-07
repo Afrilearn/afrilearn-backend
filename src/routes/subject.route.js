@@ -5,6 +5,7 @@ import AddSubject from '../validations/subject/addSubject.validator';
 
 const router = Router();
 
+router.get('/', SubjectController.getSubjects);
 router.post(
   '/add-subject',
   AddSubject.validateData(),
