@@ -30,6 +30,9 @@ const LessonSchema = new mongoose.Schema(
         videoUrl: {
           type: String,
         },
+        transcript: {
+          type: String,
+        },
       },
     ],
   },

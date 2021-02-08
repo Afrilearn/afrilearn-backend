@@ -24,7 +24,7 @@ const EnrolledCourseSchema = new mongoose.Schema(
     },
     endDate: {
       type: Date,
-      default: new Date().setHours(48),
+      default: new Date(),
     },
   },
   { timestamps: true },
