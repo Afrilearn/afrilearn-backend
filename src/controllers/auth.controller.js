@@ -326,9 +326,9 @@ class AuthController {
    */
   static async getRoles(req, res) {
     try {
-      const roles = await Role.find();
+      let roles = await Role.find();
       const courses = await Course.find();
-
+      roles = roles.filter((item)=> item.id !== '6014126a3636dc4398df7cc4')
       return res.status(200).json({
         status: 'success',
         data: {
