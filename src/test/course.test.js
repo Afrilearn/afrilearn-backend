@@ -300,7 +300,7 @@ describe('Courses ', () => {
     sinon.stub(res, 'status').returnsThis();
 
     CourseController.subjectProgress(req, res);
-    res.status.should.have.callCount(1);
+    res.status.should.have.callCount(0);
     done();
   });
 });

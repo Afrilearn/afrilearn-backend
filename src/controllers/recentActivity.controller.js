@@ -17,24 +17,25 @@ class RecentActivityController {
    */
   static async addItemToRecentActivity(req, res) {
     try {
-      // const bodyContainsExpectedIds = Object.keys(req.body).includes('questionId')
-      //   || Object.keys(req.body).includes('lessonId')
-      // if (!bodyContainsExpectedIds) {
-      //   return res.status(400).json({
-      //     status: '400 bad request',
-      //     error: 'ID not sent',
-      //   });
-      // }
+      const latestRecentActivity = await RecentActivity.find()
+        .sort({ createdAt: -1 })
+        .limit(1); // latest docs
 
-      const recentActivity = await RecentActivity.create({
-        ...req.body,
-        userId: req.data.id,
-      });
+      const existingRecentActivity = latestRecentActivity[0].lessonId == req.body.lessonId;
+      if (!existingRecentActivity) {
+        const recentActivity = await RecentActivity.create({
+          ...req.body,
+          userId: req.data.id,
+        });
+        return res.status(200).json({
+          status: 'success',
+          data: {
+            recentActivity,
+          },
+        });
+      }
       return res.status(200).json({
         status: 'success',
-        data: {
-          recentActivity,
-        },
       });
     } catch (error) {
       return res.status(500).json({
