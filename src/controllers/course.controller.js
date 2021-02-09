@@ -318,11 +318,11 @@ class CourseController {
               headers: {
                 'Content-type': 'application/json',
                 authorization:
-                    'F0c7ljTmi25e7LMIF0Wz01lZlkHX9b57DFTqUHFyWeVOlKAsKR0E5JdBOvdunpqv',
+                  'F0c7ljTmi25e7LMIF0Wz01lZlkHX9b57DFTqUHFyWeVOlKAsKR0E5JdBOvdunpqv',
               },
             },
           );
-            /* subjectIDs */
+          /* subjectIDs */
           const subjectIds = [];
           const perSubjectResults = [];
           totalSubjects.subjects.forEach((subject) => {
@@ -344,7 +344,7 @@ class CourseController {
           const pqSubjectProgress = await PastQuestionProgress.find({
             ...pastQuestionProgressData,
           }).countDocuments();
-            //   /* progress */
+          //   /* progress */
 
           examsList.push({
             name: item.name,
@@ -384,7 +384,7 @@ class CourseController {
         const subjectProgress = await SubjectProgress.find(
           subjectProgressData,
         ).countDocuments();
-          /* progress */
+        /* progress */
 
         /* performance */
         const resultCondition = {
@@ -402,9 +402,9 @@ class CourseController {
           totalScore += result.score;
           totalQuestionsCorrect += result.numberOfCorrectAnswers;
           totalQuestions
-              += result.numberOfCorrectAnswers
-              + result.numberOfWrongAnswers
-              + result.numberOfSkippedQuestions;
+            += result.numberOfCorrectAnswers
+            + result.numberOfWrongAnswers
+            + result.numberOfSkippedQuestions;
           totalTimeSpent += result.timeSpent;
         });
         const performance = totalScore / results.length;
@@ -478,12 +478,18 @@ class CourseController {
    */
   static async subjectProgress(req, res) {
     try {
-      await Recommendation.create({
-        userId: req.data.id,
-        type: req.body.type,
-        recommended: req.body.recommended,
-        reason: req.body.reason,
-      });
+      const latestRecommendation = await Recommendation.find()
+        .sort({ createdAt: -1 })
+        .limit(1); // latest docs
+      const existingRecommendation = latestRecommendation[0].recommended == req.body.recommended;
+      if (!existingRecommendation) {
+        await Recommendation.create({
+          userId: req.data.id,
+          type: req.body.type,
+          recommended: req.body.recommended,
+          reason: req.body.reason,
+        });
+      }
       const {
         courseId, subjectId, lessonId, userId,
       } = req.body;
