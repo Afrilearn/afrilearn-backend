@@ -1,25 +1,29 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const teacherAssignedContentSchema = new mongoose.Schema(
   {
     teacher: {
       type: mongoose.Schema.ObjectId,
-      ref: 'User',
+      ref: "User",
     },
     description: {
       type: String,
     },
+    userId: {
+      type: mongoose.Schema.ObjectId,
+      ref: "User",
+    },
     lessonId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'lesson',
+      ref: "lesson",
     },
     subjectId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'subject',
+      ref: "subject",
     },
     classId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'class',
+      ref: "class",
     },
     dueDate: {
       type: Date,
@@ -29,19 +33,19 @@ const teacherAssignedContentSchema = new mongoose.Schema(
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-teacherAssignedContentSchema.virtual('comments', {
-  ref: 'CommentForAssignedContent',
-  localField: '_id',
-  foreignField: 'teacherAssignedContentId',
+teacherAssignedContentSchema.virtual("comments", {
+  ref: "CommentForAssignedContent",
+  localField: "_id",
+  foreignField: "teacherAssignedContentId",
   justOne: false,
 });
 
 const TeacherAssignedContent = mongoose.model(
-  'teacherAssignedContent',
-  teacherAssignedContentSchema,
+  "teacherAssignedContent",
+  teacherAssignedContentSchema
 );
 
 export default TeacherAssignedContent;

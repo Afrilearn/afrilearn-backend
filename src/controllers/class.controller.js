@@ -1,12 +1,13 @@
-import Announcement from '../db/models/announcement.model';
-import ClassModel from '../db/models/classes.model';
-import ClassMember from '../db/models/classMembers.model';
-import Comment from '../db/models/comment.model';
-import CommentForAssignedContent from '../db/models/commentForAssignedContent.model';
-import TeacherAssignedContent from '../db/models/teacherAssignedContents.model';
-import User from '../db/models/users.model';
-import sendEmail from '../utils/email.utils';
-import Helper from '../utils/user.utils';
+import Announcement from "../db/models/announcement.model";
+import ClassModel from "../db/models/classes.model";
+import ClassMember from "../db/models/classMembers.model";
+import Comment from "../db/models/comment.model";
+import CommentForAssignedContent from "../db/models/commentForAssignedContent.model";
+import Lesson from "../db/models/lessons.model";
+import TeacherAssignedContent from "../db/models/teacherAssignedContents.model";
+import User from "../db/models/users.model";
+import sendEmail from "../utils/email.utils";
+import Helper from "../utils/user.utils";
 
 /**
  *Contains Class Controller
@@ -41,15 +42,15 @@ class ClassController {
       const newClass = await ClassModel.create({ ...classData });
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           class: newClass,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error Adding class',
+        status: "500 Internal server error",
+        error: "Error Adding class",
       });
     }
   }
@@ -67,31 +68,31 @@ class ClassController {
       const clazz = await ClassModel.findOne({ classCode: req.body.classCode });
       if (!clazz) {
         return res.status(404).json({
-          status: '404 not found',
-          error: 'Class not found',
+          status: "404 not found",
+          error: "Class not found",
         });
       }
       const classMemberData = {
         classId: clazz._id,
         userId: req.data.id,
       };
-      if (Object.keys(req.body).includes('status')) {
+      if (Object.keys(req.body).includes("status")) {
         classMemberData.status = req.body.status;
       }
       const classMember = await ClassMember.create({ ...classMemberData });
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           message:
-            'Your class request was sent, wait for teacher to let you in',
+            "Your class request was sent, wait for teacher to let you in",
           classMember,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error creating class request',
+        status: "500 Internal server error",
+        error: "Error creating class request",
       });
     }
   }
@@ -107,17 +108,17 @@ class ClassController {
   static async sendClassEmailInvite(req, res) {
     try {
       const message = `Click this link to join the class ${req.body.link}`;
-      sendEmail(req.body.email, 'Class Invite', message);
+      sendEmail(req.body.email, "Class Invite", message);
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
-          message: 'Your class Invite was sent to your email',
+          message: "Your class Invite was sent to your email",
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error creating class request',
+        status: "500 Internal server error",
+        error: "Error creating class request",
       });
     }
   }
@@ -149,20 +150,20 @@ class ClassController {
         });
         if (existingClassMember) {
           return res.status(400).json({
-            status: '400 Bad request',
+            status: "400 Bad request",
             error:
-              'Classmember already exist. Access your classes on your dashboard',
+              "Classmember already exist. Access your classes on your dashboard",
           });
         }
         const classMember = await ClassMember.create({
           classId: req.params.classId,
           userId: user._id,
-          status: 'approved',
+          status: "approved",
         });
         return res.status(200).json({
-          status: 'success',
+          status: "success",
           data: {
-            message: 'Your class request was approved.',
+            message: "Your class request was approved.",
             classMember,
             user,
           },
@@ -173,18 +174,18 @@ class ClassController {
           email: req.body.email,
           fullName: req.body.fullName,
           password: req.body.password,
-          role: '5fd08fba50964811309722d5',
+          role: "5fd08fba50964811309722d5",
         });
         const classMember = await ClassMember.create({
           classId: req.params.classId,
           userId: user._id,
-          status: 'approved',
+          status: "approved",
         });
 
         return res.status(200).json({
-          status: 'success',
+          status: "success",
           data: {
-            message: 'Your class request was approved.',
+            message: "Your class request was approved.",
             classMember,
             user,
           },
@@ -192,8 +193,8 @@ class ClassController {
       }
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error creating class request',
+        status: "500 Internal server error",
+        error: "Error creating class request",
       });
     }
   }
@@ -217,25 +218,25 @@ class ClassController {
         { status: req.body.status },
         {
           new: true,
-        },
+        }
       );
       if (!classMember) {
         return res.status(404).json({
-          status: '404 not found',
-          error: 'Classmember not found',
+          status: "404 not found",
+          error: "Classmember not found",
         });
       }
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           classMember,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error Upadating request status',
+        status: "500 Internal server error",
+        error: "Error Upadating request status",
       });
     }
   }
@@ -253,19 +254,19 @@ class ClassController {
       const classMembers = await ClassMember.find({
         classId: req.params.classId,
       })
-        .select('userId -_id')
-        .populate('userId', 'fullName');
+        .select("userId -_id")
+        .populate("userId", "fullName");
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           classMembers,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error getting student list',
+        status: "500 Internal server error",
+        error: "Error getting student list",
       });
     }
   }
@@ -284,32 +285,32 @@ class ClassController {
       const clazz = await ClassModel.findById(req.params.classId)
         .populate({
           path:
-            'relatedSubjects relatedPastQuestions userId courseId enrolledCourse',
+            "relatedSubjects relatedPastQuestions userId courseId enrolledCourse",
           populate: {
-            path: 'mainSubjectId relatedLessons pastQuestionTypeId',
-            populate: 'questions',
+            path: "mainSubjectId relatedLessons pastQuestionTypeId",
+            populate: "questions",
           },
         })
         .populate({
-          path: 'classAnnouncements',
-          populate: { path: 'comments teacher', populate: 'student' },
+          path: "classAnnouncements",
+          populate: { path: "comments teacher", populate: "student" },
         })
         .populate({
-          path: 'teacherAssignedContents',
+          path: "teacherAssignedContents",
           populate: [
-            { path: 'teacher', model: User },
-            { path: 'subjectId', populate: 'mainSubjectId' },
-            { path: 'comments', populate: 'sender' },
+            { path: "teacher", model: User },
+            { path: "subjectId", populate: "mainSubjectId" },
+            { path: "comments", populate: "sender" },
           ],
         });
       const classMembers = await ClassMember.find({
         classId: req.params.classId,
       })
-        .populate('userId')
-        .select('status userId fullName email role');
+        .populate("userId")
+        .select("status userId fullName email role");
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           class: clazz,
           classMembers,
@@ -317,8 +318,8 @@ class ClassController {
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error Loading class',
+        status: "500 Internal server error",
+        error: "Error Loading class",
       });
     }
   }
@@ -336,15 +337,15 @@ class ClassController {
       const classes = await ClassModel.find({});
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           classes,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error Loading class',
+        status: "500 Internal server error",
+        error: "Error Loading class",
       });
     }
   }
@@ -359,24 +360,26 @@ class ClassController {
    */
   static async assignContent(req, res) {
     try {
+      const lesson = await Lesson.findOne({ _id: req.body.lessonId });
       const content = await TeacherAssignedContent.create({
         teacher: req.data.id,
         classId: req.params.classId,
         description: req.body.description,
         lessonId: req.body.lessonId,
-        subjectId: req.body.subjectId,
+        userId: req.body.userId,
+        subjectId: req.body.subjectId ? req.body.subjectId : lesson.subjectId,
         dueDate: req.body.dueDate,
       });
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           content,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error Assigning content',
+        status: "500 Internal server error",
+        error: "Error Assigning content",
       });
     }
   }
@@ -397,15 +400,15 @@ class ClassController {
         text: req.body.text,
       });
       return res.status(201).json({
-        status: 'success',
+        status: "success",
         data: {
           announcement,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error creating announcement',
+        status: "500 Internal server error",
+        error: "Error creating announcement",
       });
     }
   }
@@ -426,15 +429,15 @@ class ClassController {
         text: req.body.text,
       });
       return res.status(201).json({
-        status: 'success',
+        status: "success",
         data: {
           comment,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error creating comment',
+        status: "500 Internal server error",
+        error: "Error creating comment",
       });
     }
   }
@@ -456,15 +459,15 @@ class ClassController {
         text: req.body.text,
       });
       return res.status(201).json({
-        status: 'success',
+        status: "success",
         data: {
           comment,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error creating comment',
+        status: "500 Internal server error",
+        error: "Error creating comment",
       });
     }
   }
@@ -483,21 +486,21 @@ class ClassController {
         classId: req.params.classId,
       })
         .populate({
-          path: 'comments',
+          path: "comments",
           model: Comment,
-          populate: { path: 'student' },
+          populate: { path: "student" },
         })
-        .populate('teacher');
+        .populate("teacher");
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           announcements,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error getting announcements',
+        status: "500 Internal server error",
+        error: "Error getting announcements",
       });
     }
   }
