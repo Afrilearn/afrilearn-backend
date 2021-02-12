@@ -91,7 +91,7 @@ class CourseController {
     try {
       const course = await Course.findById(req.params.courseId).populate({
         path: 'relatedSubjects',
-        populate: { path: 'mainSubjectId relatedLessons' },
+        populate: { path: 'mainSubjectId relatedLessons', populate: { path: 'questions'} }
       });
       return res.status(200).json({
         status: 'success',
