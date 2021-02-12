@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const UserSchema = new mongoose.Schema(
   {
@@ -29,9 +29,13 @@ const UserSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    gender: {
+      type: String,
+      trim: true,
+    },
     role: {
       type: mongoose.Schema.ObjectId,
-      ref: 'role',
+      ref: "role",
     },
     googleUserId: {
       type: String,
@@ -43,7 +47,7 @@ const UserSchema = new mongoose.Schema(
     },
     referee: {
       type: mongoose.Schema.ObjectId,
-      ref: 'user',
+      ref: "user",
     },
     isActivated: {
       type: Boolean,
@@ -57,36 +61,36 @@ const UserSchema = new mongoose.Schema(
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-UserSchema.virtual('enrolledCourses', {
-  ref: 'enrolledCourse',
-  localField: '_id',
-  foreignField: 'userId',
+UserSchema.virtual("enrolledCourses", {
+  ref: "enrolledCourse",
+  localField: "_id",
+  foreignField: "userId",
   justOne: false,
 });
 
-UserSchema.virtual('classMembership', {
-  ref: 'classMember',
-  localField: '_id',
-  foreignField: 'userId',
+UserSchema.virtual("classMembership", {
+  ref: "classMember",
+  localField: "_id",
+  foreignField: "userId",
   justOne: false,
 });
 
-UserSchema.virtual('classOwnership', {
-  ref: 'class',
-  localField: '_id',
-  foreignField: 'userId',
+UserSchema.virtual("classOwnership", {
+  ref: "class",
+  localField: "_id",
+  foreignField: "userId",
   justOne: false,
 });
-UserSchema.virtual('recentActivities', {
-  ref: 'recentActivity',
-  localField: '_id',
-  foreignField: 'userId',
+UserSchema.virtual("recentActivities", {
+  ref: "recentActivity",
+  localField: "_id",
+  foreignField: "userId",
   justOne: false,
 });
 
-const User = mongoose.model('user', UserSchema);
+const User = mongoose.model("user", UserSchema);
 
 export default User;
