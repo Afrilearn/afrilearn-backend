@@ -34,6 +34,11 @@ SubjectSchema.virtual('relatedLessons', {
   localField: '_id',
   foreignField: 'subjectId',
 });
+SubjectSchema.virtual('progresses', {
+  ref: 'subjectProgress',
+  localField: '_id',
+  foreignField: 'subjectId',
+});
 
 const Subject = mongoose.model('subject', SubjectSchema);
 
