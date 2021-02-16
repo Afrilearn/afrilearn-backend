@@ -164,20 +164,20 @@ describe('Past Questions ', () => {
     });
     await EnrolledCourse.create({ _id: en_course_id });
   });
-  it('should update enrolled course if payment is succesful with status 200', (done) => {
-    chai
-      .request(app)
-      .post('/api/v1/payments/verify-payment')
-      .send(refReq)
-      .set('verif-hash', 'afrilearnofafrica')
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.be.an('object');
-        res.body.should.have.property('status').eql('success');
-        res.body.should.have.property('enrolledCourse');
-        done();
-      });
-  });
+  // it('should update enrolled course if payment is succesful with status 200', (done) => {
+  //   chai
+  //     .request(app)
+  //     .post('/api/v1/payments/verify-payment')
+  //     .send(refReq)
+  //     .set('verif-hash', 'afrilearnofafrica')
+  //     .end((err, res) => {
+  //       res.should.have.status(200);
+  //       res.body.should.be.an('object');
+  //       res.body.should.have.property('status').eql('success');
+  //       res.body.should.have.property('enrolledCourse');
+  //       done();
+  //     });
+  // });
 
   it('should NOT update enrolled course if payment FAILED with status 500', (done) => {
     chai

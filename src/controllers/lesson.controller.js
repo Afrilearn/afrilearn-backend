@@ -189,5 +189,41 @@ class LessonController {
       });
     }
   }
+
+  /**
+   * Update lesson
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof LessonController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async updateLesson(req, res) {
+    try {
+      const lesson = await Lesson.findOne({
+        _id: req.params.lessonId,
+      });
+      const videoUrls = lesson.videoUrls;
+      console.log(lesson);
+      console.log("body", req.body.transcript);
+      const incomingData = {};
+      incomingData.transcript = req.body.transcript;
+      incomingData.videoUrl = req.file.location;
+      // console.log("here", [...videoUrls, incomingData]);
+      // console.log("here", incomingData);
+      lesson.videoUrls = [...videoUrls, incomingData];
+      lesson.save();
+
+      return res.status(200).json({
+        status: "success",
+        data: { lesson },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading lessons",
+      });
+    }
+  }
 }
 export default LessonController;
