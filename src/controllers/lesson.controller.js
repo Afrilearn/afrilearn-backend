@@ -204,13 +204,9 @@ class LessonController {
         _id: req.params.lessonId,
       });
       const videoUrls = lesson.videoUrls;
-      console.log(lesson);
-      console.log("body", req.body.transcript);
       const incomingData = {};
       incomingData.transcript = req.body.transcript;
-      incomingData.videoUrl = req.file.location;
-      // console.log("here", [...videoUrls, incomingData]);
-      // console.log("here", incomingData);
+      incomingData.videoUrl = req.body.videoUrl;
       lesson.videoUrls = [...videoUrls, incomingData];
       lesson.save();
 
