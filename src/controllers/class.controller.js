@@ -301,6 +301,8 @@ class ClassController {
             { path: "teacher", model: User },
             { path: "subjectId", populate: "mainSubjectId" },
             { path: "comments", populate: "sender" },
+            { path: "lessonId", model: Lesson },
+            { path: "userId", model: User },
           ],
         });
       const classMembers = await ClassMember.find({
