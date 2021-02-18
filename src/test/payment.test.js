@@ -259,26 +259,26 @@ describe('Past Questions ', () => {
       });
   });
 
-  it('should add a transaction with status 200 when courseId is sent', (done) => {
-    chai
-      .request(app)
-      .post('/api/v1/payments/add-transaction')
-      .set('token', token)
-      .send({
-        tx_ref: 'Links-616626414629',
-        amount: 200,
-        userId: '5ffdabf46d55210251b1a738',
-        paymentPlanId: '5fc90039d4c5950e84f72ab0',
-        courseId: '5fc90039d4c5950e84f72ab0',
-      })
-      .end((err, res) => {
-        res.should.have.status(201);
-        res.body.should.be.an('object');
-        res.body.should.have.property('status').eql('success');
-        res.body.should.have.property('transaction');
-        done();
-      });
-  });
+  // it('should add a transaction with status 200 when courseId is sent', (done) => {
+  //   chai
+  //     .request(app)
+  //     .post('/api/v1/payments/add-transaction')
+  //     .set('token', token)
+  //     .send({
+  //       tx_ref: 'Links-616626414629',
+  //       amount: 200,
+  //       userId: '5ffdabf46d55210251b1a738',
+  //       paymentPlanId: '5fc90039d4c5950e84f72ab0',
+  //       courseId: '5fc90039d4c5950e84f72ab0',
+  //     })
+  //     .end((err, res) => {
+  //       res.should.have.status(201);
+  //       res.body.should.be.an('object');
+  //       res.body.should.have.property('status').eql('success');
+  //       res.body.should.have.property('transaction');
+  //       done();
+  //     });
+  // });
 
   it('should NOT add a transaction when input is invalid', (done) => {
     chai

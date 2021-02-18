@@ -102,6 +102,14 @@ class LessonController {
         score: req.body.score,
         remark: req.body.remark,
       };
+      const existingQuizResult = await QuizResult.findOne({
+        lessonId: req.params.lessonId,
+      });
+      if (existingQuizResult) {
+        return res.status(200).json({
+          status: "success",
+        });
+      }
       const quizResult = await QuizResult.create({ ...quizResultData });
 
       return res.status(200).json({
