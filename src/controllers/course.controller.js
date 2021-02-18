@@ -507,9 +507,9 @@ class CourseController {
           reason: req.body.reason,
         });
       }
-      const { courseId, subjectId, lessonId, userId } = req.body;
+      const { courseId, subjectId, lessonId } = req.body;
       const condition = {
-        userId,
+        userId: req.data.id,
         courseId,
         subjectId,
         lessonId,
