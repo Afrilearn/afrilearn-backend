@@ -1,14 +1,14 @@
-import Auth from '../db/models/users.model';
-import Helper from '../utils/user.utils';
-import sendEmail from '../utils/email.utils';
-import AuthServices from '../services/auth.services';
-import ResetPassword from '../db/models/resetPassword.model';
-import Role from '../db/models/roles.model';
-import Course from '../db/models/courses.model';
-import ClassModel from '../db/models/classes.model';
-import EnrolledCourse from '../db/models/enrolledCourses.model';
-import ClassMember from '../db/models/classMembers.model';
-import Lesson from '../db/models/lessons.model';
+import Auth from "../db/models/users.model";
+import Helper from "../utils/user.utils";
+import sendEmail from "../utils/email.utils";
+import AuthServices from "../services/auth.services";
+import ResetPassword from "../db/models/resetPassword.model";
+import Role from "../db/models/roles.model";
+import Course from "../db/models/courses.model";
+import ClassModel from "../db/models/classes.model";
+import EnrolledCourse from "../db/models/enrolledCourses.model";
+import ClassMember from "../db/models/classMembers.model";
+import Lesson from "../db/models/lessons.model";
 
 /**
  *Contains Auth Controller
@@ -68,7 +68,7 @@ class AuthController {
       const token = await Helper.generateToken(result._id, role, fullName);
 
       const message = `Please verify your email address to complete your Afrilearn Account.<br/>Click the link http://demo.myafrilearn.com/login?token=${token}`;
-      sendEmail(email, 'Account Activation', message);
+      sendEmail(email, "Account Activation", message);
 
       return res.status(201).json({
         status: "success",
@@ -193,7 +193,7 @@ class AuthController {
 
       await ResetPassword.create({ ...data });
       const message = `Click on the link below to reset your password<br/>Click the link http://demo.myafrilearn.com/change_password?token=${token}&email=${email} <br/> Link Expires in 24 hours.`;
-      sendEmail(email, 'Password Reset', message);
+      sendEmail(email, "Password Reset", message);
       return res.status(201).json({
         status: "success",
         message: "Password reset link sent to your mail",
@@ -329,24 +329,24 @@ class AuthController {
   static async getRoles(req, res) {
     try {
       let roles = await Role.find();
-      const courses = await Course.find();      
+      const courses = await Course.find();
       // const lesson = await Lesson.find().populate({
-      //   path: 'questions',       
+      //   path: 'questions',
       // });;
       // let numberOfClassnote = lesson.length;
       // let numberOfVideoLesson = 0;
       // let numberOfQuizQuestions = 0;
 
-      roles = roles.filter((item)=> item.id !== '6014126a3636dc4398df7cc4');
-         
+      roles = roles.filter((item) => item.id !== "6014126a3636dc4398df7cc4");
+
       // let l = 0;
       // for (l = 0; l < lesson.length; l++){
-      //   numberOfVideoLesson += lesson[l].videoUrls.length; 
+      //   numberOfVideoLesson += lesson[l].videoUrls.length;
       //   if(lesson[l].questions && lesson[l].questions.length){
       //     numberOfQuizQuestions += lesson[l].questions.length;
-      //   }      
-      // }    
-    
+      //   }
+      // }
+
       return res.status(200).json({
         status: "success",
         data: {
@@ -446,6 +446,68 @@ class AuthController {
       return res.status(404).json({
         status: "success",
         data: { message: "User not found" },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading user",
+      });
+    }
+  }
+
+  /**
+   * check if  user exist and join class
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async moveUsers(req, res) {
+    try {
+      // user lands on join class page with email and classid
+      // if user exists
+      const users = await Auth.find({});
+
+      return res.status(200).json({
+        status: "success",
+        data: { users },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading user",
+      });
+    }
+  }
+
+  /**
+   * check if  user exist and join class
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async uploadProfilePic(req, res) {
+    try {
+      // user lands on join class page with email and classid
+      // if user exists
+
+      const user = await Auth.findOneAndUpdate(
+        { _id: req.data.id },
+        { profilePhotoUrl: req.file.location },
+        { new: true }
+      );
+
+      if (!user) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "Error finding user",
+        });
+      }
+
+      return res.status(200).json({
+        status: "success",
+        data: { user },
       });
     } catch (err) {
       return res.status(500).json({
