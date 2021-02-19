@@ -24,5 +24,6 @@ router.post(
   "/:courseId/:subjectId/subject-lessons",
   LessonController.getSubjectLessonsAndProgress
 );
+router.patch("/:lessonId/update", LessonController.updateLesson);
 
 export default router;

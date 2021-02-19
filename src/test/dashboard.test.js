@@ -54,7 +54,7 @@ describe('Dashboard ', () => {
     {
       data: {
         id: user_id,
-        role: '5fc8cc978e28fa50986ecac9',
+        role: '602f3ce39b146b3201c2dc1d',
         fullName: 'Testing fullName',
       },
     },
@@ -73,7 +73,7 @@ describe('Dashboard ', () => {
     const course = new Course({
       _id: course_id,
       name: 'Course for testing',
-      categoryId: '5fc8cc978e28fa50986ecac9',
+      categoryId: '602f3ce39b146b3201c2dc1d',
     });
 
     await course.save();
