@@ -31,7 +31,7 @@ const token = jwt.sign(
   {
     data: {
       id: user_one,
-      role: '5fc8cc978e28fa50986ecac9',
+      role: '602f3ce39b146b3201c2dc1d',
       fullName: 'Testing fullName',
     },
   },
@@ -534,7 +534,7 @@ describe('Auth Route Endpoints', () => {
     before(async () => {
       await Auth.create({
         _id: user_one,
-        role: '5fc8cc978e28fa50986ecac9',
+        role: '602f3ce39b146b3201c2dc1d',
         fullName: 'Testing fullName',
         email: 'email@test.com',
       });

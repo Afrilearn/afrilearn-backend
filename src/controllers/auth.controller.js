@@ -9,6 +9,7 @@ import ClassModel from "../db/models/classes.model";
 import EnrolledCourse from "../db/models/enrolledCourses.model";
 import ClassMember from "../db/models/classMembers.model";
 import Lesson from "../db/models/lessons.model";
+import Question from "../db/models/questions.model";
 
 /**
  *Contains Auth Controller
@@ -47,7 +48,7 @@ class AuthController {
 
       // if role is a teacher && there are className and courseId in body
       // create class with the info
-      if (role === "5fc8cc978e28fa50986ecac9") {
+      if (role === "602f3ce39b146b3201c2dc1d") {
         let classCode = await Helper.generateCode(8);
         const existingClassCode = await ClassModel.findOne({ classCode });
         if (existingClassCode) {
@@ -276,7 +277,7 @@ class AuthController {
         });
 
         if (
-          req.body.role === "5fc8cc978e28fa50986ecac9" &&
+          req.body.role === "602f3ce39b146b3201c2dc1d" &&
           req.body.className
         ) {
           let classCode = await Helper.generateCode(8);
@@ -329,7 +330,15 @@ class AuthController {
   static async getRoles(req, res) {
     try {
       let roles = await Role.find();
-      const courses = await Course.find();
+      const courses = await Course.find();    
+      const students = await Auth.countDocuments({
+        role: '5fd08fba50964811309722d5',
+      });
+      const teachers = await Auth.countDocuments({
+        role: '602f3ce39b146b3201c2dc1d',
+      });
+      const numberOfClassNote = await Lesson.countDocuments();
+      const numberOfQuizQuestions = await Question.countDocuments();
       // const lesson = await Lesson.find().populate({
       //   path: 'questions',
       // });;
@@ -337,7 +346,7 @@ class AuthController {
       // let numberOfVideoLesson = 0;
       // let numberOfQuizQuestions = 0;
 
-      roles = roles.filter((item) => item.id !== "6014126a3636dc4398df7cc4");
+      roles = roles.filter((item) => item.id !== "602f3cf79b146b3201c2dc1e");
 
       // let l = 0;
       // for (l = 0; l < lesson.length; l++){
@@ -352,9 +361,10 @@ class AuthController {
         data: {
           roles,
           courses,
-          // numberOfClassnote,
-          // numberOfVideoLesson,
-          // numberOfQuizQuestions
+          students,
+          teachers,
+          numberOfClassNote,
+          numberOfQuizQuestions
         },
       });
     } catch (err) {

@@ -22,7 +22,7 @@ describe("RecentActivities ", () => {
     {
       data: {
         id: user_id,
-        role: "5fc8cc978e28fa50986ecac9",
+        role: "602f3ce39b146b3201c2dc1d",
         fullName: "Testing fullName",
       },
     },
