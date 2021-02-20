@@ -96,10 +96,14 @@ class CourseController {
           populate: { path: "questions" },
         },
       });
+      const numOfUsers = await EnrolledCourse.countDocuments({
+        courseId: req.params.courseId,
+      });
       return res.status(200).json({
         status: "success",
         data: {
           course,
+          numOfUsers
         },
       });
     } catch (error) {

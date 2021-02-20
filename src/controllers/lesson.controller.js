@@ -2,6 +2,7 @@ import Question from "../db/models/questions.model";
 import QuizResult from "../db/models/quizResults.model";
 import Lesson from "../db/models/lessons.model";
 import Subject from "../db/models/subjects.model";
+import EnrolledCourse from "../db/models/enrolledCourses.model";
 /**
  *Contains Lesson Controller
  *
@@ -186,9 +187,16 @@ class LessonController {
         populate: "questions",
       });
 
+      const numOfUsers = await EnrolledCourse.countDocuments({
+        courseId: req.params.courseId,
+      });
+
       return res.status(200).json({
         status: "success",
-        data: { subject },
+        data: {
+           subject,
+           numOfUsers 
+          },
       });
     } catch (error) {
       return res.status(500).json({
