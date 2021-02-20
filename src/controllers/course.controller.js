@@ -142,7 +142,7 @@ class CourseController {
 
             /* Total performance */
             const pastQuestionResultCondition = {
-              userId: req.data.id,
+              userId: req.body.userId ? req.body.userId : req.data.id,
               courseId: req.params.courseId,
               pastQuestionCategoryId: item.categoryId,
               classId: req.body.classId,
@@ -188,7 +188,7 @@ class CourseController {
             }
 
             const pastQuestionProgressData = {
-              userId: req.data.id,
+              userId: req.body.userId ? req.body.userId : req.data.id,
               courseId: req.params.courseId,
               pastQuestionCategoryId: item.categoryId,
               classId: req.body.classId,
@@ -229,7 +229,7 @@ class CourseController {
 
           /* progress */
           const subjectProgressData = {
-            userId: req.data.id,
+            userId: req.body.userId ? req.body.userId : req.data.id,
             courseId: req.params.courseId,
             subjectId: subject._id,
             classId: req.body.classId,
@@ -241,7 +241,7 @@ class CourseController {
 
           /* performance */
           const resultCondition = {
-            userId: req.data.id,
+            userId: req.body.userId ? req.body.userId : req.data.id,
             courseId: req.params.courseId,
             subjectId: subject._id,
             classId: req.body.classId,
@@ -302,7 +302,7 @@ class CourseController {
 
           /* Total performance */
           const pastQuestionResultCondition = {
-            userId: req.data.id,
+            userId: req.body.userId ? req.body.userId : req.data.id,
             courseId: req.params.courseId,
             pastQuestionCategoryId: item.categoryId,
             classId: null,
@@ -349,7 +349,7 @@ class CourseController {
           }
 
           const pastQuestionProgressData = {
-            userId: req.data.id,
+            userId: req.body.userId ? req.body.userId : req.data.id,
             courseId: req.params.courseId,
             pastQuestionCategoryId: item.categoryId,
             classId: null,
@@ -391,7 +391,7 @@ class CourseController {
 
         /* progress */
         const subjectProgressData = {
-          userId: req.data.id,
+          userId: req.body.userId ? req.body.userId : req.data.id,
           courseId: req.params.courseId,
           subjectId: subject._id,
           classId: null,
@@ -403,7 +403,7 @@ class CourseController {
 
         /* performance */
         const resultCondition = {
-          userId: req.data.id,
+          userId: req.body.userId ? req.body.userId : req.data.id,
           courseId: req.params.courseId,
           subjectId: subject._id,
           classId: null,

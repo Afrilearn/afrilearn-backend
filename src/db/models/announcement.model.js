@@ -1,10 +1,10 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const AnnouncementSchema = new mongoose.Schema(
+const announcementSchema = new mongoose.Schema(
   {
     teacher: {
       type: mongoose.Schema.ObjectId,
-      ref: 'user',
+      ref: "user",
       required: true,
     },
     text: {
@@ -12,24 +12,28 @@ const AnnouncementSchema = new mongoose.Schema(
     },
     classId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'class',
+      ref: "class",
       required: true,
+    },
+    createdAt: {
+      type: Date,
+      default: Date,
     },
   },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
-  { timestamps: true },
+  { timestamps: { createdAt: false, updatedAt: true } }
 );
 
-AnnouncementSchema.virtual('comments', {
-  ref: 'Comment',
-  localField: '_id',
-  foreignField: 'announcementId',
+announcementSchema.virtual("comments", {
+  ref: "Comment",
+  localField: "_id",
+  foreignField: "announcementId",
   justOne: false,
 });
 
-const Announcement = mongoose.model('announcement', AnnouncementSchema);
+const Announcement = mongoose.model("announcement", announcementSchema);
 
 export default Announcement;
