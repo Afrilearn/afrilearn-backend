@@ -294,6 +294,8 @@ class ClassController {
         .populate({
           path: "classAnnouncements",
           populate: { path: "comments teacher", populate: "student" },
+          model: Announcement,
+          sort: ["createdAt", 1],
         })
         .populate({
           path: "teacherAssignedContents",

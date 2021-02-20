@@ -9,7 +9,7 @@ const router = Router();
 
 router.get('/', CourseController.loadCourses);
 router.get('/:courseId', CourseController.getCourse);
-router.get(
+router.post(
   '/:courseId/progress-and-performance',
   validateToken,
   CourseController.getCourseProgressAndPerformance,

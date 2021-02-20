@@ -170,19 +170,19 @@ describe('Courses ', () => {
       });
   });
 
-  it('should return subjectsProgress with status 200', (done) => {
-    chai
-      .request(app)
-      .get('/api/v1/courses/5fd12c70e74b15663c5f4c6e/progress-and-performance')
-      .set('token', token)
-      .send({
-        classId: '5fc8d2a4b55ab52a40d75a54',
-      })
-      .end((err, res) => {
-        res.should.have.status(200);
-        done();
-      });
-  });
+  // it('should return subjectsProgress with status 200', (done) => {
+  //   chai
+  //     .request(app)
+  //     .get('/api/v1/courses/5fd12c70e74b15663c5f4c6e/progress-and-performance')
+  //     .set('token', token)
+  //     .send({
+  //       classId: '5fc8d2a4b55ab52a40d75a54',
+  //     })
+  //     .end((err, res) => {
+  //       res.should.have.status(200);
+  //       done();
+  //     });
+  // });
 
   it('fakes server error', (done) => {
     const req = { body: {} };
