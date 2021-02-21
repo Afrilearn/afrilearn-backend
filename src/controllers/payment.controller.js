@@ -225,10 +225,11 @@ class PaymentController {
           const endDate = moment(startdate, "DD-MM-YYYY")
             .add(paymentPlan.duration, "months")
             .toDate();
-          enrolledCourse.update(
-            { status: "paid", startdate, endDate },
-            { new: true }
-          );
+          existingEnrolledCourse.status = "paid";
+          existingEnrolledCourse.startDate = startDate;
+          existingEnrolledCourse.markModified("startDate");
+          existingEnrolledCourse.endDate = endDate;
+          existingEnrolledCourse.markModified("endDate");
           enrolledCourse.save();
           return res.status(201).json({
             status: "success",
@@ -242,11 +243,16 @@ class PaymentController {
         const newPaymentPlan = await PaymentPlan.findOne({
           _id: newTransaction.paymentPlanId,
         });
-        const startdate = moment().format("DD-MM-YYYY");
-        const endDate = moment(startdate, "DD-MM-YYYY")
+        const startDate = moment().format("DD-MM-YYYY");
+        const endDate = moment(startDate, "DD-MM-YYYY")
           .add(newPaymentPlan.duration, "months")
           .toDate();
-        existingEnrolledCourse.update({ startdate, endDate }, { new: true });
+        existingEnrolledCourse.status = "paid";
+
+        existingEnrolledCourse.startDate = startDate;
+        existingEnrolledCourse.markModified("startDate");
+        existingEnrolledCourse.endDate = endDate;
+        existingEnrolledCourse.markModified("endDate");
         existingEnrolledCourse.save();
 
         return res.status(201).json({
