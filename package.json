@@ -42,13 +42,13 @@
     "morgan": "^1.10.0",
     "multer": "^1.4.2",
     "multer-s3": "^2.9.0",
-    "winston": "^3.3.3"
+    "winston": "^3.3.3",
+    "dotenv": "^8.2.0"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
     "chai": "^4.2.0",
     "chai-http": "^4.3.0",
-    "dotenv": "^8.2.0",
     "eslint": "^7.14.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-config-prettier": "^6.11.0",
@@ -63,13 +63,16 @@
     "sinon-chai": "^3.5.0"
   },
   "nyc": {
-    "exclude": [
+    "exclude": [     
+      "src/test/*",
       "src/index.js",
       "src/controllers/socialLogin.controller.js",
       "src/config/index.js",
       "src/db/*",
-      "src/routes/index.js",
-      "src/test/*"
+      "src/routes/index.js"      
     ]
+  },
+  "engines": {
+    "node": "14.13.1"
   }
 }
