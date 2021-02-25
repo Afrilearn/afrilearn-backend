@@ -28,6 +28,7 @@ class AuthController {
    */
   static async signUp(req, res) {
     try {
+      let customerRole = 'Student';
       const { fullName, password, email, role } = req.body;
 
       const encryptpassword = await Helper.encrptPassword(password);
@@ -49,6 +50,7 @@ class AuthController {
       // if role is a teacher && there are className and courseId in body
       // create class with the info
       if (role === "602f3ce39b146b3201c2dc1d") {
+        customerRole = 'Teacher';
         let classCode = await Helper.generateCode(8);
         const existingClassCode = await ClassModel.findOne({ classCode });
         if (existingClassCode) {
@@ -68,8 +70,9 @@ class AuthController {
       const user = await AuthServices.emailExist(email, res);
       const token = await Helper.generateToken(result._id, role, fullName);
 
-      const message = `Please verify your email address to complete your Afrilearn Account.<br/>Click the link http://demo.myafrilearn.com/login?token=${token}`;
-      sendEmail(email, "Account Activation", message);
+      
+      const message  = `Hi, ${fullName} just created a new ${customerRole}'s account`;
+      sendEmail('africustomers@gmail.com', "New Customer", message);
 
       return res.status(201).json({
         status: "success",
