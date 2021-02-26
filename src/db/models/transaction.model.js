@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const TransactionSchema = new mongoose.Schema(
   {
@@ -13,35 +13,35 @@ const TransactionSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ['pending', 'successful', 'failed'],
-      default: 'pending',
+      enum: ["pending", "successful", "failed", "paid"], //pending- customer has initiated payment, paid - the payment was recieved by payment merchant, successful - merchant sent webhook stating successful transaction
+      default: "pending",
     },
     userId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'user',
+      ref: "user",
     },
     enrolledCourseId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'enrolledCourse',
+      ref: "enrolledCourse",
     },
     paymentPlanId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'paymentPlan',
+      ref: "paymentPlan",
     },
   },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-TransactionSchema.virtual('relatedEnrolledCourse', {
-  ref: 'enrolledCourse',
-  localField: 'enrolledCourseId',
-  foreignField: '_id',
+TransactionSchema.virtual("relatedEnrolledCourse", {
+  ref: "enrolledCourse",
+  localField: "enrolledCourseId",
+  foreignField: "_id",
   justOne: false,
 });
-const Transaction = mongoose.model('Transaction', TransactionSchema);
+const Transaction = mongoose.model("Transaction", TransactionSchema);
 
 export default Transaction;

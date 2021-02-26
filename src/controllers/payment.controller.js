@@ -125,7 +125,7 @@ class PaymentController {
   static async verifyPaystackPayment(req, res) {
     // const secret = 'sk_test_a0ed224ebc90b07788dc7a4865a5b48d039986c7';
     try {
-      await Transaction.create({ flutterWaveResponse: req.body });
+      // await Transaction.create({ flutterWaveResponse: req.body });
 
       // validate event
       // var hash = crypto
@@ -204,11 +204,10 @@ class PaymentController {
   static async addTransaction(req, res) {
     try {
       if (req.body.courseId) {
-        const existingEnrolledCourse = await EnrolledCourse.findOneAndUpdate(
-          { courseId: req.body.courseId, userId: req.body.userId },
-          { status: "paid" },
-          { new: true }
-        );
+        const existingEnrolledCourse = await EnrolledCourse.findOne({
+          courseId: req.body.courseId,
+          userId: req.body.userId,
+        });
         if (!existingEnrolledCourse) {
           const enrolledCourse = await EnrolledCourse.create({
             userId: req.body.userId,
