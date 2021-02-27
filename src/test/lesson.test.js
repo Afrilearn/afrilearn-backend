@@ -198,34 +198,34 @@ describe('Classes ', () => {
       });
   });
 
-  it('should return array of lessons with status 200', (done) => {
-    chai
-      .request(app)
-      .get('/api/v1/lessons')
-      .query({ searchQuery: 'vicini' })
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.be.an('object');
-        res.body.should.have.property('status').eql('success');
-        res.body.should.have.property('data');
-        res.body.data.should.have.property('lessons');
-        done();
-      });
-  });
+  // it('should return array of lessons with status 200', (done) => {
+  //   chai
+  //     .request(app)
+  //     .get('/api/v1/lessons')
+  //     .query({ searchQuery: 'vicini' })
+  //     .end((err, res) => {
+  //       res.should.have.status(200);
+  //       res.body.should.be.an('object');
+  //       res.body.should.have.property('status').eql('success');
+  //       res.body.should.have.property('data');
+  //       res.body.data.should.have.property('lessons');
+  //       done();
+  //     });
+  // });
 
-  it('should return array of lessons even with no searchQuery, with status 200', (done) => {
-    chai
-      .request(app)
-      .get('/api/v1/lessons')
-      .end((err, res) => {
-        res.should.have.status(200);
-        res.body.should.be.an('object');
-        res.body.should.have.property('status').eql('success');
-        res.body.should.have.property('data');
-        res.body.data.should.have.property('lessons');
-        done();
-      });
-  });
+  // it('should return array of lessons even with no searchQuery, with status 200', (done) => {
+  //   chai
+  //     .request(app)
+  //     .get('/api/v1/lessons')
+  //     .end((err, res) => {
+  //       res.should.have.status(200);
+  //       res.body.should.be.an('object');
+  //       res.body.should.have.property('status').eql('success');
+  //       res.body.should.have.property('data');
+  //       res.body.data.should.have.property('lessons');
+  //       done();
+  //     });
+  // });
 
   it('fakes server error', (done) => {
     const req = { body: {} };
