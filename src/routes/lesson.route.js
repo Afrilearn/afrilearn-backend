@@ -19,11 +19,11 @@ router.get(
   verifyToken,
   LessonController.getTestResult
 );
-router.get("/", LessonController.searchLessons);
+router.post("/search/:keywords", LessonController.searchLessons);
 router.post(
   "/:courseId/:subjectId/subject-lessons",
   LessonController.getSubjectLessonsAndProgress
 );
 router.patch("/:lessonId/update", LessonController.updateLesson);
-
+router.get("/:lessonId/", LessonController.getSingleLesson);
 export default router;

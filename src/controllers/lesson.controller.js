@@ -46,25 +46,22 @@ class LessonController {
    */
   static async searchLessons(req, res) {
     try {
-      const searchEntry = req.query.searchQuery ? req.query.searchQuery : "";
-      const searchQuery = new RegExp(`.*${searchEntry}.*`, "i");
-      const lessons = await Lesson.find({
-        $or: [{ title: searchQuery }, { content: searchQuery }],
-      }).populate({
-        path: "subjectId courseId termId",
-        populate: "mainSubjectId",
-      });
-
+      const {keywords} = req.params;
+      const searchQuery = new RegExp(`.*${keywords}.*`, "i");
+      const result = await Lesson.find({'title': searchQuery}, { title: 1 }).limit(18).populate({
+        path: "courseId",  
+        select:"name"     
+      });      
       return res.status(200).json({
         status: "success",
         data: {
-          lessons,
+          result,
         },
       });
     } catch (error) {
       return res.status(500).json({
         status: "500 Internal server error",
-        error: "Error Loading lessons",
+        error: "Error returning search result",
       });
     }
   }
@@ -221,6 +218,31 @@ class LessonController {
       lesson.videoUrls = [...videoUrls, incomingData];
       lesson.save();
 
+      return res.status(200).json({
+        status: "success",
+        data: { lesson },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading lessons",
+      });
+    }
+  }
+
+  /**
+   * Update lesson
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof LessonController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getSingleLesson(req, res) {
+    try {
+      const lesson = await Lesson.findOne({
+        _id: req.params.lessonId,
+      }, { title: 1, content:1 });      
       return res.status(200).json({
         status: "success",
         data: { lesson },
