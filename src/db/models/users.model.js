@@ -90,6 +90,12 @@ UserSchema.virtual("recentActivities", {
   foreignField: "userId",
   justOne: false,
 });
+UserSchema.virtual("adminRoles", {
+  ref: "adminRole",
+  localField: "_id",
+  foreignField: "userId",
+  justOne: false,
+});
 
 const User = mongoose.model("user", UserSchema);
 
