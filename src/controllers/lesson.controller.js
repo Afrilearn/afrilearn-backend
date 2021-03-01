@@ -37,7 +37,7 @@ class LessonController {
   }
 
   /**
-   * Seacrch for lessons
+   * Search for lessons title and details
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
    * @memberof LessonController
@@ -46,12 +46,23 @@ class LessonController {
    */
   static async searchLessons(req, res) {
     try {
+      let result;
       const {keywords} = req.params;
       const searchQuery = new RegExp(`.*${keywords}.*`, "i");
-      const result = await Lesson.find({'title': searchQuery}, { title: 1 }).limit(18).populate({
-        path: "courseId",  
-        select:"name"     
-      });      
+      if (Object.keys(req.body).includes("details")) {
+        result = await Lesson.find({'title': searchQuery}, { title: 1, content:1 }).limit(18).populate({
+          path: "subjectId courseId termId",
+          select:"name",
+          populate: ({
+            path: "mainSubjectId",
+            select:"imageUrl"
+          })
+        });
+      }else{
+        result = await Lesson.find({'title': searchQuery}, { title: 1 }).limit(18)
+      }
+      
+         
       return res.status(200).json({
         status: "success",
         data: {
