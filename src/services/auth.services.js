@@ -1,6 +1,7 @@
-import Auth from '../db/models/users.model';
-import EnrolledCourse from '../db/models/enrolledCourses.model';
-import ResetPassword from '../db/models/resetPassword.model';
+import Auth from "../db/models/users.model";
+import EnrolledCourse from "../db/models/enrolledCourses.model";
+import ResetPassword from "../db/models/resetPassword.model";
+import AdminRole from "../db/models/adminRole.model";
 
 export default {
   async emailExist(email, res) {
@@ -10,20 +11,25 @@ export default {
       };
       const user = await Auth.findOne(condition)
         .populate({
-          path: 'enrolledCourses',
+          path: "enrolledCourses",
           model: EnrolledCourse,
           populate: {
-            path: 'courseId',
-            select: 'name imageUrl',
+            path: "courseId",
+            select: "name imageUrl",
           },
         })
-        .populate({ path: 'classOwnership', populate: 'enrolledCourse' });
+        .populate({ path: "classOwnership", populate: "enrolledCourse" })
+        .populate({
+          path: "adminRoles",
+          model: AdminRole,
+          populate: { path: "classId", populate: "enrolledCourse" },
+        });
 
       return user;
     } catch (err) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error checking for email',
+        status: "500 Internal server error",
+        error: "Error checking for email",
       });
     }
   },
@@ -44,8 +50,8 @@ export default {
       return true;
     } catch (err) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error matching activation code',
+        status: "500 Internal server error",
+        error: "Error matching activation code",
       });
     }
   },
@@ -58,8 +64,8 @@ export default {
       return user;
     } catch (err) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error getting email',
+        status: "500 Internal server error",
+        error: "Error getting email",
       });
     }
   },
