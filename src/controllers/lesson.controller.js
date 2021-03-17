@@ -37,6 +37,37 @@ class LessonController {
   }
 
   /**
+   * Get  lessons
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof LessonController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getAllLessons(req, res) {
+    try {
+      const lessons = await Lesson.find({})
+        .select("-content -courseId -creatorId -termId -transcript -id")
+        .populate({
+          path: "subjectId",
+          select: "mainSubjectId",
+          populate: { path: "mainSubjectId", select: "name" },
+        });
+      return res.status(200).json({
+        status: "success",
+        data: {
+          lessons,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading questions",
+      });
+    }
+  }
+
+  /**
    * Search for lessons title and details
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
@@ -47,22 +78,28 @@ class LessonController {
   static async searchLessons(req, res) {
     try {
       let result;
-      const {keywords} = req.params;
+      const { keywords } = req.params;
       const searchQuery = new RegExp(`.*${keywords}.*`, "i");
       if (Object.keys(req.body).includes("details")) {
-        result = await Lesson.find({'title': searchQuery}, { title: 1, content:1 }).limit(18).populate({
-          path: "subjectId courseId termId",
-          select:"name",
-          populate: ({
-            path: "mainSubjectId",
-            select:"imageUrl"
-          })
-        });
-      }else{
-        result = await Lesson.find({'title': searchQuery}, { title: 1 }).limit(18)
+        result = await Lesson.find(
+          { title: searchQuery },
+          { title: 1, content: 1 }
+        )
+          .limit(18)
+          .populate({
+            path: "subjectId courseId termId",
+            select: "name",
+            populate: {
+              path: "mainSubjectId",
+              select: "imageUrl",
+            },
+          });
+      } else {
+        result = await Lesson.find({ title: searchQuery }, { title: 1 }).limit(
+          18
+        );
       }
-      
-         
+
       return res.status(200).json({
         status: "success",
         data: {
@@ -199,7 +236,7 @@ class LessonController {
       });
       return res.status(200).json({
         status: "success",
-        data: { subject,numOfUsers },
+        data: { subject, numOfUsers },
       });
     } catch (error) {
       return res.status(500).json({
@@ -251,9 +288,12 @@ class LessonController {
    */
   static async getSingleLesson(req, res) {
     try {
-      const lesson = await Lesson.findOne({
-        _id: req.params.lessonId,
-      }, { title: 1, content:1 });      
+      const lesson = await Lesson.findOne(
+        {
+          _id: req.params.lessonId,
+        },
+        { title: 1, content: 1 }
+      );
       return res.status(200).json({
         status: "success",
         data: { lesson },

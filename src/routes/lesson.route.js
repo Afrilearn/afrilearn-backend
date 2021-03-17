@@ -6,6 +6,7 @@ import SaveQuizResults from "../validations/results/quizResults.validator";
 
 const router = Router();
 
+router.get("/", LessonController.getAllLessons);
 router.get("/:lessonId/test", LessonController.loadTest);
 router.post(
   "/:lessonId/save-test-results",
