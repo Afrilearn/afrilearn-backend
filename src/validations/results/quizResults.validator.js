@@ -1,4 +1,4 @@
-import { check, validationResult } from 'express-validator';
+import { check, validationResult } from "express-validator";
 
 /**
  *Contains SaveQuizResults Validator
@@ -15,65 +15,44 @@ class SaveQuizResults {
    */
   static validateData() {
     return [
-      check('results')
+      check("results")
         .exists()
-        .withMessage('Results is required')
-        .not()
-        .isEmpty()
-        .withMessage('Results cannot be empty')
+        .withMessage("Results is required")
         .isArray()
-        .withMessage('Results should be an array'),
-      check('userId')
+        .withMessage("Results should be an array"),
+      check("userId")
         .exists()
-        .withMessage('User ID is required')
+        .withMessage("User ID is required")
         .isMongoId()
-        .withMessage('User ID should be a mongoID'),
-      check('courseId')
+        .withMessage("User ID should be a mongoID"),
+      check("courseId")
         .exists()
-        .withMessage('Course ID is required')
+        .withMessage("Course ID is required")
         .isMongoId()
-        .withMessage('Course ID should be a mongoID'),
-      check('lessonId')
+        .withMessage("Course ID should be a mongoID"),
+      check("lessonId")
         .exists()
-        .withMessage('Lesson ID is required')
+        .withMessage("Lesson ID is required")
         .isMongoId()
-        .withMessage('Lesson ID should be a mongoID'),
-      check('timeSpent')
-        .exists()
-        .withMessage('Time spent is required')
-        .not()
-        .isEmpty()
-        .withMessage('Time spent cannot be empty')
+        .withMessage("Lesson ID should be a mongoID"),
+      check("timeSpent")
         .isString()
-        .withMessage('Time spent is type String'),
-      check('numberOfCorrectAnswers')
-        .exists()
-        .withMessage('Number of Correct Answers is required')
+        .withMessage("Time spent is type String"),
+      check("numberOfCorrectAnswers")
         .isInt()
-        .withMessage('Number of Correct Answers is an Integer'),
-      check('numberOfWrongAnswers')
-        .exists()
-        .withMessage('Number of Wrong Answers is required')
+        .withMessage("Number of Correct Answers is an Integer"),
+      check("numberOfWrongAnswers")
         .isInt()
-        .withMessage('Number of Wrong Answers is an Integer'),
-      check('numberOfSkippedQuestions')
-        .exists()
-        .withMessage('Number of Skipped Answers is required')
+        .withMessage("Number of Wrong Answers is an Integer"),
+      check("numberOfSkippedQuestions")
         .isInt()
-        .withMessage('Number of Skipped Answers is an Integer'),
-      check('score')
-        .exists()
-        .withMessage('Score is required')
+        .withMessage("Number of Skipped Answers is an Integer"),
+      check("score")
         .isInt()
-        .withMessage('Score is an Integer'),
-      check('remark')
-        .exists()
-        .withMessage('Remark is required')
-        .not()
-        .isEmpty()
-        .withMessage('Remark cannot be empty')
+        .withMessage("Score is an Integer"),
+      check("remark")
         .isString()
-        .withMessage('Remark is type String'),
+        .withMessage("Remark is type String"),
     ];
   }
 
@@ -90,8 +69,8 @@ class SaveQuizResults {
     if (!errors.isEmpty()) {
       const errArr = errors.array().map(({ msg }) => msg);
       return res.status(400).json({
-        status: '400 Invalid Request',
-        error: 'Your request contains invalid parameters',
+        status: "400 Invalid Request",
+        error: "Your request contains invalid parameters",
         errors: errArr,
       });
     }

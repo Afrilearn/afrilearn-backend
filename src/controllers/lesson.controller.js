@@ -148,12 +148,20 @@ class LessonController {
         score: req.body.score,
         remark: req.body.remark,
       };
-      const existingQuizResult = await QuizResult.findOne({
-        lessonId: req.params.lessonId,
-      });
+      const existingQuizResult = await QuizResult.findOneAndUpdate(
+        {
+          lessonId: req.params.lessonId,
+          userId: req.data.id,
+        },
+        quizResultData,
+        { new: true }
+      );
       if (existingQuizResult) {
         return res.status(200).json({
           status: "success",
+          data: {
+            results: existingQuizResult,
+          },
         });
       }
       const quizResult = await QuizResult.create({ ...quizResultData });
