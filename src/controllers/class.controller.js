@@ -79,6 +79,15 @@ class ClassController {
       if (Object.keys(req.body).includes("status")) {
         classMemberData.status = req.body.status;
       }
+      const existingClassMember = await ClassMember.findOne({
+        ...classMemberData,
+      });
+      if (existingClassMember) {
+        return res.status(400).json({
+          status: "400 not found",
+          error: "You are already a member of this class",
+        });
+      }
       const classMember = await ClassMember.create({ ...classMemberData });
 
       return res.status(200).json({
