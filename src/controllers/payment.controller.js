@@ -220,12 +220,12 @@ class PaymentController {
           const paymentPlan = await PaymentPlan.findOne({
             _id: transaction.paymentPlanId,
           });
-          const startdate = moment().format("DD-MM-YYYY");
+          const startdate = moment().toDate();
           const endDate = moment(startdate, "DD-MM-YYYY")
             .add(paymentPlan.duration, "months")
             .toDate();
           existingEnrolledCourse.status = "paid";
-          existingEnrolledCourse.startDate = startDate;
+          existingEnrolledCourse.startDate = startdate;
           existingEnrolledCourse.markModified("startDate");
           existingEnrolledCourse.endDate = endDate;
           existingEnrolledCourse.markModified("endDate");
@@ -242,7 +242,7 @@ class PaymentController {
         const newPaymentPlan = await PaymentPlan.findOne({
           _id: newTransaction.paymentPlanId,
         });
-        const startDate = moment().format("DD-MM-YYYY");
+        const startDate = moment().toDate();
         const endDate = moment(startDate, "DD-MM-YYYY")
           .add(newPaymentPlan.duration, "months")
           .toDate();

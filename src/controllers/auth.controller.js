@@ -28,7 +28,7 @@ class AuthController {
    */
   static async signUp(req, res) {
     try {
-      let customerRole = 'Student';
+      let customerRole = "Student";
       const { fullName, password, email, role } = req.body;
 
       const encryptpassword = await Helper.encrptPassword(password);
@@ -50,7 +50,7 @@ class AuthController {
       // if role is a teacher && there are className and courseId in body
       // create class with the info
       if (role === "602f3ce39b146b3201c2dc1d") {
-        customerRole = 'Teacher';
+        customerRole = "Teacher";
         let classCode = await Helper.generateCode(8);
         const existingClassCode = await ClassModel.findOne({ classCode });
         if (existingClassCode) {
@@ -70,9 +70,8 @@ class AuthController {
       const user = await AuthServices.emailExist(email, res);
       const token = await Helper.generateToken(result._id, role, fullName);
 
-      
-      const message  = `Hi, ${fullName} just created a new ${customerRole}'s account`;
-      sendEmail('africustomers@gmail.com', "New Customer", message);
+      const message = `Hi, ${fullName} just created a new ${customerRole}'s account`;
+      sendEmail("africustomers@gmail.com", "New Customer", message);
 
       return res.status(201).json({
         status: "success",
@@ -196,7 +195,7 @@ class AuthController {
       };
 
       await ResetPassword.create({ ...data });
-      const message = `Click on the link below to reset your password<br/>Click the link http://demo.myafrilearn.com/change_password?token=${token}&email=${email} <br/> Link Expires in 24 hours.`;
+      const message = `Click on the link below to reset your password<br/>Click the link https://myafrilearn.com/change_password?token=${token}&email=${email} <br/> Link Expires in 24 hours.`;
       sendEmail(email, "Password Reset", message);
       return res.status(201).json({
         status: "success",
@@ -333,12 +332,12 @@ class AuthController {
   static async getRoles(req, res) {
     try {
       let roles = await Role.find();
-      const courses = await Course.find();    
+      const courses = await Course.find();
       const students = await Auth.countDocuments({
-        role: '5fd08fba50964811309722d5',
+        role: "5fd08fba50964811309722d5",
       });
       const teachers = await Auth.countDocuments({
-        role: '602f3ce39b146b3201c2dc1d',
+        role: "602f3ce39b146b3201c2dc1d",
       });
       const numberOfClassNote = await Lesson.countDocuments();
       const numberOfQuizQuestions = await Question.countDocuments();
@@ -367,7 +366,7 @@ class AuthController {
           students,
           teachers,
           numberOfClassNote,
-          numberOfQuizQuestions
+          numberOfQuizQuestions,
         },
       });
     } catch (err) {
