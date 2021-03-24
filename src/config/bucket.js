@@ -13,7 +13,7 @@ aws.config.update({
 const storage = multerS3({
   acl: "public-read",
   s3,
-  bucket: "afrilearn-media",
+  bucket: "afrilearn-media", 
   metadata: function (req, file, cb) {
     cb(null, { fieldName: file.fieldname });
   },
