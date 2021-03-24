@@ -5,15 +5,15 @@ const multerS3 = require("multer-s3");
 
 const s3 = new aws.S3();
 aws.config.update({
-  secretAccessKey: "XOBy5yocMWuLgbhOYJCGr7QmNmm0NJGb/16CiEuR",
-  accessKeyId: "AKIAISRPVTHSMOK2AFCQ",
-  region: "us-east-1",
+  secretAccessKey: process.env.S3_ACCESS_SECRET,
+  accessKeyId: process.env.S3_ACCESS_KEY,
+  region: "eu-west-3",
 });
 
 const storage = multerS3({
   acl: "public-read",
   s3,
-  bucket: "afrilearn",
+  bucket: "afrilearn-media", 
   metadata: function (req, file, cb) {
     cb(null, { fieldName: file.fieldname });
   },
