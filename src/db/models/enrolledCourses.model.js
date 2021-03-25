@@ -37,6 +37,7 @@ EnrolledCourseSchema.methods.toJSON = function () {
   return enrolledCourseObject;
 };
 
+
 const EnrolledCourse = mongoose.model('enrolledCourse', EnrolledCourseSchema);
 
 export default EnrolledCourse;

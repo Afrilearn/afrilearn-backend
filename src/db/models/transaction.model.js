@@ -28,6 +28,10 @@ const TransactionSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "paymentPlan",
     },
+    creatorId: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'cmsUser',
+    },
   },
   {
     toJSON: { virtuals: true },

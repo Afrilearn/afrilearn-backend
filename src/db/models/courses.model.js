@@ -5,20 +5,25 @@ const courseSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
+      unique: true
     },
-    imageUrl: {
-      type: String,
+    alias: {
+      type: String     
     },
     categoryId: {
       type: mongoose.Schema.ObjectId,
       ref: 'courseCategory',
     },
+    creatorId: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'cmsUser',
+    },
   },
+  { timestamps: true },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   },
-  { timestamps: true },
 );
 
 courseSchema.virtual('relatedPastQuestions', {
