@@ -8,8 +8,7 @@ const courseSchema = new mongoose.Schema(
       unique: true
     },
     alias: {
-      type: String,
-      required: true,
+      type: String     
     },
     categoryId: {
       type: mongoose.Schema.ObjectId,
