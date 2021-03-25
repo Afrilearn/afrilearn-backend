@@ -10,6 +10,9 @@ const SubjectSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'course',
     },
+    imageUrl: {
+      type: String
+    }
   },
   {
     toJSON: { virtuals: true },

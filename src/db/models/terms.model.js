@@ -6,6 +6,10 @@ const TermSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    creatorId: {
+      type: mongoose.Schema.ObjectId,
+      ref: "cmsUser"
+    }    
   },
   { timestamps: true },
   {

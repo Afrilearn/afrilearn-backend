@@ -1,11 +1,11 @@
 import mongoose from 'mongoose';
 
-const courseCategorySchema = new mongoose.Schema(
+const RoleSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
-    }  
+    },
   },
   { timestamps: true },
   {
@@ -14,6 +14,6 @@ const courseCategorySchema = new mongoose.Schema(
   },
 );
 
-const CourseCategory = mongoose.model('courseCategory', courseCategorySchema);
+const Role = mongoose.model('role', RoleSchema);
 
-export default CourseCategory;
+export default Role;

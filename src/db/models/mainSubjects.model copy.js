@@ -18,7 +18,7 @@ const mainSubjectSchema = new mongoose.Schema(
     },
     classification: {
       type: String,
-    },
+    }
   },
   { timestamps: true },
   {
