@@ -1,13 +1,29 @@
-import { Router } from 'express';
-import DashboardController from '../controllers/dashboard.controller';
-import validateToken from '../middlewares/auth.middleware';
+import { Router } from "express";
+import DashboardController from "../controllers/dashboard.controller";
+import validateToken from "../middlewares/auth.middleware";
 
 const router = Router();
 
+router.post("/", validateToken, DashboardController.getUserDashboard);
 router.post(
-  '/',
+  "/class-membership",
   validateToken,
-  DashboardController.getUserDashboard,
+  DashboardController.getUserDashboardClassMembership
+);
+router.post(
+  "/recentActivities",
+  validateToken,
+  DashboardController.getUserDashboardRecentActivities
+);
+router.post(
+  "/recommendations",
+  validateToken,
+  DashboardController.getUserDashboardRecommendations
+);
+router.post(
+  "/enrolled-courses",
+  validateToken,
+  DashboardController.getUserDashboardEnrolledCourses
 );
 // router.get('/:courseId', CourseController.getCourse);
 // router.get(

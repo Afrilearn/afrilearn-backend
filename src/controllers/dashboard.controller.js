@@ -1,9 +1,9 @@
-import ClassMember from '../db/models/classMembers.model';
-import EnrolledCourse from '../db/models/enrolledCourses.model';
-import QuizResult from '../db/models/quizResults.model';
-import RecentActivity from '../db/models/recentActivities.model';
-import Recommendation from '../db/models/recommendation.model';
-import SubjectProgress from '../db/models/subjectProgresses.model';
+import ClassMember from "../db/models/classMembers.model";
+import EnrolledCourse from "../db/models/enrolledCourses.model";
+import QuizResult from "../db/models/quizResults.model";
+import RecentActivity from "../db/models/recentActivities.model";
+import Recommendation from "../db/models/recommendation.model";
+import SubjectProgress from "../db/models/subjectProgresses.model";
 /**
  *Contains Dashboard Controller
  *
@@ -24,17 +24,17 @@ class DashboardController {
     try {
       const classMembership = await ClassMember.find({
         userId: req.data.id,
-      }).populate({ path: 'classId userId', populate: 'userId' });
+      }).populate({ path: "classId userId", populate: "userId" });
       const recentActivities = await RecentActivity.find({
         userId: req.data.id,
       })
         .sort({ createdAt: -1 })
         .populate({
-          path: 'lessonId',
-          select: 'title subjectId',
+          path: "lessonId",
+          select: "title subjectId",
           populate: {
-            path: 'subjectId',
-            populate: 'mainSubjectId',
+            path: "subjectId",
+            populate: "mainSubjectId",
           },
         });
       const recommendation = await Recommendation.find({
@@ -42,14 +42,14 @@ class DashboardController {
       })
         .sort({ createdAt: -1 })
         .populate({
-          path: 'reason',
-          select: 'title',
-          populate: { path: '_id' },
+          path: "reason",
+          select: "title",
+          populate: { path: "_id" },
         })
         .populate({
-          path: 'recommended',
-          select: 'title videoUrls',
-          populate: { path: '_id' },
+          path: "recommended",
+          select: "title videoUrls",
+          populate: { path: "_id" },
         });
       const data = {
         classMembership,
@@ -61,12 +61,12 @@ class DashboardController {
           _id: req.body.enrolledCourseId,
           userId: req.data.id,
         }).populate({
-          path: 'courseId',
+          path: "courseId",
           populate: {
-            path: 'relatedPastQuestions relatedSubjects',
+            path: "relatedPastQuestions relatedSubjects",
             populate: {
               path:
-                'pastQuestionTypes mainSubjectId quizResults relatedLessons',
+                "pastQuestionTypes mainSubjectId quizResults relatedLessons",
             },
           },
         });
@@ -86,7 +86,7 @@ class DashboardController {
               subjectId: subject._id,
             };
             const subjectProgress = await SubjectProgress.find(
-              subjectProgressData,
+              subjectProgressData
             ).countDocuments();
             /* progress */
 
@@ -104,10 +104,10 @@ class DashboardController {
             results.forEach((result) => {
               totalScore += result.score;
               totalQuestionsCorrect += result.numberOfCorrectAnswers;
-              totalQuestions
-                += result.numberOfCorrectAnswers
-                + result.numberOfWrongAnswers
-                + result.numberOfSkippedQuestions;
+              totalQuestions +=
+                result.numberOfCorrectAnswers +
+                result.numberOfWrongAnswers +
+                result.numberOfSkippedQuestions;
               totalTimeSpent += result.timeSpent;
             });
             const performance = totalScore / results.length;
@@ -129,13 +129,145 @@ class DashboardController {
       }
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data,
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error Loading Dashboard',
+        status: "500 Internal server error",
+        error: "Error Loading Dashboard",
+      });
+    }
+  }
+
+  /**
+   * Get a user's classMembership
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof DashboardController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getUserDashboardClassMembership(req, res) {
+    try {
+      const classMembership = await ClassMember.find({
+        userId: req.data.id,
+      }).populate({ path: "classId userId", populate: "userId" });
+      return res.status(200).json({
+        status: "success",
+        data: { classMembership },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading Dashboard ClassMembership",
+      });
+    }
+  }
+
+  /**
+   * Get a user's recentActivities
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof DashboardController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getUserDashboardRecentActivities(req, res) {
+    try {
+      const recentActivities = await RecentActivity.find({
+        userId: req.data.id,
+      })
+        .sort({ createdAt: -1 })
+        .populate({
+          path: "lessonId",
+          select: "title subjectId",
+          populate: {
+            path: "subjectId",
+            populate: "mainSubjectId",
+          },
+        });
+
+      return res.status(200).json({
+        status: "success",
+        data: { recentActivities },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading Dashboard recentActivities",
+      });
+    }
+  }
+
+  /**
+   * Get a user's recommendations
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof DashboardController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getUserDashboardRecommendations(req, res) {
+    try {
+      const recommendation = await Recommendation.find({
+        userId: req.data.id,
+      })
+        .sort({ createdAt: -1 })
+        .populate({
+          path: "reason",
+          select: "title",
+          populate: { path: "_id" },
+        })
+        .populate({
+          path: "recommended",
+          select: "title videoUrls",
+          populate: { path: "_id" },
+        });
+
+      return res.status(200).json({
+        status: "success",
+        data: { recommendation },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading Dashboard recommendation",
+      });
+    }
+  }
+
+  /**
+   * Get a user's enrolledCourses
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof DashboardController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getUserDashboardEnrolledCourses(req, res) {
+    try {
+      const enrolledCourse = await EnrolledCourse.findOne({
+        _id: req.body.enrolledCourseId,
+        userId: req.data.id,
+      }).populate({
+        path: "courseId",
+        populate: {
+          path: "relatedPastQuestions relatedSubjects",
+          populate: {
+            path: "pastQuestionTypes mainSubjectId",
+          },
+        },
+      });
+
+      return res.status(200).json({
+        status: "success",
+        data: { enrolledCourse },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading Dashboard EnrolledCourse",
       });
     }
   }
