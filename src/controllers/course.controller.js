@@ -103,7 +103,7 @@ class CourseController {
         status: "success",
         data: {
           course,
-          numOfUsers
+          numOfUsers,
         },
       });
     } catch (error) {
@@ -123,6 +123,7 @@ class CourseController {
    *
    */
   static async getCourseProgressAndPerformance(req, res) {
+    console.log("Starting");
     try {
       if (req.body.classId) {
         // if req.body.classId
@@ -297,23 +298,29 @@ class CourseController {
         select: "name categoryId",
         model: PastQuestionType,
       });
+      console.log("relatedPq", relatedPq[0].pastQuestionTypes);
       const examsList = [];
       for (let index = 0; index < relatedPq.length; index++) {
         const pq = relatedPq[index];
 
         for (let index = 0; index < pq.pastQuestionTypes.length; index++) {
           const item = pq.pastQuestionTypes[index];
+          console.log("item", item);
 
           /* Total performance */
           const pastQuestionResultCondition = {
             userId: req.body.userId ? req.body.userId : req.data.id,
             courseId: req.params.courseId,
             pastQuestionCategoryId: item.categoryId,
-            classId: null,
           };
+          console.log(
+            "pastQuestionResultCondition",
+            pastQuestionResultCondition
+          );
           const pastQuestionResults = await PastQuestionQuizResult.find(
             pastQuestionResultCondition
           );
+          console.log("pastQuestionResults", pastQuestionResults);
           let pqTotalScore = 0;
           let totalTimeSpentOnQuestion = 0;
           pastQuestionResults.forEach((result) => {
@@ -337,6 +344,7 @@ class CourseController {
             }
           );
           const totalSubjects = response.data;
+          console.log("totalSubjects", totalSubjects);
           /* subjectIDs */
           const subjectIds = [];
           const perSubjectResults = [];
