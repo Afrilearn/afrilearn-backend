@@ -39,6 +39,9 @@ class AuthController {
         email,
         role,
       };
+      if (req.body.referralCode) {
+        newUser.referee = req.body.referralCode;
+      }
 
       const result = await Auth.create({ ...newUser });
 
