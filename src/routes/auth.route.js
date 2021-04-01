@@ -52,6 +52,13 @@ router.post(
 );
 
 router.post(
+  "/social_login/google/mobile",
+  SocialLoginValidator.validateData(),
+  SocialLoginValidator.myValidationResult,
+  SocialLoginController.socialLoginGoogleMobile
+);
+
+router.post(
   "/social_login/facebook",
   SocialLoginValidator.validateData(),
   SocialLoginValidator.myValidationResult,
