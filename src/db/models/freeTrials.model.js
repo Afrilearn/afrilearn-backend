@@ -24,10 +24,10 @@ const FreeTrialSchema = new mongoose.Schema(
       type: Date,
     },
   },
-  { timestamps: true },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    timestamps: true
   },
 );
 

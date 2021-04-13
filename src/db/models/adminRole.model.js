@@ -14,8 +14,8 @@ const AdminRoleSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    timestamps: true
   },
-  { timestamps: true }
 );
 
 const AdminRole = mongoose.model("adminRole", AdminRoleSchema);

@@ -23,10 +23,10 @@ const SubjectProgressSchema = new mongoose.Schema(
       ref: 'subject',
     },
   },
-  { timestamps: true },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    timestamps: true
   },
 );
 

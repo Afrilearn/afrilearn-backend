@@ -41,7 +41,7 @@ const UserSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    referralCode: {
+    referralLink: {
       type: String,
       trim: true,
     },
@@ -60,8 +60,8 @@ const UserSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-  },
-  { timestamps: true }
+    timestamps: true
+  }  
 );
 
 UserSchema.virtual("enrolledCourses", {

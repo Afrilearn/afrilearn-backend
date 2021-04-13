@@ -11,10 +11,10 @@ const classCourseSchema = new mongoose.Schema(
       ref: 'course',
     },
   },
-  { timestamps: true },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    timestamps: true
   },
 );
 

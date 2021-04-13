@@ -23,8 +23,8 @@ const announcementSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    timestamps: { createdAt: false, updatedAt: true }
   },
-  { timestamps: { createdAt: false, updatedAt: true } }
 );
 
 announcementSchema.virtual("comments", {

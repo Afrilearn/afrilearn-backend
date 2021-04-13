@@ -19,8 +19,8 @@ const PaymentPlanSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    timestamps: true 
   },
-  { timestamps: true },
 );
 
 const PaymentPlan = mongoose.model('paymentPlan', PaymentPlanSchema);

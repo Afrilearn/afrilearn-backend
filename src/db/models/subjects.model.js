@@ -17,8 +17,8 @@ const SubjectSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    timestamps: true 
   },
-  { timestamps: true },
 );
 
 SubjectSchema.virtual('mainSubjects', {

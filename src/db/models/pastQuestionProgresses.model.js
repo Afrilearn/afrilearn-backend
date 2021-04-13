@@ -28,8 +28,8 @@ const PastQuestionProgressSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    timestamps: true
   },
-  { timestamps: true },
 );
 
 const PastQuestionProgress = mongoose.model(
