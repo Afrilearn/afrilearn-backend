@@ -2,6 +2,9 @@ import mongoose from "mongoose";
 
 const AdminRoleSchema = new mongoose.Schema(
   {
+    roleDescription: {
+      type: String,
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
@@ -9,6 +12,10 @@ const AdminRoleSchema = new mongoose.Schema(
     classId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "class",
+    },
+    schoolId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "school",
     },
   },
   {

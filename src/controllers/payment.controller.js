@@ -21,7 +21,7 @@ class PaymentController {
    * @returns {JSON} - A JSON success response.
    *
    */
-  static async verifyPayment(req, res) {
+  static async verifyPayment(req, res) { 
     try {
       await Transaction.create({ flutterWaveResponse: req.body });
       /* It is a good idea to log all events received. Add code *

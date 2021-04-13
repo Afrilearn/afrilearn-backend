@@ -39,6 +39,9 @@ class ClassController {
         name: req.body.name,
         classCode,
       };
+      if (req.body.school) {
+        classData.school = req.body.school;
+      }
       const newClass = await ClassModel.create({ ...classData });
 
       return res.status(200).json({
@@ -51,6 +54,31 @@ class ClassController {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Adding class",
+      });
+    }
+  }
+
+  /**
+   * Delete a Class
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async deleteClass(req, res) {
+    try {
+      const newClass = await ClassModel.findByIdAndRemove(req.params.classId);
+      return res.status(200).json({
+        status: "success",
+        data: {
+          class: newClass,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Removing class",
       });
     }
   }
@@ -116,8 +144,21 @@ class ClassController {
    */
   static async sendClassEmailInvite(req, res) {
     try {
-      const message = `Click this link to join the class ${req.body.link}`;
-      sendEmail(req.body.email, "Class Invite", message);
+      const fullName = req.data.fullName;
+      const message = `
+      Congratulations! <br/>
+      
+      Your friend, ${fullName}, is inviting you to enjoy engaging video lessons, class notes, practice tests, live classes for best results in WASSCE, NECO, BECE, UTME, POST-UTME & more. Simply download the fun Afrilearn App or visit https://myafrilearn.com/ now. <br/>
+      
+      Afrilearn transforms average students and outright failures into high flying students and highly successful people. <br/>
+      
+      Download the fun Afrilearn App or visit https://myafrilearn.com/ now.
+      <br/>
+      
+      Cheers to Academic Excellence! 
+      <br/>
+      Click this link to join the class ${req.body.link}`;
+      sendEmail(req.body.email, "Become A High-Flying Student!", message);
       return res.status(200).json({
         status: "success",
         data: {

@@ -8,6 +8,8 @@ import PasswordResetValidator from "../validations/auth/resetPassword.validator"
 import SocialLoginValidator from "../validations/auth/socialLogin.validator";
 import CheckUserAndJoin from "../validations/auth/checkAndJoin.validator";
 import upload from "../config/bucket";
+import AddCourseForChild from "../validations/auth/addCourseForChild";
+import SignupForChild from "../validations/auth/signupForChild.validator";
 
 const router = Router();
 
@@ -74,6 +76,24 @@ router.post(
   CheckUserAndJoin.validateData(),
   CheckUserAndJoin.myValidationResult,
   AuthController.checkUserExistAndJoin
+);
+router.post(
+  "/parent/add-course-for-child",
+  verifyToken,
+  AddCourseForChild.validateData(),
+  AddCourseForChild.myValidationResult,
+  AuthController.enrollChildInCourse 
+);
+router.get(
+  "/parent/children",
+  verifyToken,
+  AuthController.populateParentDashboard
+);
+router.post(
+  "/sign-up-for-a-child",
+  SignupForChild.validateData(),
+  SignupForChild.myValidationResult,
+  AuthController.signUpForChild
 );
 router.post("/move-users", AuthController.moveUsers);
 router.patch(
