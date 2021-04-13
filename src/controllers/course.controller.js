@@ -518,10 +518,13 @@ class CourseController {
   static async subjectProgress(req, res) {
     try {
       const latestRecommendation = await Recommendation.find()
-        .sort({ createdAt: -1 }) 
+        .sort({ createdAt: -1 })
         .limit(1); // latest docs
       const existingRecommendation =
-        latestRecommendation[0].recommended == req.body.recommended;
+        latestRecommendation &&
+        latestRecommendation[0] &&
+        latestRecommendation[0].recommended === req.body.recommended;
+
       if (!existingRecommendation) {
         await Recommendation.create({
           userId: req.data.id,
