@@ -27,10 +27,10 @@ const UserSchema = new mongoose.Schema(
       default: true,
     },
   },
-  { timestamps: true },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    timestamps: true
   },
 );
 UserSchema.virtual('recentActivities', {

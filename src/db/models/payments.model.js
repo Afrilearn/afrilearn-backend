@@ -22,10 +22,10 @@ const PaymentSchema = new mongoose.Schema(
       type: Number,
     },
   },
-  { timestamps: true },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    timestamps: true
   },
 );
 

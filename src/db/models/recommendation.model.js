@@ -20,10 +20,10 @@ const RecommendationSchema = new mongoose.Schema(
       ref: 'lesson',
     },
   },
-  { timestamps: true },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    timestamps: true
   },
 );
 

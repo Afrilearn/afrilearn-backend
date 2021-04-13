@@ -11,10 +11,10 @@ const TermSchema = new mongoose.Schema(
       ref: "cmsUser"
     }    
   },
-  { timestamps: true },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
+    timestamps: true 
   },
 );
 

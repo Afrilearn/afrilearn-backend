@@ -10,6 +10,7 @@ import EnrolledCourse from "../db/models/enrolledCourses.model";
 import ClassMember from "../db/models/classMembers.model";
 import Lesson from "../db/models/lessons.model";
 import Question from "../db/models/questions.model";
+import mongoose from 'mongoose';
 
 /**
  *Contains Auth Controller
@@ -39,8 +40,13 @@ class AuthController {
         email,
         role,
       };
-      if (req.body.referralCode) {
+      
+      if (req.body.referralCode && mongoose.isValidObjectId(req.body.referralCode)) {       
         newUser.referee = req.body.referralCode;
+      }
+
+      if (req.body.referralLink) {       
+        newUser.referralLink = req.body.referralLink;
       }
 
       const result = await Auth.create({ ...newUser });
