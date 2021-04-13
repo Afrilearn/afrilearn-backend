@@ -8,7 +8,7 @@ const router = Router();
 router.get('/plans', PaymentController.getPaymentPlans);
 router.post(
   '/add-transaction',
-  validateToken,
+  validateToken, 
   AddTransaction.validateData(),
   AddTransaction.myValidationResult,
   PaymentController.addTransaction,

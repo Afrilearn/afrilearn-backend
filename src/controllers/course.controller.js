@@ -125,6 +125,9 @@ class CourseController {
   static async getCourseProgressAndPerformance(req, res) {
     console.log("Starting");
     try {
+      const userID = req.body.userId || req.data.id;
+      console.log("userID", userID);
+      const userWithThisPerformance = "Usman";
       if (req.body.classId) {
         // if req.body.classId
         /* pq */
@@ -239,9 +242,11 @@ class CourseController {
             subjectId: subject._id,
             classId: req.body.classId,
           };
-          const subjectProgress = await SubjectProgress.find(
+          const incomingSubjectProgress = await SubjectProgress.find(
             subjectProgressData
           ).countDocuments();
+          const subjectProgress =
+            (incomingSubjectProgress / subject.relatedLessons.length) * 100;
           /* progress */
 
           /* performance */
@@ -286,11 +291,14 @@ class CourseController {
             subjectsList,
             examsList,
             status: "with class",
+            user: userWithThisPerformance,
           },
         });
       }
       // no req.body.classId
       /* pq */
+      console.log("No classid");
+
       const relatedPq = await RelatedPastQuestion.find({
         courseId: req.params.courseId,
       }).populate({
@@ -408,9 +416,11 @@ class CourseController {
           subjectId: subject._id,
           classId: null,
         };
-        const subjectProgress = await SubjectProgress.find(
+        const incomingSubjectProgress = await SubjectProgress.find(
           subjectProgressData
         ).countDocuments();
+        const subjectProgress =
+          (incomingSubjectProgress / subject.relatedLessons.length) * 100;
         /* progress */
 
         /* performance */
@@ -455,6 +465,7 @@ class CourseController {
           subjectsList,
           examsList,
           status: " without class",
+          user: userWithThisPerformance,
         },
       });
     } catch (error) {
@@ -510,7 +521,10 @@ class CourseController {
         .sort({ createdAt: -1 })
         .limit(1); // latest docs
       const existingRecommendation =
-        latestRecommendation[0].recommended == req.body.recommended;
+        latestRecommendation &&
+        latestRecommendation[0] &&
+        latestRecommendation[0].recommended === req.body.recommended;
+
       if (!existingRecommendation) {
         await Recommendation.create({
           userId: req.data.id,

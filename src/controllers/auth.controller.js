@@ -11,6 +11,7 @@ import ClassMember from "../db/models/classMembers.model";
 import Lesson from "../db/models/lessons.model";
 import Question from "../db/models/questions.model";
 import mongoose from 'mongoose';
+import School from "../db/models/schoolProfile";
 
 /**
  *Contains Auth Controller
@@ -80,6 +81,7 @@ class AuthController {
       const token = await Helper.generateToken(result._id, role, fullName);
 
       const message = `Hi, ${fullName} just created a new ${customerRole}'s account`;
+
       sendEmail("africustomers@gmail.com", "New Customer", message);
 
       return res.status(201).json({
@@ -87,6 +89,223 @@ class AuthController {
         data: {
           token,
           user,
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error creating new user",
+      });
+    }
+  }
+
+  /**
+   * School Create account for a student.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async signUpForStudent(req, res) {
+    try {
+      let customerRole = "Student";
+      const { fullName, password, email, courseId, schoolId } = req.body;
+
+      const encryptpassword = await Helper.encrptPassword(password);
+      const existingSchool = await School.findOne({ _id: schoolId });
+      if (!existingSchool) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "School is not registered",
+        });
+      }
+      const existingSchoolStudent = await Auth.find({
+        email,
+        schoolId,
+      });
+
+      if (existingSchoolStudent) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error: "Student already registered to this school",
+        });
+      }
+
+      const newUser = {
+        fullName,
+        password: encryptpassword,
+        email,
+        role: "5fd08fba50964811309722d5",
+        schoolId,
+      };
+
+      const result = await Auth.create({ ...newUser });
+
+      const enrolledCourse = await EnrolledCourse.create({
+        userId: result._id,
+        courseId,
+      });
+
+      const message = `Hi, ${fullName}, your school just created a new ${customerRole}'s account for you.`;
+      const adminMessage = ` ${existingSchool.name}, just created a new ${customerRole}'s account for ${fullName}.`;
+
+      sendEmail(email, "Welcome to Afrilearn", message);
+      sendEmail("africustomers@gmail.com", "New Customer", adminMessage);
+      sendEmail(existingSchool.email, "Student Registered", adminMessage);
+
+      return res.status(201).json({
+        status: "success",
+        data: {
+          user: result,
+          enrolledCourse,
+          password,
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error creating new user",
+      });
+    }
+  }
+
+  /**
+   * Parent Create account for a child.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async signUpForChild(req, res) {
+    try {
+      let customerRole = "Student";
+      const { fullName, password, email, courseId, parentId } = req.body;
+
+      const encryptpassword = await Helper.encrptPassword(password);
+      const existingParent = await Auth.findOne({ _id: parentId });
+      if (!existingParent) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "Parent is not registered",
+        });
+      }
+      const existingUser = await Auth.findOne({
+        email: email,
+      });
+      if (existingUser) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error: email + " already in use",
+        });
+      }
+      const existingParentChild = await Auth.findOne({
+        email: email,
+        parentId: parentId,
+      });
+
+      if (existingParentChild) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error: "Child already registered to this parent",
+        });
+      }
+
+      const newUser = {
+        fullName,
+        password: encryptpassword,
+        email,
+        role: "5fd08fba50964811309722d5",
+        parentId,
+      };
+
+      const result = new Auth({ ...newUser });
+      await result.save();
+
+      const enrolledCourse = await EnrolledCourse.create({
+        userId: result._id,
+        courseId,
+      });
+
+      const message = `Hi, ${fullName}, your parent just created a new ${customerRole}'s account for you.`;
+      const adminMessage = ` ${existingParent.fullName} just created a new ${customerRole}'s account for ${fullName}.`;
+      const parentMessage = `You just created a new ${customerRole}'s account for ${fullName}.`;
+
+      sendEmail(email, "Welcome to Afrilearn", message);
+      sendEmail("africustomers@gmail.com", "New Customer", adminMessage);
+      sendEmail(
+        existingParent.email,
+        "Your Child is Registered",
+        parentMessage
+      );
+
+      return res.status(201).json({
+        status: "success",
+        data: {
+          user: result,
+          enrolledCourse,
+          password,
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error creating new user",
+      });
+    }
+  }
+
+  /**
+   * Parent Add a course for a child.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async enrollChildInCourse(req, res) {
+    try {
+      const { email, courseId } = req.body;
+
+      const child = await Auth.findOne({ email: email });
+      const parent = req.data;
+      if (!child) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "Student is not registered",
+        });
+      }
+      if (child.parentId.toString() !== parent.id) {
+        return res.status(401).json({
+          status: "401 Unautorized",
+          error: `You are not the registered Parent of ${child.fullName}`,
+        });
+      }
+
+      const existingEnrolledCourse = await EnrolledCourse.findOne({
+        userId: child._id,
+        courseId,
+      });
+      if (existingEnrolledCourse) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error: `${child.fullName} is already enrolled to this class`,
+        });
+      }
+      const enrolledCourse = await EnrolledCourse.create({
+        userId: child._id,
+        courseId,
+      });
+
+      const message = `Hi, ${child.fullName}, your parent just enrolled you in a class log in yo your account on https://myafrilearn.com to check out`;
+      const adminMessage = ` ${parent.fullName} just enrolled ${child.fullName} to a new course.`;
+
+      sendEmail(email, "Welcome to Afrilearn", message);
+      sendEmail("africustomers@gmail.com", "New Customer", adminMessage);
+      sendEmail(parent.email, "Student Registered", adminMessage);
+
+      return res.status(201).json({
+        status: "success",
+        data: {
+          enrolledCourse,
         },
       });
     } catch (err) {
@@ -138,12 +357,14 @@ class AuthController {
   static async login(req, res) {
     try {
       const { email, password } = req.body;
-      const user = await AuthServices.emailExist(email, res);
+      const lowerCaseEmail = email.toLowerCase();
+      const user = await AuthServices.emailExist(lowerCaseEmail, res);
 
       if (!user) {
         return res.status(401).json({
           status: "401 Unauthorized",
-          error: "Invalid email address",
+          error:
+            "Sorry, your email was incorrect. Please double-check your email.",
         });
       }
 
@@ -155,7 +376,8 @@ class AuthController {
       if (!confirmPassword) {
         return res.status(401).json({
           status: "401 Unauthorized",
-          error: "Invalid password",
+          error:
+            "Sorry, your password was incorrect. Please double-check your password.",
         });
       }
 
@@ -175,7 +397,8 @@ class AuthController {
     } catch (err) {
       return res.status(500).json({
         status: "500 Internal server error",
-        error: "Error Logging in user",
+        error:
+          "Sorry, you are unable to login due to server issues. Please try again. Thank you.",
       });
     }
   }
@@ -190,6 +413,16 @@ class AuthController {
   static async resetPassword(req, res) {
     try {
       const { email } = req.params;
+      //
+
+      const user = Auth.findOne({ email });
+      if (!user) {
+        return res.status(404).json({
+          status: "404 Internal server error",
+          error:
+            "Sorry, there’s no Afrilearn account with this email address. Click Register to create a free account.",
+        });
+      }
 
       const Time = new Date();
       const expiringDate = Time.setDate(Time.getDate() + 1);
@@ -529,6 +762,41 @@ class AuthController {
       return res.status(200).json({
         status: "success",
         data: { user },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading user",
+      });
+    }
+  }
+
+  /**
+   * Parent's list of children
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async populateParentDashboard(req, res) {
+    try {
+      const children = await Auth.find({ parentId: req.data.id }).populate({
+        path: "enrolledCourses",
+        // select: "courseId -userId",
+        populate: { path: "courseId", select: "name" },
+      });
+      // .select("fullName");
+
+      if (!children) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "Children not found",
+        });
+      }
+
+      return res.status(200).json({
+        status: "success",
+        data: { children },
       });
     } catch (err) {
       return res.status(500).json({

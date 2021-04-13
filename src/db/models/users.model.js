@@ -37,6 +37,14 @@ const UserSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "role",
     },
+    parentId: {
+      type: mongoose.Schema.ObjectId,
+      ref: "user",
+    },
+    schoolId: {
+      type: mongoose.Schema.ObjectId,
+      ref: "school",
+    },
     googleUserId: {
       type: String,
       trim: true,

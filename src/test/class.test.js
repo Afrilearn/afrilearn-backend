@@ -322,7 +322,7 @@ describe("Classes ", () => {
     sinon.stub(res, "status").returnsThis();
 
     ClassController.sendClassEmailInvite(req, res);
-    res.status.should.have.callCount(2);
+    res.status.should.have.callCount(1);
     done();
   });
 
