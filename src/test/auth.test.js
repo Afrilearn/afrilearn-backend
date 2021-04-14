@@ -61,7 +61,7 @@ const customChild = {
   _id: child_id,
   fullName: "hackerbay",
   userName: "jackson",
-  email: "child@gmail.com",
+  email: "child" + child_id + "@gmail.com",
   password: "123456",
   confirmPassword: "123456",
   gender: "male",

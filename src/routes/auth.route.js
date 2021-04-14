@@ -10,6 +10,8 @@ import CheckUserAndJoin from "../validations/auth/checkAndJoin.validator";
 import upload from "../config/bucket";
 import AddCourseForChild from "../validations/auth/addCourseForChild";
 import SignupForChild from "../validations/auth/signupForChild.validator";
+import AddUserAsChild from "../validations/auth/addUserAsChild.validator";
+import UnlinkChildAccount from "../validations/auth/unlinkChildAccount.validator";
 
 const router = Router();
 
@@ -82,7 +84,7 @@ router.post(
   verifyToken,
   AddCourseForChild.validateData(),
   AddCourseForChild.myValidationResult,
-  AuthController.enrollChildInCourse 
+  AuthController.enrollChildInCourse
 );
 router.get(
   "/parent/children",
@@ -94,6 +96,24 @@ router.post(
   SignupForChild.validateData(),
   SignupForChild.myValidationResult,
   AuthController.signUpForChild
+);
+router.post(
+  "/add-user-as-child",
+  AddUserAsChild.validateData(),
+  AddUserAsChild.myValidationResult,
+  AuthController.addExistingUserAsChild
+);
+router.patch(
+  "/unlink-child-account",
+  UnlinkChildAccount.validateData(),
+  UnlinkChildAccount.myValidationResult,
+  AuthController.unlinkChildAccount
+);
+router.delete(
+  "/delete-child-account",
+  UnlinkChildAccount.validateData(),
+  UnlinkChildAccount.myValidationResult,
+  AuthController.deleteChildAccount
 );
 router.post("/move-users", AuthController.moveUsers);
 router.patch(

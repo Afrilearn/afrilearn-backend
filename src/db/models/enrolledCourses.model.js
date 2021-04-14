@@ -29,7 +29,7 @@ const EnrolledCourseSchema = new mongoose.Schema(
   },
   { timestamps: true },
 );
-
+ 
 EnrolledCourseSchema.methods.toJSON = function () {
   const enrolledCourse = this;
   const enrolledCourseObject = enrolledCourse.toObject();
