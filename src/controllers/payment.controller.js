@@ -330,7 +330,7 @@ class PaymentController {
           });
         } else {
           // console.log(response)
-          if (response.receipt.purchaseState === 0) {
+          if (response.receipt.purchaseState === 1) {
             verified = true
             if (role === '602f3ce39b146b3201c2dc1d') {
               (async () => {
