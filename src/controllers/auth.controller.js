@@ -54,11 +54,13 @@ class AuthController {
       }
 
       const result = await Auth.create({ ...newUser });
-
-      const enrolledCourse = await EnrolledCourse.create({
-        userId: result._id,
-        courseId: req.body.courseId,
-      });
+      let enrolledCourse;
+      if (role !== "606ed82e70f40e18e029165e") {
+        enrolledCourse = await EnrolledCourse.create({
+          userId: result._id,
+          courseId: req.body.courseId,
+        });
+      }
 
       // if role is a teacher && there are className and courseId in body
       // create class with the info
@@ -983,7 +985,7 @@ class AuthController {
    * @memberof AuthController
    * @returns {JSON} - A JSON success response.
    */
-  static async populateParentDashboard(req, res) {``
+  static async populateParentDashboard(req, res) {
     try {
       const children = await Auth.find({ parentId: req.data.id }).populate({
         path: "enrolledCourses",
