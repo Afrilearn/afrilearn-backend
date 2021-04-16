@@ -31,7 +31,7 @@ class ClassController {
       const existingClassCode = await ClassModel.findOne({ classCode });
 
       if (existingClassCode) {
-        classCode = await Helper.generateCode(8);
+        classCode = await Helper.generateCode(9);
       }
       const classData = {
         courseId: req.body.courseId,

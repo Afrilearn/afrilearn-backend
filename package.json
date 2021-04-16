@@ -30,20 +30,21 @@
     "cors": "^2.8.5",
     "coveralls": "^3.1.0",
     "crypto": "^1.0.1",
+    "dotenv": "^8.2.0",
     "env-cmd": "^8.0.2",
     "esm": "^3.2.25",
     "express": "^4.17.1",
     "express-validator": "^6.6.1",
     "fs": "0.0.1-security",
     "google-auth-library": "^6.0.6",
+    "iap": "^1.1.1",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.1",
     "mongoose": "^5.10.4",
     "morgan": "^1.10.0",
     "multer": "^1.4.2",
     "multer-s3": "^2.9.0",
-    "winston": "^3.3.3",
-    "dotenv": "^8.2.0"
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "babel-eslint": "^10.1.0",
@@ -63,13 +64,13 @@
     "sinon-chai": "^3.5.0"
   },
   "nyc": {
-    "exclude": [     
+    "exclude": [
       "src/test/*",
       "src/index.js",
       "src/controllers/socialLogin.controller.js",
       "src/config/index.js",
       "src/db/*",
-      "src/routes/index.js"      
+      "src/routes/index.js"
     ]
   },
   "engines": {

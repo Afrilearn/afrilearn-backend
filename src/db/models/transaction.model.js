@@ -20,6 +20,10 @@ const TransactionSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "user",
     },
+    classId: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'class',
+    },
     enrolledCourseId: {
       type: mongoose.Schema.ObjectId,
       ref: "enrolledCourse",
