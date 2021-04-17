@@ -990,7 +990,11 @@ class AuthController {
       const children = await Auth.find({ parentId: req.data.id }).populate({
         path: "enrolledCourses",
         // select: "courseId -userId",
-        populate: { path: "courseId", select: "name alias" },
+        populate: {
+          path: "courseId transaction",
+          select: "name alias paymentPlanId",
+          populate: { path: "paymentPlanId", select: "name" },
+        },
       });
       // .select("fullName");
 
