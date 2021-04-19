@@ -11,6 +11,10 @@ router.post(
   DashboardController.getUserDashboardClassMembership
 );
 router.post(
+  "/recentActivities-by-time",
+  DashboardController.getUserDashboardRecentActivitiesTimeBased
+);
+router.post(
   "/recentActivities",
   validateToken,
   DashboardController.getUserDashboardRecentActivities

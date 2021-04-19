@@ -27,7 +27,7 @@ const QuizResultsSchema = new mongoose.Schema(
     classId: {
       type: mongoose.Schema.ObjectId,
       ref: 'class',
-    },
+    }, 
     courseId: {
       type: mongoose.Schema.ObjectId,
       ref: 'course',
