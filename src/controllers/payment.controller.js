@@ -322,15 +322,13 @@ class PaymentController {
       iap.verifyPayment(platform, payment, function (error, response) {
         if (error) {      
           console.log(error)          
-          return res.status(200).json({
-            status: "success",
-            data: {
-              verified:false
-            }
+          return res.status(400).json({
+            status: "error",
+            error
           });
         } else {
           // console.log(response)
-          if (response.receipt.purchaseState === 1) {
+          if (response.receipt.purchaseState === 0) {
             verified = true
             if (role === '602f3ce39b146b3201c2dc1d') {
               (async () => {
@@ -464,98 +462,22 @@ class PaymentController {
             return res.status(200).json({
               status: "success",
               data: {
-                verified:true
+                verified:true,
+                purchaseState:response.receipt.purchaseState
               }
             });
           }else{
             return res.status(200).json({
               status: "success",
               data: {
-                verified:false
+                verified:false,
+                purchaseState:response
+                // purchaseState:response.receipt.purchaseState
               }
             });
           }
         }
-      });
-
-      //payment section    
-
-      // //if the user is a teacher that wants to add a new class
-      // if (role === '602f3ce39b146b3201c2dc1d' && req.body.newClassName) {       
-      //   let classCode = await Helper.generateCode(8);
-
-      //   const existingClassCode = await ClassModel.findOne({ classCode });
-      //   if (existingClassCode) {
-      //     classCode = await Helper.generateCode(9);
-      //   }
-
-      //   condition = {        
-      //     userId: clientUserId,
-      //     name: req.body.newClassName,
-      //     courseId,
-      //     classCode
-      //   }
-
-      //   newClass = await ClassModel.create(condition);
-      //   console.log(newClass)
-      // }
-
-      // // check whether the user is already enrolled for this course
-      // condition = {
-      //   courseId,
-      //   userId: clientUserId,
-      // }
-
-      // let existingEnrolledCourse = await EnrolledCourse.findOne(condition);
-
-      // if (!existingEnrolledCourse) {    
-      //   if (role === '602f3ce39b146b3201c2dc1d' && req.body.newClassName) {
-      //     console.log('attash class id')
-      //     console.log(newClass)
-      //     condition['classId'] = newClass.id;
-      //   }
-      //   existingEnrolledCourse = await EnrolledCourse.create(condition);       
-      // }
-
-      // // Get payment plan length and amount
-      // condition = {
-      //   _id: productId,
-      // }
-      // const paymentPlan = await PaymentPlan.findOne({
-      //   _id: productId,
-      // }, {
-      //   amount: 1,
-      //   duration: 1
-      // });
-
-      // //credit the user
-      // const startdate = moment().toDate();
-      // const endDate = moment(startdate, "DD-MM-YYYY")
-      //   .add(paymentPlan.duration, "months")
-      //   .toDate();
-
-      // existingEnrolledCourse.startDate = startdate;
-      // existingEnrolledCourse.endDate = endDate;
-      // existingEnrolledCourse.status = "paid";
-      // existingEnrolledCourse.save();
-
-      // // // Create the transaction
-      // condition = {
-      //   tx_ref: purchaseToken,
-      //   amount: paymentPlan.amount,
-      //   status: 'successful',
-      //   userId: clientUserId,
-      //   enrolledCourseId: existingEnrolledCourse._id,
-      //   paymentPlanId: productId
-      // }
-      // await Transaction.create(condition)
-
-      // return res.status(200).json({
-      //   status: "success",
-      //   data: {
-      //     verified
-      //   }
-      // });
+      });     
     } catch (error) {
       return res.status(500).json({
         status: "500 Internal server error",
