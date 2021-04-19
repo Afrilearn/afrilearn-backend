@@ -1,4 +1,4 @@
-import RecentActivity from '../db/models/recentActivities.model';
+import RecentActivity from "../db/models/recentActivities.model";
 /**
  *Contains Lesson Controller
  *
@@ -21,26 +21,27 @@ class RecentActivityController {
         .sort({ createdAt: -1 })
         .limit(1); // latest docs
 
-      const existingRecentActivity = latestRecentActivity[0].lessonId == req.body.lessonId;
+      const existingRecentActivity =
+        latestRecentActivity[0].lessonId == req.body.lessonId;
       if (!existingRecentActivity) {
         const recentActivity = await RecentActivity.create({
           ...req.body,
           userId: req.data.id,
         });
         return res.status(200).json({
-          status: 'success',
+          status: "success",
           data: {
             recentActivity,
           },
         });
       }
       return res.status(200).json({
-        status: 'success',
+        status: "success",
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error Saving RecentActivity',
+        status: "500 Internal server error",
+        error: "Error Saving RecentActivity",
       });
     }
   }
@@ -58,18 +59,19 @@ class RecentActivityController {
       const recentActivities = await RecentActivity.find({
         userId: req.data.id,
       })
-        .limit(5)
-        .sort('-createdAt');
+        .limit(5) 
+        .sort("-createdAt")
+        .populate("quizResults");
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           recentActivities,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error loading RecentActivities',
+        status: "500 Internal server error",
+        error: "Error loading RecentActivities",
       });
     }
   }

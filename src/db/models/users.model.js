@@ -68,10 +68,16 @@ const UserSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-    timestamps: true
-  }  
+    timestamps: true,
+  }
 );
 
+UserSchema.virtual("usersReferred", {
+  ref: "user",
+  localField: "_id",
+  foreignField: "referee",
+  justOne: false,
+});
 UserSchema.virtual("enrolledCourses", {
   ref: "enrolledCourse",
   localField: "_id",

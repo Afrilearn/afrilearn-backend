@@ -201,6 +201,51 @@ class DashboardController {
   }
 
   /**
+   * Get a user's recentActivities time based
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof DashboardController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getUserDashboardRecentActivitiesTimeBased(req, res) {
+    const { startDate, endDate } = req.body;
+    try {
+      const recentActivities = await RecentActivity.find({
+        userId: req.body.userId,
+        createdAt: {
+          $gte: startDate,
+          $lte: endDate,
+        },
+      })
+        .sort({ createdAt: -1 })
+        .populate({
+          path: "lessonId",
+          select: "title subjectId courseId",
+          populate: {
+            path: "subjectId",
+            populate: { path: "mainSubjectId", select: "-introText" },
+          },
+        })
+        .populate({
+          path: "quizResults",
+          model: QuizResult,
+          select: "timeSpent score createdAt",
+        });
+
+      return res.status(200).json({
+        status: "success",
+        data: { recentActivities },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading Dashboard recentActivities",
+      });
+    }
+  }
+
+  /**
    * Get a user's recommendations
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.

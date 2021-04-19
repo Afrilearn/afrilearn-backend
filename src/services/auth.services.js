@@ -23,7 +23,8 @@ export default {
           path: "adminRoles",
           model: AdminRole,
           populate: { path: "classId", populate: "enrolledCourse" },
-        });
+        })
+        .populate({ path: "usersReferred", select: "fullName" });
 
       return user;
     } catch (err) {
