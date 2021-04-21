@@ -20,6 +20,12 @@ const SchoolSchema = new mongoose.Schema(
     logo: {
       type: String,
     },
+    coverPhoto: {
+      type: String,
+    },
+    courseCategoryId: {
+      type: mongoose.Schema.Types.ObjectId,
+    },
     creator: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",

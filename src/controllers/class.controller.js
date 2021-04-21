@@ -39,8 +39,8 @@ class ClassController {
         name: req.body.name,
         classCode,
       };
-      if (req.body.school) {
-        classData.school = req.body.school;
+      if (req.body.schoolId) {
+        classData.schoolId = req.body.schoolId;
       }
       const newClass = await ClassModel.create({ ...classData });
 

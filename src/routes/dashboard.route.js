@@ -29,6 +29,11 @@ router.post(
   validateToken,
   DashboardController.getUserDashboardEnrolledCourses
 );
+router.post(
+  "/student-performance-summary",
+  validateToken,
+  DashboardController.getStudentPerformanceSummary
+);
 // router.get('/:courseId', CourseController.getCourse);
 // router.get(
 //   '/:courseId/progress-and-performance',
