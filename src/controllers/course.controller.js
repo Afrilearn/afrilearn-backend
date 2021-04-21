@@ -57,6 +57,16 @@ class CourseController {
    */
   static async addCourseToEnrolledCourses(req, res) {
     try {
+      const existingEnrollement = await EnrolledCourse.findOne({
+        userId: req.body.userId,
+        courseId: req.body.courseId,
+      });
+      if (existingEnrollement) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error: "You are enrolled to this class",
+        });
+      }
       const course = await EnrolledCourse.create({
         userId: req.body.userId,
         courseId: req.body.courseId,

@@ -13,6 +13,13 @@ import Question from "../db/models/questions.model";
 import mongoose from "mongoose";
 import School from "../db/models/schoolProfile";
 
+import Userz from "../../users.json";
+import Students from "../../students.json";
+import axios from "axios";
+import CourseCategory from "../db/models/courseCategories.model";
+import Class from "../db/models/classes.model";
+import AdminRole from "../db/models/adminRole.model";
+
 /**
  *Contains Auth Controller
  *
@@ -62,6 +69,24 @@ class AuthController {
         });
       }
 
+      //if school role, create school profile
+      if (role === "607ededa2712163504210684") {
+        const school = await School.create({
+          name: req.body.schoolName,
+          email: req.body.email,
+          courseCategoryId: req.body.courseCategoryId,
+          creator: result._id,
+        });
+
+        //create classes according to the course category
+        await AuthServices.createClassesForSchool(
+          req.body.courseCategoryId,
+          school,
+          result,
+          res
+        );
+      }
+
       // if role is a teacher && there are className and courseId in body
       // create class with the info
       if (role === "602f3ce39b146b3201c2dc1d") {
@@ -105,6 +130,261 @@ class AuthController {
   }
 
   /**
+   * School Create add teacher to class.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async schoolAddExistingTeacher(req, res) {
+    try {
+      let customerRole = "Teacher";
+      const { email, schoolId, classId } = req.body;
+
+      const existingSchool = await School.findOne({ _id: schoolId });
+      if (!existingSchool) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "School is not registered",
+        });
+      }
+
+      const existingUser = await Auth.findOne({
+        email,
+      });
+      if (!existingUser) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error:
+            "Teacher with this email not found, Add a name and password to craete a new account",
+        });
+      }
+      if (
+        existingUser &&
+        existingUser.schoolId &&
+        existingUser.schoolId.toString() !== schoolId
+      ) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error: "Teacher is registered with another school",
+        });
+      }
+
+      const classHasExistingTeacher = await Class.findOne({
+        classId,
+        schoolId,
+      });
+      if (!classHasExistingTeacher) {
+        return res.status(404).json({
+          status: "404 Bad request",
+          error: "Class not registered to this school",
+        });
+      }
+
+      if (classHasExistingTeacher && classHasExistingTeacher.userId) {
+        //add new teacher to admins
+        const newAdmin = await AdminRole.create({
+          roleDescription: "Teacher",
+          userId: existingUser._id,
+          classId,
+          schoolId,
+        });
+        const message = `Hi, ${existingUser.fullName}, your school just created a new Admin account for you.`;
+        const adminMessage = ` ${existingSchool.name} just created a new Admin account for ${existingUser.fullName}.`;
+
+        sendEmail(email, "Welcome to Afrilearn", message);
+        sendEmail("africustomers@gmail.com", "New Customer", adminMessage);
+        sendEmail(existingSchool.email, "Student Registered", adminMessage);
+        return res.status(201).json({
+          status: "success",
+          data: {
+            user: existingUser,
+          },
+        });
+      } else {
+        //Add  teacher to class s
+        classHasExistingTeacher.userId = existingUser._id;
+        await classHasExistingTeacher.save();
+      }
+
+      const message = `Hi ${existingUser.fullName}, your school just created a new ${customerRole}'s account for you.`;
+      const adminMessage = ` ${existingSchool.name}, just created a new ${customerRole}'s account for ${existingUser.fullName}.`;
+
+      sendEmail(email, "Welcome to Afrilearn", message);
+      sendEmail("africustomers@gmail.com", "New Customer", adminMessage);
+      sendEmail(existingSchool.email, "Student Registered", adminMessage);
+
+      return res.status(201).json({
+        status: "success",
+        data: {
+          user: existingUser,
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error creating new user",
+      });
+    }
+  }
+
+  /**
+   * School makes teacher an admin.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async makeTeacherAdmin(req, res) {
+    try {
+      const { email, schoolId, classId } = req.body;
+
+      const existingSchool = await School.findOne({ _id: schoolId });
+      if (!existingSchool) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "School is not registered",
+        });
+      }
+
+      const existingUser = await Auth.findOne({
+        email,
+      });
+      if (!existingUser) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error:
+            "Teacher with this email not found, Add a name and password to craete a new account",
+        });
+      }
+
+      const existingClass = await Class.findOne({
+        _id: classId,
+        schoolId,
+      });
+      console.log("existingClass", existingClass);
+      if (classId && !existingClass) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "Class not registered to this School",
+        });
+      }
+
+      //add teacher to admins
+      const admin = await AdminRole.create({
+        roleDescription: "Admin",
+        userId: existingUser._id,
+        classId,
+        schoolId,
+      });
+      const message = `Hi, ${existingUser.fullName}, ${existingSchool.name} made you an Admin`;
+      const adminMessage = ` ${existingSchool.name} added ${existingUser.fullName} as Admin.`;
+
+      sendEmail(email, "You are now an Admin", message);
+      sendEmail("africustomers@gmail.com", "New Admin", adminMessage);
+      sendEmail(existingSchool.email, "Admin Added", adminMessage);
+      return res.status(201).json({
+        status: "success",
+        data: {
+          admin,
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error adding admin",
+      });
+    }
+  }
+
+  /**
+   * School Create account for a student.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async signUpForTeacher(req, res) {
+    try {
+      let customerRole = "Teacher";
+      const { fullName, password, email, schoolId } = req.body;
+
+      const encryptpassword = await Helper.encrptPassword(password);
+      const existingUser = await Auth.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({
+          status: "400 Not found",
+          error: "Email is registered, Add to an Existing class",
+        });
+      }
+      const existingSchool = await School.findOne({ _id: schoolId });
+      if (!existingSchool) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "School is not registered",
+        });
+      }
+      const existingSchoolTeacher = await Auth.findOne({
+        email,
+        schoolId,
+      });
+
+      if (existingSchoolTeacher) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error: "Teacher already registered to this school",
+        });
+      }
+
+      const newUser = {
+        fullName,
+        password: encryptpassword,
+        email,
+        role: "602f3ce39b146b3201c2dc1d",
+        schoolId,
+      };
+
+      const result = await Auth.create({ ...newUser });
+
+      //create class
+      // let classCode = await Helper.generateCode(8);
+      // const existingClassCode = await Class.findOne({ classCode });
+
+      // if (existingClassCode) {
+      //   classCode = await Helper.generateCode(9);
+      // }
+      // const trimmedSchoolName = existingSchool.name.replace(/\s/g, "");
+      // const classData = {
+      //   schoolId: existingSchool._id,
+      //   name: `${existingSchool.name} ${course.name}`,
+      //   classCode: `${trimmedSchoolName}${classCode}`,
+      // };
+
+      // await Class.create({ ...classData });
+
+      const message = `Hi, ${fullName}, your school just created a new ${customerRole}'s account for you.`;
+      const adminMessage = ` ${existingSchool.name}, just created a new ${customerRole}'s account for ${fullName}.`;
+
+      sendEmail(email, "Welcome to Afrilearn", message);
+      sendEmail("africustomers@gmail.com", "New Customer", adminMessage);
+      sendEmail(existingSchool.email, "Student Registered", adminMessage);
+
+      return res.status(201).json({
+        status: "success",
+        data: {
+          user: result,
+          password,
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error creating new user",
+      });
+    }
+  }
+
+  /**
    * School Create account for a student.
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
@@ -114,9 +394,16 @@ class AuthController {
   static async signUpForStudent(req, res) {
     try {
       let customerRole = "Student";
-      const { fullName, password, email, courseId, schoolId } = req.body;
+      const { fullName, password, email, classId, schoolId } = req.body;
 
       const encryptpassword = await Helper.encrptPassword(password);
+      const existingUser = await Auth.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({
+          status: "400 Not found",
+          error: "Email is registered, Add to an Existing class",
+        });
+      }
       const existingSchool = await School.findOne({ _id: schoolId });
       if (!existingSchool) {
         return res.status(404).json({
@@ -124,11 +411,12 @@ class AuthController {
           error: "School is not registered",
         });
       }
-      const existingSchoolStudent = await Auth.find({
+      const existingSchoolStudent = await Auth.findOne({
         email,
         schoolId,
       });
 
+      console.log("existingSchoolStudent", existingSchoolStudent);
       if (existingSchoolStudent) {
         return res.status(400).json({
           status: "400 Bad request",
@@ -144,11 +432,32 @@ class AuthController {
         schoolId,
       };
 
+      const existingClass = await Class.findOne({
+        _id: classId,
+      });
+
+      if (!existingClass) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error: "Class not found",
+        });
+      }
+      const existingSchoolClass = await Class.findOne({
+        schoolId,
+        _id: classId,
+      });
+
+      if (!existingSchoolClass) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error: "Select a class registered with this School",
+        });
+      }
       const result = await Auth.create({ ...newUser });
 
-      const enrolledCourse = await EnrolledCourse.create({
+      await ClassMember.create({
         userId: result._id,
-        courseId,
+        classId,
       });
 
       const message = `Hi, ${fullName}, your school just created a new ${customerRole}'s account for you.`;
@@ -162,7 +471,6 @@ class AuthController {
         status: "success",
         data: {
           user: result,
-          enrolledCourse,
           password,
         },
       });
@@ -433,7 +741,7 @@ class AuthController {
 
       sendEmail(
         existingParentChild.email,
-        "You parent deleted your account",
+        "Your parent deleted your account",
         message
       );
       sendEmail(
@@ -457,6 +765,297 @@ class AuthController {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Deleteing user",
+      });
+    }
+  }
+
+  /**
+   * School delete teacher account.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async deleteTeacherAccount(req, res) {
+    const { userId, schoolId } = req.body;
+    try {
+      const existingSchool = await School.findOne({ _id: schoolId });
+      if (!existingSchool) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "School is not registered",
+        });
+      }
+
+      const existingSchoolTeacher = await Auth.findOneAndDelete({
+        _id: userId,
+        schoolId,
+      });
+
+      if (!existingSchoolTeacher) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error: "Teacher is not registered with this School",
+        });
+      }
+
+      //update related classes
+      const classes = await Class.find({
+        userId,
+        schoolId,
+      });
+
+      if (classes.length > 0) {
+        for (let index = 0; index < classes.length; index++) {
+          const clazz = classes[index];
+          clazz.userId = "";
+          await clazz.save();
+        }
+      }
+
+      const message = `Hi ${existingSchoolTeacher.fullName}, ${existingSchool.name} deleted your account.`;
+      const adminMessage = ` ${existingSchool.name} just deleted ${existingSchoolTeacher.fullName}'s account.`;
+      const parentMessage = `You just deleted ${existingSchoolTeacher.fullName}'s account`;
+
+      sendEmail(
+        existingSchoolTeacher.email,
+        "Your School deleted your account",
+        message
+      );
+      sendEmail(
+        "africustomers@gmail.com",
+        "A Customer account deleted",
+        adminMessage
+      );
+      sendEmail(
+        existingSchool.email,
+        "Your Child account has been deleted",
+        parentMessage
+      );
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          user: existingSchoolTeacher,
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Deleteing user",
+      });
+    }
+  }
+
+  /**
+   * School unlink teacher account.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async unlinkTeacherAccount(req, res) {
+    const { userId, schoolId } = req.body;
+    try {
+      const existingSchool = await School.findOne({ _id: schoolId });
+      if (!existingSchool) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "School is not registered",
+        });
+      }
+      const existingSchoolTeacher = await Auth.findOne({
+        _id: userId,
+        schoolId,
+      });
+
+      if (!existingSchoolTeacher) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error: "Teacher is not registered with this School",
+        });
+      }
+      existingSchoolTeacher.schoolId = null;
+      await existingSchoolTeacher.save();
+
+      //update related classes
+      const classes = await Class.find({
+        userId,
+        schoolId,
+      });
+      console.log("classes", classes.length);
+
+      if (classes.length > 0) {
+        for (let index = 0; index < classes.length; index++) {
+          const clazz = classes[index];
+          clazz.userId = "";
+          await clazz.save();
+        }
+      }
+
+      const message = `Hi ${existingSchoolTeacher.fullName}, ${existingSchool.name} unlinked your account.`;
+      const adminMessage = ` ${existingSchool.name} just unlink ${existingSchoolTeacher.fullName}'s account.`;
+      const parentMessage = `You just unlinked ${existingSchoolTeacher.fullName}'s account`;
+
+      sendEmail(
+        existingSchoolTeacher.email,
+        "Your School unlinked your account",
+        message
+      );
+      sendEmail(
+        "africustomers@gmail.com",
+        "A Customer account unlinked",
+        adminMessage
+      );
+      sendEmail(
+        existingSchool.email,
+        "Your Child account has been unlinked",
+        parentMessage
+      );
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          user: existingSchoolTeacher,
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Updating user",
+      });
+    }
+  }
+
+  /**
+   * School delete student account.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async deleteStudentAccount(req, res) {
+    const { userId, schoolId } = req.body;
+    try {
+      const existingSchool = await School.findOne({ _id: schoolId });
+      if (!existingSchool) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "School is not registered",
+        });
+      }
+
+      const existingSchoolStudent = await Auth.findOne({
+        _id: userId,
+        schoolId,
+      });
+
+      if (!existingSchoolStudent) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error: "Student is not registered with this School",
+        });
+      }
+
+      await existingSchoolStudent.delete();
+
+      const message = `Hi ${existingSchoolStudent.fullName}, ${existingSchool.name} deleted your account.`;
+      const adminMessage = ` ${existingSchool.name} just deleted ${existingSchoolStudent.fullName}'s account.`;
+      const schoolMessage = `You just deleted ${existingSchoolStudent.fullName}'s account`;
+
+      sendEmail(
+        existingSchoolStudent.email,
+        "Your School deleted your account",
+        message
+      );
+      sendEmail(
+        "africustomers@gmail.com",
+        "A Customer account deleted",
+        adminMessage
+      );
+      sendEmail(
+        existingSchool.email,
+        "Your Student's account has been deleted",
+        schoolMessage
+      );
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          user: existingSchoolStudent,
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Deleteing user",
+      });
+    }
+  }
+
+  /**
+   * School unlink student's account.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async unlinkStudentAccount(req, res) {
+    const { userId, schoolId } = req.body;
+    try {
+      const existingSchool = await School.findOne({ _id: schoolId });
+      if (!existingSchool) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "School is not registered",
+        });
+      }
+
+      const existingSchoolStudent = await Auth.findOneAndUpdate(
+        {
+          _id: userId,
+          schoolId,
+        },
+        { schoolId: null }
+      );
+
+      if (!existingSchoolStudent) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error: "Student is not registered with this School",
+        });
+      }
+
+      const message = `Hi ${existingSchoolStudent.fullName}, ${existingSchool.name} unlinked your account.`;
+      const adminMessage = ` ${existingSchool.name} just unlink ${existingSchoolStudent.fullName}'s account.`;
+      const schoolMessage = `You just unlinked ${existingSchoolStudent.fullName}'s account`;
+
+      sendEmail(
+        existingSchoolStudent.email,
+        "Your School unlinked your account",
+        message
+      );
+      sendEmail(
+        "africustomers@gmail.com",
+        "A Customer account unlinked",
+        adminMessage
+      );
+      sendEmail(
+        existingSchool.email,
+        "Your Student's account has been unlinked",
+        schoolMessage
+      );
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          user: existingSchoolStudent,
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Updating user",
       });
     }
   }
@@ -782,6 +1381,7 @@ class AuthController {
     try {
       let roles = await Role.find();
       const courses = await Course.find();
+      const courseCategories = await CourseCategory.find();
       const students = await Auth.countDocuments({
         role: "5fd08fba50964811309722d5",
       });
@@ -816,6 +1416,7 @@ class AuthController {
           teachers,
           numberOfClassNote,
           numberOfQuizQuestions,
+          courseCategories,
         },
       });
     } catch (err) {
@@ -927,11 +1528,51 @@ class AuthController {
     try {
       // user lands on join class page with email and classid
       // if user exists
-      const users = await Auth.find({});
+
+      //   Get students : https://classnotes.ng/wp-json/llms/v1/students?context=edit&per_page=100&page=3
+      // const student_enrollment_links = student._links.enrollments[0].href
+      // Get student enrollments : https://classnotes.ng/wp-json/llms/v1/students/7/enrollments
+      // const membership_link = enrollment._links.post.find(post=> post.type === "llms_membership").href
+      // https://classnotes.ng/wp-json/llms/v1/memberships/78
+
+      // const users = JSON.parse(Users);
+
+      // console.log("First", users[0]);
+      const enrlist = [];
+      for (let index = 0; index < Students.data.users.length; index++) {
+        const user = Students.data.users[index];
+        await axios
+          .get(
+            `https://classnotes.ng/wp-json/llms/v1/students/${user.id.toString()}/enrollments`,
+            {
+              headers: {
+                "X-LLMS-CONSUMER-KEY":
+                  "ck_bd62ce88aab3f97c05c6dc07c479b186bf01773a",
+                "X-LLMS-CONSUMER-SECRET":
+                  "cs_61e82f5bf39e487ea765f3e306ce53b030834685",
+              },
+            }
+          )
+          .then(function (response) {
+            let membership_link = "";
+            if (response.data) {
+              membership_link = response.data._links.post.find(
+                (post) => post.type === "llms_membership"
+              ).href;
+            }
+            // console.log({ user, link: membership_link });
+            // enrlist.push(user._links.enrollments[0].href);
+            enrlist.push({ user, link: membership_link });
+            console.log("1");
+          })
+          .catch(function (error) {
+            console.log("2");
+          });
+      }
 
       return res.status(200).json({
         status: "success",
-        data: { users },
+        data: { users: enrlist },
       });
     } catch (err) {
       return res.status(500).json({
@@ -942,7 +1583,7 @@ class AuthController {
   }
 
   /**
-   * check if  user exist and join class
+   * Update profile pic
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
    * @memberof AuthController
@@ -1013,6 +1654,121 @@ class AuthController {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Loading user",
+      });
+    }
+  }
+
+  /**
+   * Update school profile
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async updateSchoolProfile(req, res) {
+    const updates = Object.keys(req.body);
+    const allowedUpdates = ["name", "description", "regNumber", "location"];
+    const isValidOperation = updates.every((update) =>
+      allowedUpdates.includes(update)
+    );
+    if (!isValidOperation) {
+      return res.status(400).json({
+        status: "400 Invalid Updates",
+        error: "Error updating profile",
+      });
+    }
+    try {
+      const school = await School.findOne({
+        creator: req.data.id,
+        _id: req.params.schoolId,
+      });
+      updates.forEach((update) => {
+        school[update] = req.body[update];
+      });
+      await school.save();
+
+      return res.status(200).json({
+        status: "success",
+        data: { school },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Updating profile",
+      });
+    }
+  }
+
+  /**
+   * Update school logo
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async uploadSchoolLogo(req, res) {
+    try {
+      const school = await School.findOneAndUpdate(
+        {
+          creator: req.data.id,
+          _id: req.params.schoolId,
+        },
+        { logo: req.file.location },
+        { new: true }
+      );
+      if (!school) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "Error finding school profile",
+        });
+      }
+
+      await school.save();
+      return res.status(200).json({
+        status: "success",
+        data: { school },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Update profile",
+      });
+    }
+  }
+
+  /**
+   * Update school logo
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async uploadSchoolCoverPhoto(req, res) {
+    try {
+      const school = await School.findOneAndUpdate(
+        {
+          creator: req.data.id,
+          _id: req.params.schoolId,
+        },
+        { coverPhoto: req.file.location },
+        { new: true }
+      );
+      if (!school) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "Error finding school profile",
+        });
+      }
+
+      await school.save();
+      return res.status(200).json({
+        status: "success",
+        data: { school },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Update profile",
       });
     }
   }

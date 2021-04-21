@@ -12,6 +12,11 @@ import AddCourseForChild from "../validations/auth/addCourseForChild";
 import SignupForChild from "../validations/auth/signupForChild.validator";
 import AddUserAsChild from "../validations/auth/addUserAsChild.validator";
 import UnlinkChildAccount from "../validations/auth/unlinkChildAccount.validator";
+import SignupForStudent from "../validations/auth/signupForStudent.validator";
+import SignupForTeacher from "../validations/auth/signupForTeacher.validator";
+import UnlinkStudentAccount from "../validations/auth/unlinkStudentAccount.validator";
+import AddUserAsTeacher from "../validations/auth/addUserAsTeacher.validator";
+import MaketeacherAnAdmin from "../validations/auth/makeTeacherAdmin.validator";
 
 const router = Router();
 
@@ -80,6 +85,30 @@ router.post(
   AuthController.checkUserExistAndJoin
 );
 router.post(
+  "/school/sign-up-for-student",
+  SignupForStudent.validateData(),
+  SignupForStudent.myValidationResult,
+  AuthController.signUpForStudent
+);
+router.post(
+  "/school/sign-up-for-teacher",
+  SignupForTeacher.validateData(),
+  SignupForTeacher.myValidationResult,
+  AuthController.signUpForTeacher
+);
+router.post(
+  "/school/add-user-as-teacher",
+  AddUserAsTeacher.validateData(),
+  AddUserAsTeacher.myValidationResult,
+  AuthController.schoolAddExistingTeacher
+);
+router.post(
+  "/school/add-teacher-as-admin",
+  MaketeacherAnAdmin.validateData(),
+  MaketeacherAnAdmin.myValidationResult,
+  AuthController.makeTeacherAdmin
+);
+router.post(
   "/parent/add-course-for-child",
   verifyToken,
   AddCourseForChild.validateData(),
@@ -115,11 +144,47 @@ router.delete(
   UnlinkChildAccount.myValidationResult,
   AuthController.deleteChildAccount
 );
+router.patch(
+  "/school/unlink-teacher-account",
+  UnlinkStudentAccount.validateData(),
+  UnlinkStudentAccount.myValidationResult,
+  AuthController.unlinkTeacherAccount
+);
+router.delete(
+  "/school/delete-teacher-account",
+  UnlinkStudentAccount.validateData(),
+  UnlinkStudentAccount.myValidationResult,
+  AuthController.deleteTeacherAccount
+);
+router.patch(
+  "/school/unlink-student-account",
+  UnlinkStudentAccount.validateData(),
+  UnlinkStudentAccount.myValidationResult,
+  AuthController.unlinkStudentAccount
+);
+router.delete(
+  "/school/delete-student-account",
+  UnlinkStudentAccount.validateData(),
+  UnlinkStudentAccount.myValidationResult,
+  AuthController.deleteStudentAccount
+);
 router.post("/move-users", AuthController.moveUsers);
 router.patch(
   "/update-profile-pic",
   upload.single("profilePhotoUrl"),
   verifyToken,
   AuthController.uploadProfilePic
+);
+router.patch(
+  "/school/update-logo/:schoolId",
+  upload.single("logo"),
+  verifyToken,
+  AuthController.uploadSchoolLogo
+);
+router.patch(
+  "/school/update-cover-photo/:schoolId",
+  upload.single("coverPhoto"),
+  verifyToken,
+  AuthController.uploadSchoolCoverPhoto
 );
 export default router;
