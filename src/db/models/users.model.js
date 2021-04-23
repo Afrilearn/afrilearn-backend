@@ -110,6 +110,12 @@ UserSchema.virtual("adminRoles", {
   foreignField: "userId",
   justOne: false,
 });
+UserSchema.virtual("schoolOwnership", {
+  ref: "school",
+  localField: "_id",
+  foreignField: "creator",
+  justOne: false,
+});
 
 const User = mongoose.model("user", UserSchema);
 
