@@ -99,7 +99,7 @@ export default {
         const classData = {
           courseId: course._id,
           schoolId: school._id,
-          name: `${school.name} ${course.name}`,
+          name: `${course.name}-${school.name}`,
           classCode: `${trimmedSchoolName}${classCode}`,
         };
 

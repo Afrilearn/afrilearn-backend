@@ -10,6 +10,10 @@ const EnrolledCourseSchema = new mongoose.Schema(
       type: String,
       default: "trial",
     },
+    schoolId: {
+      type: mongoose.Schema.ObjectId,
+      ref: "school",
+    },
     classId: {
       type: mongoose.Schema.ObjectId,
       ref: "class",

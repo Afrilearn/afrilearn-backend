@@ -77,6 +77,11 @@ class AuthController {
           courseCategoryId: req.body.courseCategoryId,
           creator: result._id,
         });
+        
+        await EnrolledCourse.create({
+          userId: result._id,
+          schoolId: school._id,
+        });
 
         //create classes according to the course category
         await AuthServices.createClassesForSchool(
@@ -307,14 +312,15 @@ class AuthController {
   static async signUpForTeacher(req, res) {
     try {
       let customerRole = "Teacher";
-      const { fullName, password, email, schoolId } = req.body;
-
+      const { fullName, password, email, schoolId, courseId } = req.body;
+     
       const encryptpassword = await Helper.encrptPassword(password);
+
       const existingUser = await Auth.findOne({ email });
       if (existingUser) {
         return res.status(400).json({
           status: "400 Not found",
-          error: "Email is registered, Add to an Existing class",
+          error: "Email already exist",
         });
       }
       const existingSchool = await School.findOne({ _id: schoolId });
@@ -323,19 +329,8 @@ class AuthController {
           status: "404 Not found",
           error: "School is not registered",
         });
-      }
-      const existingSchoolTeacher = await Auth.findOne({
-        email,
-        schoolId,
-      });
-
-      if (existingSchoolTeacher) {
-        return res.status(400).json({
-          status: "400 Bad request",
-          error: "Teacher already registered to this school",
-        });
-      }
-
+      }    
+    
       const newUser = {
         fullName,
         password: encryptpassword,
@@ -344,30 +339,32 @@ class AuthController {
         schoolId,
       };
 
-      const result = await Auth.create({ ...newUser });
+      const result = await Auth.create({ ...newUser });     
 
-      //create class
-      // let classCode = await Helper.generateCode(8);
-      // const existingClassCode = await Class.findOne({ classCode });
+      const existingTeacherforClass = await ClassModel.findOne({      
+        schoolId,
+        courseId
+      });
 
-      // if (existingClassCode) {
-      //   classCode = await Helper.generateCode(9);
-      // }
-      // const trimmedSchoolName = existingSchool.name.replace(/\s/g, "");
-      // const classData = {
-      //   schoolId: existingSchool._id,
-      //   name: `${existingSchool.name} ${course.name}`,
-      //   classCode: `${trimmedSchoolName}${classCode}`,
-      // };
+      // if teacher exists already, add the new teacher to admin
+      if(existingTeacherforClass.userId){    
+        const data = {
+          roleDescription:'teacher',
+          userId:result.id,
+          schoolId
+        }
+        await AdminRole.create({...data})
+      }else{
+        existingTeacherforClass.userId =result.id;
+        existingTeacherforClass.save();
+      }
 
-      // await Class.create({ ...classData });
+      // const message = `Hi, ${fullName}, your school just created a new ${customerRole}'s account for you.`;
+      // const adminMessage = ` ${existingSchool.name}, just created a new ${customerRole}'s account for ${fullName}.`;
 
-      const message = `Hi, ${fullName}, your school just created a new ${customerRole}'s account for you.`;
-      const adminMessage = ` ${existingSchool.name}, just created a new ${customerRole}'s account for ${fullName}.`;
-
-      sendEmail(email, "Welcome to Afrilearn", message);
-      sendEmail("africustomers@gmail.com", "New Customer", adminMessage);
-      sendEmail(existingSchool.email, "Student Registered", adminMessage);
+      // sendEmail(email, "Welcome to Afrilearn", message);
+      // sendEmail("africustomers@gmail.com", "New Customer", adminMessage);
+      // sendEmail(existingSchool.email, "Student Registered", adminMessage);
 
       return res.status(201).json({
         status: "success",
@@ -375,7 +372,7 @@ class AuthController {
           user: result,
           password,
         },
-      });
+      });     
     } catch (err) {
       return res.status(500).json({
         status: "500 Internal server error",
@@ -394,14 +391,14 @@ class AuthController {
   static async signUpForStudent(req, res) {
     try {
       let customerRole = "Student";
-      const { fullName, password, email, classId, schoolId } = req.body;
+      const { fullName, password, email, classId, schoolId, courseId } = req.body;
 
       const encryptpassword = await Helper.encrptPassword(password);
       const existingUser = await Auth.findOne({ email });
       if (existingUser) {
         return res.status(400).json({
           status: "400 Not found",
-          error: "Email is registered, Add to an Existing class",
+          error: "Email already exist",
         });
       }
       const existingSchool = await School.findOne({ _id: schoolId });
@@ -411,19 +408,7 @@ class AuthController {
           error: "School is not registered",
         });
       }
-      const existingSchoolStudent = await Auth.findOne({
-        email,
-        schoolId,
-      });
-
-      console.log("existingSchoolStudent", existingSchoolStudent);
-      if (existingSchoolStudent) {
-        return res.status(400).json({
-          status: "400 Bad request",
-          error: "Student already registered to this school",
-        });
-      }
-
+          
       const newUser = {
         fullName,
         password: encryptpassword,
@@ -432,16 +417,6 @@ class AuthController {
         schoolId,
       };
 
-      const existingClass = await Class.findOne({
-        _id: classId,
-      });
-
-      if (!existingClass) {
-        return res.status(400).json({
-          status: "400 Bad request",
-          error: "Class not found",
-        });
-      }
       const existingSchoolClass = await Class.findOne({
         schoolId,
         _id: classId,
@@ -459,7 +434,12 @@ class AuthController {
         userId: result._id,
         classId,
       });
-
+      
+      await EnrolledCourse.create({
+        courseId,
+        userId: result._id        
+      });
+      
       const message = `Hi, ${fullName}, your school just created a new ${customerRole}'s account for you.`;
       const adminMessage = ` ${existingSchool.name}, just created a new ${customerRole}'s account for ${fullName}.`;
 
