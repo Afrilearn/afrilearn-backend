@@ -23,8 +23,7 @@ class AddUserAsTeacher {
         .isEmpty()
         .withMessage("Email cannot be empty")
         .isEmail()
-        .withMessage("Email should be a valid email address"),
-      
+        .withMessage("Email should be a valid email address"),      
       check("schoolId")
         .exists()
         .withMessage("schoolId is required")
