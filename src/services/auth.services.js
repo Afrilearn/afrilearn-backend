@@ -27,7 +27,8 @@ export default {
           model: AdminRole,
           populate: { path: "classId", populate: "enrolledCourse" },
         })
-        .populate({ path: "usersReferred", select: "fullName" });
+        .populate({ path: "usersReferred", select: "fullName" })
+        .populate({ path: "schoolOwnership"});
 
       return user;
     } catch (err) {

@@ -12,11 +12,11 @@ import paymentRouter from "./payment.route";
 import termRouter from "./term.route";
 import dashboardRouter from "./dashboard.route";
 import adminRoleRouter from "./adminRole.route";
-// import schoolRouter from "./school.route";
+import schoolRouter from "./school.route";
 
 const router = Router();
 
-// router.use("/schools", schoolRouter);
+router.use("/schools", schoolRouter);
 router.use("/courses", courseRouter);
 router.use("/adminroles", adminRoleRouter);
 router.use("/auth", authRouter);
