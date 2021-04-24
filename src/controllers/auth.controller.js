@@ -64,7 +64,10 @@ class AuthController {
 
       const result = await Auth.create({ ...newUser });
       let enrolledCourse;
-      if (role !== "606ed82e70f40e18e029165e" && role !== '607ededa2712163504210684') {
+      if (
+        role !== "606ed82e70f40e18e029165e" &&
+        role !== "607ededa2712163504210684"
+      ) {
         enrolledCourse = await EnrolledCourse.create({
           userId: result._id,
           courseId: req.body.courseId,
@@ -80,7 +83,7 @@ class AuthController {
           creator: result._id,
           schoolId: req.body.schoolId,
         });
-        
+
         await EnrolledCourse.create({
           userId: result._id,
           schoolId: school._id,
@@ -316,7 +319,7 @@ class AuthController {
     try {
       let customerRole = "Teacher";
       const { fullName, password, email, schoolId, courseId } = req.body;
-     
+
       const encryptpassword = await Helper.encrptPassword(password);
 
       const existingUser = await Auth.findOne({ email });
@@ -326,15 +329,15 @@ class AuthController {
           error: "Email already exist",
         });
       }
-     
+
       const existingSchool = await School.findOne({ _id: schoolId });
       if (!existingSchool) {
         return res.status(404).json({
           status: "404 Not found",
           error: "School is not registered",
         });
-      }    
-     
+      }
+
       const newUser = {
         fullName,
         password: encryptpassword,
@@ -343,27 +346,27 @@ class AuthController {
         schoolId,
       };
 
-      const result = await Auth.create({ ...newUser });     
-     
-      const existingTeacherforClass = await ClassModel.findOne({      
+      const result = await Auth.create({ ...newUser });
+
+      const existingTeacherforClass = await ClassModel.findOne({
         schoolId,
-        courseId
+        courseId,
       });
-    
+
       // if teacher exists already, add the new teacher to admin
 
-      if(existingTeacherforClass.userId){    
+      if (existingTeacherforClass.userId) {
         const data = {
-          roleDescription:'teacher',
-          userId:result.id,
-          schoolId
-        }
-        await AdminRole.create({...data})
-      }else{
-        existingTeacherforClass.userId =result.id;
+          roleDescription: "teacher",
+          userId: result.id,
+          schoolId,
+        };
+        await AdminRole.create({ ...data });
+      } else {
+        existingTeacherforClass.userId = result.id;
         existingTeacherforClass.save();
       }
-     
+
       const message = `Hi, ${fullName}, your school just created a new ${customerRole}'s account for you.`;
       const adminMessage = ` ${existingSchool.name}, just created a new ${customerRole}'s account for ${fullName}.`;
 
@@ -377,7 +380,7 @@ class AuthController {
           user: result,
           password,
         },
-      });     
+      });
     } catch (err) {
       return res.status(500).json({
         status: "500 Internal server error",
@@ -396,7 +399,14 @@ class AuthController {
   static async signUpForStudent(req, res) {
     try {
       let customerRole = "Student";
-      const { fullName, password, email, classId, schoolId, courseId } = req.body;
+      const {
+        fullName,
+        password,
+        email,
+        classId,
+        schoolId,
+        courseId,
+      } = req.body;
 
       const encryptpassword = await Helper.encrptPassword(password);
       const existingUser = await Auth.findOne({ email });
@@ -413,7 +423,7 @@ class AuthController {
           error: "School is not registered",
         });
       }
-          
+
       const newUser = {
         fullName,
         password: encryptpassword,
@@ -428,12 +438,12 @@ class AuthController {
         userId: result._id,
         classId,
       });
-      
+
       await EnrolledCourse.create({
         courseId,
-        userId: result._id        
+        userId: result._id,
       });
-      
+
       const message = `Hi, ${fullName}, your school just created a new ${customerRole}'s account for you.`;
       const adminMessage = ` ${existingSchool.name}, just created a new ${customerRole}'s account for ${fullName}.`;
 
@@ -1774,37 +1784,6 @@ class AuthController {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Update profile",
-      });
-    }
-  }
-
-  /**
-   * Get school profile
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof AuthController
-   * @returns {JSON} - A JSON success response.
-   */
-  static async getSchoolProfile(req, res) {
-    try {
-      const school = await School.findOne({
-        _id: req.params.schoolId,
-      });
-      if (!school) {
-        return res.status(404).json({
-          status: "404 Not found",
-          error: "Error finding school profile",
-        });
-      }
-
-      return res.status(200).json({
-        status: "success",
-        data: { school },
-      });
-    } catch (err) {
-      return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error finding school profile",
       });
     }
   }
