@@ -11,7 +11,7 @@ router.get('/', CourseController.loadCourses);
 router.get('/:courseId', CourseController.getCourse);
 router.post(
   '/:courseId/progress-and-performance',
-  validateToken,
+  validateToken, 
   CourseController.getCourseProgressAndPerformance,
 );
 router.get('/:courseId/subjects', CourseController.getSubjectsForACourse);

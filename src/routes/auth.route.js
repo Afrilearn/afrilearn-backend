@@ -187,4 +187,9 @@ router.patch(
   verifyToken,
   AuthController.uploadSchoolCoverPhoto
 );
+router.patch(
+  "/school/update-profile/:schoolId",
+  verifyToken,
+  AuthController.updateSchoolProfile
+);
 export default router;

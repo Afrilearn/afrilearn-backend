@@ -1,3 +1,4 @@
+import AdminRole from "../db/models/adminRole.model";
 import Announcement from "../db/models/announcement.model";
 import ClassModel from "../db/models/classes.model";
 import ClassMember from "../db/models/classMembers.model";
@@ -73,6 +74,44 @@ class ClassController {
         status: "success",
         data: {
           class: newClass,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Removing class",
+      });
+    }
+  }
+
+  /**
+   * Update a Class Name
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async updateClassName(req, res) {
+    try {
+      const existingClass = await ClassModel.findByIdAndUpdate(
+        req.params.classId,
+        {
+          name: req.body.name,
+        },
+        { new: true }
+      );
+      if (!existingClass) {
+        return res.status(404).json({
+          status: "404 not found",
+          error: "Class not found",
+        });
+      }
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          class: existingClass,
         },
       });
     } catch (error) {
@@ -306,11 +345,20 @@ class ClassController {
       })
         .select("userId -_id")
         .populate("userId", "fullName");
-
+      const admins = await AdminRole.find({
+        classId: req.params.classId,
+      })
+        .select("userId roleDescription")
+        .populate({
+          path: "userId",
+          select: "-password -schoolId",
+          populate: "role",
+        });
       return res.status(200).json({
         status: "success",
         data: {
           classMembers,
+          admins,
         },
       });
     } catch (error) {

@@ -15,6 +15,8 @@ import School from "../db/models/schoolProfile";
 
 import Userz from "../../users.json";
 import Students from "../../students.json";
+import NewUsers from "../../NewUsers.json";
+import OldUsers from "../../old.json";
 import axios from "axios";
 import CourseCategory from "../db/models/courseCategories.model";
 import Class from "../db/models/classes.model";
@@ -76,6 +78,7 @@ class AuthController {
           email: req.body.email,
           courseCategoryId: req.body.courseCategoryId,
           creator: result._id,
+          schoolId: req.body.schoolId,
         });
         
         await EnrolledCourse.create({
@@ -1510,40 +1513,56 @@ class AuthController {
 
       // console.log("First", users[0]);
       const enrlist = [];
+      // for (let index = 0; index < NewUsers.data.users.length; index++) {
+      // const newuser = NewUsers.data.users[index];
+
+      // const encryptpassword = await Helper.encrptPassword(user.last_name);
+      // if()
+      // const isOld = Students.data.users.find(
+      //   (user) => user.email !== newuser.email
+      // );
+      // if (isOld) {
+      //   enrlist.push(isOld);
+      // }
+
+      // const newUser = {
+      //   fullName: user.name,
+      //   password: encryptpassword,
+      //   email: user.email,
+      //   role: "5fd08fba50964811309722d5",
+      // };
+      // const createdUser = await Auth.create({ ...newUser });
+      // }
       for (let index = 0; index < Students.data.users.length; index++) {
-        const user = Students.data.users[index];
-        await axios
-          .get(
-            `https://classnotes.ng/wp-json/llms/v1/students/${user.id.toString()}/enrollments`,
-            {
-              headers: {
-                "X-LLMS-CONSUMER-KEY":
-                  "ck_bd62ce88aab3f97c05c6dc07c479b186bf01773a",
-                "X-LLMS-CONSUMER-SECRET":
-                  "cs_61e82f5bf39e487ea765f3e306ce53b030834685",
-              },
-            }
-          )
-          .then(function (response) {
-            let membership_link = "";
-            if (response.data) {
-              membership_link = response.data._links.post.find(
-                (post) => post.type === "llms_membership"
-              ).href;
-            }
-            // console.log({ user, link: membership_link });
-            // enrlist.push(user._links.enrollments[0].href);
-            enrlist.push({ user, link: membership_link });
-            console.log("1");
-          })
-          .catch(function (error) {
-            console.log("2");
-          });
+        const student = Students.data.users[index];
+        await Auth.findOneAndDelete({
+          email: student.email,
+        });
+        const encryptpassword = await Helper.encrptPassword(student.last_name);
+
+        const newUser = await Auth.create({
+          fullName: student.name,
+          password: encryptpassword,
+          email: student.email,
+          role: "5fd08fba50964811309722d5",
+        });
+
+        await EnrolledCourse.create({
+          userId: newUser._id,
+          courseId: "5fff72b3de0bdb47f826feaf",
+        });
+
+        // console.log(student);
+        enrlist.push(newUser);
       }
+
+      // const count = NewUsers.data.users.length;
 
       return res.status(200).json({
         status: "success",
-        data: { users: enrlist },
+        data: {
+          old: enrlist,
+        },
       });
     } catch (err) {
       return res.status(500).json({
@@ -1649,10 +1668,25 @@ class AuthController {
       });
     }
     try {
+      const yourSchool = await School.findOne({
+        creator: req.data.id,
+      });
       const school = await School.findOne({
         creator: req.data.id,
         _id: req.params.schoolId,
       });
+      if (!yourSchool) {
+        return res.status(401).json({
+          status: "401 Invalid Updates",
+          error: "School not registered to you",
+        });
+      }
+      if (!school) {
+        return res.status(404).json({
+          status: "404 Invalid Updates",
+          error: "School not found",
+        });
+      }
       updates.forEach((update) => {
         school[update] = req.body[update];
       });

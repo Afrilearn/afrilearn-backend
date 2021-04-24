@@ -503,10 +503,17 @@ class CourseController {
         select: "name imageUrl classification -_id",
         model: MainSubject,
       });
+
+      const relatedPastQuestions = await RelatedPastQuestion.find({
+        courseId: req.params.courseId,
+      })
+        .select("pastQuestionTypeId")
+        .populate({ path: "pastQuestionTypeId", select: "name categoryId" });
       return res.status(200).json({
         status: "success",
         data: {
           subjects,
+          relatedPastQuestions,
         },
       });
     } catch (error) {
