@@ -59,7 +59,8 @@ class SchoolController {
                 const data = {                   
                     className:schoolClasses[i].name,
                     numOfClassTeachers,
-                    courseId:schoolClasses[i].courseId                   
+                    courseId:schoolClasses[i].courseId,
+                    classId: schoolClasses[i].id,                  
                 }
                 schoolClassesData.push(data)
             }
