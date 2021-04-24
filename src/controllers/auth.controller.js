@@ -1777,5 +1777,36 @@ class AuthController {
       });
     }
   }
+
+  /**
+   * Get school profile
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async getSchoolProfile(req, res) {
+    try {
+      const school = await School.findOne({
+        _id: req.params.schoolId,
+      });
+      if (!school) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "Error finding school profile",
+        });
+      }
+
+      return res.status(200).json({
+        status: "success",
+        data: { school },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error finding school profile",
+      });
+    }
+  }
 }
 export default AuthController;
