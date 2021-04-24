@@ -976,7 +976,7 @@ class AuthController {
   }
 
   /**
-   * School unlink student's account.
+   * School unlinking student's account.
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
    * @memberof AuthController
