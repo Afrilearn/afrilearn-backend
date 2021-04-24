@@ -192,5 +192,4 @@ router.patch(
   verifyToken,
   AuthController.updateSchoolProfile
 );
-router.get("/school/:schoolId", AuthController.getSchoolProfile);
 export default router;
