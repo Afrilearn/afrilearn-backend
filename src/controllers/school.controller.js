@@ -42,7 +42,8 @@ class SchoolController {
                 schoolId
             }, {
                 name: 1,
-                userId:1
+                userId:1,
+                courseId:1
             })
 
             for(let i = 0; i<schoolClasses.length; i++){                         
@@ -55,9 +56,10 @@ class SchoolController {
                     ++numOfClassTeachers
                 }  
                 
-                const data = {
+                const data = {                   
                     className:schoolClasses[i].name,
-                    numOfClassTeachers
+                    numOfClassTeachers,
+                    courseId:schoolClasses[i].courseId                   
                 }
                 schoolClassesData.push(data)
             }
