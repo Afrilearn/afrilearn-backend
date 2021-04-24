@@ -419,17 +419,6 @@ class AuthController {
         schoolId,
       };
 
-      const existingSchoolClass = await Class.findOne({
-        schoolId,
-        _id: classId,
-      });
-
-      if (!existingSchoolClass) {
-        return res.status(400).json({
-          status: "400 Bad request",
-          error: "Select a class registered with this School",
-        });
-      }
       const result = await Auth.create({ ...newUser });
 
       await ClassMember.create({

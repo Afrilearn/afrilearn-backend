@@ -59,6 +59,11 @@ class SignupForStudent {
         .withMessage("classId is required")
         .isMongoId()
         .withMessage("classId should be a MongoID"),
+      check("courseId")
+        .exists()
+        .withMessage("courseId is required")
+        .isMongoId()
+        .withMessage("courseId should be a MongoID"),
     ];
   }
 
