@@ -1,5 +1,6 @@
 import AdminRole from "../db/models/adminRole.model";
 import Announcement from "../db/models/announcement.model";
+import Class from "../db/models/classes.model";
 import ClassModel from "../db/models/classes.model";
 import ClassMember from "../db/models/classMembers.model";
 import Comment from "../db/models/comment.model";
@@ -345,6 +346,9 @@ class ClassController {
       })
         .select("userId -_id")
         .populate("userId", "fullName");
+      const teacher = await Class.findOne({
+        _id: req.params.classId,
+      }).populate({ path: "userId", populate: "role" });
       const admins = await AdminRole.find({
         classId: req.params.classId,
       })
@@ -354,11 +358,20 @@ class ClassController {
           select: "-password -schoolId",
           populate: "role",
         });
+
+      const teacherPlusAdmins = [...admins];
+      if (teacher.userId) {
+        teacherPlusAdmins.push({
+          _id: teacher.userId._id,
+          roleDescription: "Teacher",
+          userId: teacher.userId,
+        });
+      }
       return res.status(200).json({
         status: "success",
         data: {
           classMembers,
-          admins,
+          admins: teacherPlusAdmins,
         },
       });
     } catch (error) {
