@@ -15,6 +15,8 @@ import School from "../db/models/schoolProfile";
 
 import Userz from "../../users.json";
 import Students from "../../students.json";
+import NewUsers from "../../NewUsers.json";
+import OldUsers from "../../old.json";
 import axios from "axios";
 import CourseCategory from "../db/models/courseCategories.model";
 import Class from "../db/models/classes.model";
@@ -62,7 +64,10 @@ class AuthController {
 
       const result = await Auth.create({ ...newUser });
       let enrolledCourse;
-      if (role !== "606ed82e70f40e18e029165e" && role !== '607ededa2712163504210684') {
+      if (
+        role !== "606ed82e70f40e18e029165e" &&
+        role !== "607ededa2712163504210684"
+      ) {
         enrolledCourse = await EnrolledCourse.create({
           userId: result._id,
           courseId: req.body.courseId,
@@ -76,8 +81,9 @@ class AuthController {
           email: req.body.email,
           courseCategoryId: req.body.courseCategoryId,
           creator: result._id,
+          schoolId: req.body.schoolId,
         });
-        
+
         await EnrolledCourse.create({
           userId: result._id,
           schoolId: school._id,
@@ -313,7 +319,7 @@ class AuthController {
     try {
       let customerRole = "Teacher";
       const { fullName, password, email, schoolId, courseId } = req.body;
-     
+
       const encryptpassword = await Helper.encrptPassword(password);
 
       const existingUser = await Auth.findOne({ email });
@@ -323,15 +329,15 @@ class AuthController {
           error: "Email already exist",
         });
       }
-     
+
       const existingSchool = await School.findOne({ _id: schoolId });
       if (!existingSchool) {
         return res.status(404).json({
           status: "404 Not found",
           error: "School is not registered",
         });
-      }    
-     
+      }
+
       const newUser = {
         fullName,
         password: encryptpassword,
@@ -340,27 +346,27 @@ class AuthController {
         schoolId,
       };
 
-      const result = await Auth.create({ ...newUser });     
-     
-      const existingTeacherforClass = await ClassModel.findOne({      
+      const result = await Auth.create({ ...newUser });
+
+      const existingTeacherforClass = await ClassModel.findOne({
         schoolId,
-        courseId
+        courseId,
       });
-    
+
       // if teacher exists already, add the new teacher to admin
 
-      if(existingTeacherforClass.userId){    
+      if (existingTeacherforClass.userId) {
         const data = {
-          roleDescription:'teacher',
-          userId:result.id,
-          schoolId
-        }
-        await AdminRole.create({...data})
-      }else{
-        existingTeacherforClass.userId =result.id;
+          roleDescription: "teacher",
+          userId: result.id,
+          schoolId,
+        };
+        await AdminRole.create({ ...data });
+      } else {
+        existingTeacherforClass.userId = result.id;
         existingTeacherforClass.save();
       }
-     
+
       const message = `Hi, ${fullName}, your school just created a new ${customerRole}'s account for you.`;
       const adminMessage = ` ${existingSchool.name}, just created a new ${customerRole}'s account for ${fullName}.`;
 
@@ -374,7 +380,7 @@ class AuthController {
           user: result,
           password,
         },
-      });     
+      });
     } catch (err) {
       return res.status(500).json({
         status: "500 Internal server error",
@@ -393,7 +399,14 @@ class AuthController {
   static async signUpForStudent(req, res) {
     try {
       let customerRole = "Student";
-      const { fullName, password, email, classId, schoolId, courseId } = req.body;
+      const {
+        fullName,
+        password,
+        email,
+        classId,
+        schoolId,
+        courseId,
+      } = req.body;
 
       const encryptpassword = await Helper.encrptPassword(password);
       const existingUser = await Auth.findOne({ email });
@@ -410,7 +423,7 @@ class AuthController {
           error: "School is not registered",
         });
       }
-          
+
       const newUser = {
         fullName,
         password: encryptpassword,
@@ -425,12 +438,12 @@ class AuthController {
         userId: result._id,
         classId,
       });
-      
+
       await EnrolledCourse.create({
         courseId,
-        userId: result._id        
+        userId: result._id,
       });
-      
+
       const message = `Hi, ${fullName}, your school just created a new ${customerRole}'s account for you.`;
       const adminMessage = ` ${existingSchool.name}, just created a new ${customerRole}'s account for ${fullName}.`;
 
@@ -1510,40 +1523,56 @@ class AuthController {
 
       // console.log("First", users[0]);
       const enrlist = [];
+      // for (let index = 0; index < NewUsers.data.users.length; index++) {
+      // const newuser = NewUsers.data.users[index];
+
+      // const encryptpassword = await Helper.encrptPassword(user.last_name);
+      // if()
+      // const isOld = Students.data.users.find(
+      //   (user) => user.email !== newuser.email
+      // );
+      // if (isOld) {
+      //   enrlist.push(isOld);
+      // }
+
+      // const newUser = {
+      //   fullName: user.name,
+      //   password: encryptpassword,
+      //   email: user.email,
+      //   role: "5fd08fba50964811309722d5",
+      // };
+      // const createdUser = await Auth.create({ ...newUser });
+      // }
       for (let index = 0; index < Students.data.users.length; index++) {
-        const user = Students.data.users[index];
-        await axios
-          .get(
-            `https://classnotes.ng/wp-json/llms/v1/students/${user.id.toString()}/enrollments`,
-            {
-              headers: {
-                "X-LLMS-CONSUMER-KEY":
-                  "ck_bd62ce88aab3f97c05c6dc07c479b186bf01773a",
-                "X-LLMS-CONSUMER-SECRET":
-                  "cs_61e82f5bf39e487ea765f3e306ce53b030834685",
-              },
-            }
-          )
-          .then(function (response) {
-            let membership_link = "";
-            if (response.data) {
-              membership_link = response.data._links.post.find(
-                (post) => post.type === "llms_membership"
-              ).href;
-            }
-            // console.log({ user, link: membership_link });
-            // enrlist.push(user._links.enrollments[0].href);
-            enrlist.push({ user, link: membership_link });
-            console.log("1");
-          })
-          .catch(function (error) {
-            console.log("2");
-          });
+        const student = Students.data.users[index];
+        await Auth.findOneAndDelete({
+          email: student.email,
+        });
+        const encryptpassword = await Helper.encrptPassword(student.last_name);
+
+        const newUser = await Auth.create({
+          fullName: student.name,
+          password: encryptpassword,
+          email: student.email,
+          role: "5fd08fba50964811309722d5",
+        });
+
+        await EnrolledCourse.create({
+          userId: newUser._id,
+          courseId: "5fff72b3de0bdb47f826feaf",
+        });
+
+        // console.log(student);
+        enrlist.push(newUser);
       }
+
+      // const count = NewUsers.data.users.length;
 
       return res.status(200).json({
         status: "success",
-        data: { users: enrlist },
+        data: {
+          old: enrlist,
+        },
       });
     } catch (err) {
       return res.status(500).json({
@@ -1649,10 +1678,25 @@ class AuthController {
       });
     }
     try {
+      const yourSchool = await School.findOne({
+        creator: req.data.id,
+      });
       const school = await School.findOne({
         creator: req.data.id,
         _id: req.params.schoolId,
       });
+      if (!yourSchool) {
+        return res.status(401).json({
+          status: "401 Invalid Updates",
+          error: "School not registered to you",
+        });
+      }
+      if (!school) {
+        return res.status(404).json({
+          status: "404 Invalid Updates",
+          error: "School not found",
+        });
+      }
       updates.forEach((update) => {
         school[update] = req.body[update];
       });

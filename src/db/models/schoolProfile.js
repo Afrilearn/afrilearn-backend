@@ -25,6 +25,7 @@ const SchoolSchema = new mongoose.Schema(
     },
     courseCategoryId: {
       type: mongoose.Schema.Types.ObjectId,
+      ref: "courseCategory",
     },
     creator: {
       type: mongoose.Schema.Types.ObjectId,

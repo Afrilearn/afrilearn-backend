@@ -7,6 +7,7 @@ import AddClassValidator from "../validations/classes/addClass.validator";
 import AddCommentValidator from "../validations/classes/addComment.validator";
 import AddCommentToAssignedContentValidator from "../validations/classes/addCommentToAssignedContent.validator";
 import AssignContent from "../validations/classes/assignContent.validator";
+import RenameClassValidator from "../validations/classes/renameClass.validator";
 import SendClassInvite from "../validations/classes/sendClassInvite.validator";
 import SendClassRequest from "../validations/classes/sendClassRequest.validator";
 // import authRouter from './auth.route';
@@ -78,6 +79,12 @@ router.post(
   AssignContent.validateData(),
   AssignContent.myValidationResult,
   ClassController.assignContent
+);
+router.patch(
+  "/:classId/rename",
+  RenameClassValidator.validateData(),
+  RenameClassValidator.myValidationResult,
+  ClassController.updateClassName
 );
 
 export default router;
