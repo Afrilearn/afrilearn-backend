@@ -688,6 +688,91 @@ class AuthController {
   }
 
   /**
+   * Parent unlink children account.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async unlinkChildrenAccounts(req, res) {
+    const { childrenIds, parentId } = req.body;
+    try {
+      const existingParent = await Auth.findOne({ _id: parentId });
+      if (!existingParent) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "Parent is not registered",
+        });
+      }
+      let children = [];
+
+      for (let index = 0; index < childrenIds.length; index++) {
+        const userId = childrenIds[index];
+
+        const existingParentChild = await Auth.findOne({
+          _id: userId,
+          parentId,
+        });
+        if (!existingParentChild) {
+          const childDetail = await Auth.findOne({
+            _id: userId,
+          });
+          let text = "some users";
+          if (childDetail) {
+            text = childDetail.email;
+          }
+          return res.status(400).json({
+            status: "400 Bad request",
+            error:
+              "You have no parent relationship with " +
+              text +
+              ". Select only your children.",
+          });
+        }
+      }
+      for (let index = 0; index < childrenIds.length; index++) {
+        const userId = childrenIds[index];
+
+        const existingParentChild = await Auth.findOne({
+          _id: userId,
+          parentId,
+        });
+
+        existingParentChild.parentId = null;
+        await existingParentChild.save();
+
+        const message = `Hi, ${existingParentChild.fullName}, ${existingParent.fullName} removed you from children list.`;
+        const adminMessage = ` ${existingParent.fullName} just removed ${existingParentChild.fullName} from their children list.`;
+        const parentMessage = `You just removed ${existingParentChild.fullName} from your children list.`;
+
+        sendEmail(existingParentChild.email, "You parent removed you", message);
+        sendEmail("africustomers@gmail.com", "New Customer", adminMessage);
+        sendEmail(
+          existingParent.email,
+          "Your Child account has been Unlinked to you",
+          parentMessage
+        );
+
+        children.push(existingParentChild);
+      }
+
+      // console.log(existingParent);
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          users: children,
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Unlinking users",
+      });
+    }
+  }
+
+  /**
    * Parent delete child account.
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
@@ -743,6 +828,98 @@ class AuthController {
         status: "success",
         data: {
           user: existingParentChild,
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Deleteing user",
+      });
+    }
+  }
+
+  /**
+   * Parent delete children accounts.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async deleteChildrenAccounts(req, res) {
+    const { childrenIds, parentId } = req.body;
+    try {
+      const existingParent = await Auth.findOne({ _id: parentId });
+      if (!existingParent) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "Parent is not registered",
+        });
+      }
+
+      let children = [];
+
+      for (let index = 0; index < childrenIds.length; index++) {
+        const userId = childrenIds[index];
+
+        const existingParentChild = await Auth.findOne({
+          _id: userId,
+          parentId,
+        });
+        if (!existingParentChild) {
+          const childDetail = await Auth.findOne({
+            _id: userId,
+          });
+          let text = "some users";
+          if (childDetail) {
+            text = childDetail.email;
+          }
+          return res.status(400).json({
+            status: "400 Bad request",
+            error:
+              "You have no parent relationship with " +
+              text +
+              ". Select only your children.",
+          });
+        }
+      }
+
+      for (let index = 0; index < childrenIds.length; index++) {
+        const userId = childrenIds[index];
+
+        const existingParentChild = await Auth.findOne({
+          _id: userId,
+          parentId,
+        });
+
+        await existingParentChild.delete();
+
+        const message = `Hi, ${existingParentChild.fullName}, ${existingParent.fullName} deleted your account.`;
+        const adminMessage = ` ${existingParent.fullName} just deleted ${existingParentChild.fullName}'s account.`;
+        const parentMessage = `You just deleted ${existingParentChild.fullName}'s account`;
+
+        sendEmail(
+          existingParentChild.email,
+          "Your parent deleted your account",
+          message
+        );
+        sendEmail(
+          "africustomers@gmail.com",
+          "A Customer account deleted",
+          adminMessage
+        );
+        sendEmail(
+          existingParent.email,
+          "Your Child account has been deleted",
+          parentMessage
+        );
+
+        children.push(existingParentChild);
+      }
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          users: children,
         },
       });
     } catch (err) {
@@ -1547,25 +1724,21 @@ class AuthController {
       // }
       for (let index = 0; index < Students.data.users.length; index++) {
         const student = Students.data.users[index];
-        await Auth.findOneAndDelete({
+        const existingUser = await Auth.findOne({
           email: student.email,
         });
-        const encryptpassword = await Helper.encrptPassword(student.last_name);
 
-        const newUser = await Auth.create({
-          fullName: student.name,
-          password: encryptpassword,
-          email: student.email,
-          role: "5fd08fba50964811309722d5",
-        });
-
-        await EnrolledCourse.create({
-          userId: newUser._id,
-          courseId: "5fff72b3de0bdb47f826feaf",
-        });
+        const enrolledCourse = await EnrolledCourse.findOneAndUpdate(
+          {
+            userId: existingUser._id,
+            courseId: "5fff72b3de0bdb47f826feaf",
+          },
+          { endDate: "2021-05-23T10:22:56.825+00:00" },
+          { now: true }
+        );
 
         // console.log(student);
-        enrlist.push(newUser);
+        enrlist.push(enrolledCourse);
       }
 
       // const count = NewUsers.data.users.length;
