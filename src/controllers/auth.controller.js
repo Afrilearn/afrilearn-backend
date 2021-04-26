@@ -563,7 +563,10 @@ class AuthController {
       const { email, parentId } = req.body;
       const existingUser = await Auth.findOne({
         email: email,
-      }).populate("enrolledCourses");
+      }).populate({
+        path: "enrolledCourses",
+        populate: "courseId",
+      });
       const existingParent = await Auth.findOne({ _id: parentId });
       if (!existingParent) {
         return res.status(404).json({
@@ -1722,21 +1725,27 @@ class AuthController {
       // }
       for (let index = 0; index < Students.data.users.length; index++) {
         const student = Students.data.users[index];
-        const existingUser = await Auth.findOne({
-          email: student.email,
-        });
-
-        const enrolledCourse = await EnrolledCourse.findOneAndUpdate(
+        const existingUser = await Auth.findOneAndUpdate(
           {
-            userId: existingUser._id,
-            courseId: "5fff72b3de0bdb47f826feaf",
+            email: student.email,
           },
-          { endDate: "2021-05-23T10:22:56.825+00:00" },
-          { now: true }
+          { referralLink: "classnote" },
+          {
+            new: true,
+          }
         );
 
+        // const enrolledCourse = await EnrolledCourse.findOneAndUpdate(
+        //   {
+        //     userId: existingUser._id,
+        //     courseId: "5fff72b3de0bdb47f826feaf",
+        //   },
+        //   { endDate: "2021-05-23T10:22:56.825+00:00" },
+        //   { now: true }
+        // );
+
         // console.log(student);
-        enrlist.push(enrolledCourse);
+        enrlist.push(existingUser);
       }
 
       // const count = NewUsers.data.users.length;
