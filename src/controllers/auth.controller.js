@@ -1372,6 +1372,7 @@ class AuthController {
       const teachers = await Auth.countDocuments({
         role: "602f3ce39b146b3201c2dc1d",
       });
+      const allUsers = await Auth.countDocuments();
       const numberOfClassNote = await Lesson.countDocuments();
       const numberOfQuizQuestions = await Question.countDocuments();
       // const lesson = await Lesson.find().populate({
@@ -1401,6 +1402,7 @@ class AuthController {
           numberOfClassNote,
           numberOfQuizQuestions,
           courseCategories,
+          allUsers
         },
       });
     } catch (err) {
