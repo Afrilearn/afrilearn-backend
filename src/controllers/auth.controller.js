@@ -563,7 +563,7 @@ class AuthController {
       const { email, parentId } = req.body;
       const existingUser = await Auth.findOne({
         email: email,
-      });
+      }).populate("enrolledCourses");
       const existingParent = await Auth.findOne({ _id: parentId });
       if (!existingParent) {
         return res.status(404).json({
