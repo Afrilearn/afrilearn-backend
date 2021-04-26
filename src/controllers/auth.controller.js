@@ -182,7 +182,7 @@ class AuthController {
       }
 
       const classHasExistingTeacher = await Class.findOne({
-        classId,
+        _id: classId,
         schoolId,
       });
       if (!classHasExistingTeacher) {
@@ -192,6 +192,8 @@ class AuthController {
         });
       }
 
+      existingUser.schoolId = schoolId;
+      await existingUser.save();
       if (classHasExistingTeacher && classHasExistingTeacher.userId) {
         //add new teacher to admins
         const newAdmin = await AdminRole.create({
