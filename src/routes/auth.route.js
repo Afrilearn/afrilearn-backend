@@ -17,6 +17,7 @@ import SignupForTeacher from "../validations/auth/signupForTeacher.validator";
 import UnlinkStudentAccount from "../validations/auth/unlinkStudentAccount.validator";
 import AddUserAsTeacher from "../validations/auth/addUserAsTeacher.validator";
 import MaketeacherAnAdmin from "../validations/auth/makeTeacherAdmin.validator";
+import UnlinkChildrenAccounts from "../validations/auth/unlinkChildrenAccounts.validator";
 
 const router = Router();
 
@@ -137,6 +138,19 @@ router.patch(
   UnlinkChildAccount.validateData(),
   UnlinkChildAccount.myValidationResult,
   AuthController.unlinkChildAccount
+);
+
+router.patch(
+  "/unlink-children-accounts",
+  UnlinkChildrenAccounts.validateData(),
+  UnlinkChildrenAccounts.myValidationResult,
+  AuthController.unlinkChildrenAccounts
+);
+router.delete(
+  "/delete-children-accounts",
+  UnlinkChildrenAccounts.validateData(),
+  UnlinkChildrenAccounts.myValidationResult,
+  AuthController.deleteChildrenAccounts
 );
 router.delete(
   "/delete-child-account",
