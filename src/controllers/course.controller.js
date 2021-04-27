@@ -10,6 +10,7 @@ import PastQuestionQuizResult from "../db/models/pastQuestionQuizResults.model";
 import RelatedPastQuestion from "../db/models/relatedPastQuestions.model";
 import PastQuestionType from "../db/models/pastQuestionTypes.model";
 import Recommendation from "../db/models/recommendation.model";
+import Lesson from "../db/models/lessons.model";
 /**
  *Contains Course Controller
  *
@@ -133,7 +134,6 @@ class CourseController {
    *
    */
   static async getCourseProgressAndPerformance(req, res) {
-    console.log("Starting");
     try {
       const userID = req.body.userId || req.data.id;
       console.log("userID", userID);
@@ -307,7 +307,6 @@ class CourseController {
       }
       // no req.body.classId
       /* pq */
-      console.log("No classid");
 
       const relatedPq = await RelatedPastQuestion.find({
         courseId: req.params.courseId,
@@ -316,29 +315,22 @@ class CourseController {
         select: "name categoryId",
         model: PastQuestionType,
       });
-      console.log("relatedPq", relatedPq[0].pastQuestionTypes);
       const examsList = [];
       for (let index = 0; index < relatedPq.length; index++) {
         const pq = relatedPq[index];
 
         for (let index = 0; index < pq.pastQuestionTypes.length; index++) {
           const item = pq.pastQuestionTypes[index];
-          console.log("item", item);
-
           /* Total performance */
           const pastQuestionResultCondition = {
             userId: req.body.userId ? req.body.userId : req.data.id,
             courseId: req.params.courseId,
             pastQuestionCategoryId: item.categoryId,
           };
-          console.log(
-            "pastQuestionResultCondition",
-            pastQuestionResultCondition
-          );
+  
           const pastQuestionResults = await PastQuestionQuizResult.find(
             pastQuestionResultCondition
           );
-          console.log("pastQuestionResults", pastQuestionResults);
           let pqTotalScore = 0;
           let totalTimeSpentOnQuestion = 0;
           pastQuestionResults.forEach((result) => {
@@ -362,7 +354,6 @@ class CourseController {
             }
           );
           const totalSubjects = response.data;
-          console.log("totalSubjects", totalSubjects);
           /* subjectIDs */
           const subjectIds = [];
           const perSubjectResults = [];
@@ -533,24 +524,33 @@ class CourseController {
    *
    */
   static async subjectProgress(req, res) {
+    const { courseId, subjectId, lessonId } = req.body;
     try {
+      const otherLessons = await Lesson.find({
+        courseId,
+        subjectId,
+        _id: { $ne: lessonId },
+      });
+
+      const randomLesson =
+        otherLessons[Math.floor(Math.random() * otherLessons.length)];
+      const recommended = randomLesson._id;
       const latestRecommendation = await Recommendation.find()
         .sort({ createdAt: -1 })
         .limit(1); // latest docs
       const existingRecommendation =
         latestRecommendation &&
         latestRecommendation[0] &&
-        latestRecommendation[0].recommended === req.body.recommended;
+        latestRecommendation[0].recommended === recommended;
 
       if (!existingRecommendation) {
         await Recommendation.create({
           userId: req.data.id,
           type: req.body.type,
-          recommended: req.body.recommended,
+          recommended,
           reason: req.body.reason,
         });
       }
-      const { courseId, subjectId, lessonId } = req.body;
       const condition = {
         userId: req.data.id,
         courseId,

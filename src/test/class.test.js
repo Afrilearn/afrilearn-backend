@@ -257,14 +257,15 @@ describe("Classes ", () => {
       .set("token", token)
       .send({
         description: "Attemp the last English test again",
-        lessonId: lesson_id,
+        lessonIds: [lesson_id],
+        audience: "all",
       })
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.an("object");
         res.body.should.have.property("status").eql("success");
         res.body.should.have.property("data");
-        res.body.data.should.have.property("content");
+        res.body.data.should.have.property("createdContents");
         done();
       });
   });
