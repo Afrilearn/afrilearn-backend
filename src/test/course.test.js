@@ -9,19 +9,13 @@ import Course from "../db/models/courses.model";
 import SubjectProgress from "../db/models/subjectProgresses.model";
 import CourseController from "../controllers/course.controller";
 import PastQuestionQuizResult from "../db/models/pastQuestionQuizResults.model";
+import Lesson from "../db/models/lessons.model";
 
 chai.should();
 chai.use(Sinonchai);
 chai.use(chaiHttp);
 // const { expect } = chai;
 
-const subjectProgress = {
-  userId: "5fcf78a4a26c8527bc8f423a",
-  subjectId: "5fcf78a4a26c8527bc8f423a",
-  courseId: "5fcf78a4a26c8527bc8f423a",
-  lessonId: "5fcf78a4a26c8527bc8f423a",
-  classId: "5fcf78a4a26c8527bc8f423a",
-};
 const pqResult = {
   results: [
     {
@@ -56,7 +50,16 @@ const pqResult = {
 describe("Courses ", () => {
   const course_id = new mongoose.mongo.ObjectId();
   const user_id = new mongoose.mongo.ObjectId();
+  const subject_id = new mongoose.mongo.ObjectId();
+  const lesson_id = new mongoose.mongo.ObjectId();
 
+  const subjectProgress = {
+    userId: user_id,
+    subjectId: subject_id,
+    courseId: course_id,
+    lessonId: "602f3ce39b146b3201c2dc1d",
+    reason: lesson_id,
+  };
   const token = jwt.sign(
     {
       data: {
@@ -73,7 +76,14 @@ describe("Courses ", () => {
       name: "Another Course for testing" + course_id,
       categoryId: "602f3ce39b146b3201c2dc1d",
     });
+    const lesson = new Lesson({
+      _id: lesson_id,
+      title: "Another Course for testing" + course_id,
+      courseId: course_id,
+      subjectId: subject_id,
+    });
 
+    await lesson.save();
     await course.save();
     const newPqResult = new PastQuestionQuizResult({ ...pqResult });
     await newPqResult.save();

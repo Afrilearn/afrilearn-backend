@@ -10,6 +10,7 @@ import PastQuestionQuizResult from "../db/models/pastQuestionQuizResults.model";
 import RelatedPastQuestion from "../db/models/relatedPastQuestions.model";
 import PastQuestionType from "../db/models/pastQuestionTypes.model";
 import Recommendation from "../db/models/recommendation.model";
+import Lesson from "../db/models/lessons.model";
 /**
  *Contains Course Controller
  *
@@ -533,24 +534,33 @@ class CourseController {
    *
    */
   static async subjectProgress(req, res) {
+    const { courseId, subjectId, lessonId } = req.body;
     try {
+      const otherLessons = await Lesson.find({
+        courseId,
+        subjectId,
+        _id: { $ne: lessonId },
+      });
+
+      const randomLesson =
+        otherLessons[Math.floor(Math.random() * otherLessons.length)];
+      const recommended = randomLesson._id;
       const latestRecommendation = await Recommendation.find()
         .sort({ createdAt: -1 })
         .limit(1); // latest docs
       const existingRecommendation =
         latestRecommendation &&
         latestRecommendation[0] &&
-        latestRecommendation[0].recommended === req.body.recommended;
+        latestRecommendation[0].recommended === recommended;
 
       if (!existingRecommendation) {
         await Recommendation.create({
           userId: req.data.id,
           type: req.body.type,
-          recommended: req.body.recommended,
+          recommended,
           reason: req.body.reason,
         });
       }
-      const { courseId, subjectId, lessonId } = req.body;
       const condition = {
         userId: req.data.id,
         courseId,
