@@ -9,6 +9,10 @@ const teacherAssignedContentSchema = new mongoose.Schema(
     description: {
       type: String,
     },
+    audience: {
+      type: String,
+      default: "single",
+    },
     userId: {
       type: mongoose.Schema.ObjectId,
       ref: "User",
@@ -32,7 +36,7 @@ const teacherAssignedContentSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-    timestamps: true
+    timestamps: true,
   }
 );
 

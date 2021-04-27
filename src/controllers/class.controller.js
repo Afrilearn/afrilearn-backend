@@ -394,6 +394,7 @@ class ClassController {
     try {
       // if classmember with userId, and classId exist, allow, else deny
       const clazz = await ClassModel.findById(req.params.classId)
+        .populate("schoolId")
         .populate({
           path:
             "relatedSubjects relatedPastQuestions userId courseId enrolledCourse",
@@ -475,20 +476,43 @@ class ClassController {
    */
   static async assignContent(req, res) {
     try {
-      const lesson = await Lesson.findOne({ _id: req.body.lessonId });
-      const content = await TeacherAssignedContent.create({
-        teacher: req.data.id,
-        classId: req.params.classId,
-        description: req.body.description,
-        lessonId: req.body.lessonId,
-        userId: req.body.userId,
-        subjectId: req.body.subjectId ? req.body.subjectId : lesson.subjectId,
-        dueDate: req.body.dueDate,
-      });
+      const lessons = await Lesson.find({ _id: { $in: req.body.lessonIds } });
+      const createdContents = [];
+      for (let index = 0; index < lessons.length; index++) {
+        const lesson = lessons[index];
+        const assignedContentData = {
+          teacher: req.data.id,
+          classId: req.params.classId,
+          description: req.body.description,
+          lessonId: lesson._id,
+          subjectId: lesson.subjectId,
+          dueDate: req.body.dueDate,
+        };
+
+        if (req.body.audience === "all") {
+          assignedContentData.audience = "all";
+          const content = await TeacherAssignedContent.create(
+            assignedContentData
+          );
+          createdContents.push(content);
+        } else if (
+          req.body.audience !== "all" &&
+          Array.isArray(req.body.userIds)
+        ) {
+          for (let index = 0; index < req.body.userIds.length; index++) {
+            const userId = req.body.userIds[index];
+            assignedContentData.userId = userId;
+            const content = await TeacherAssignedContent.create(
+              assignedContentData
+            );
+            createdContents.push(content);
+          }
+        }
+      }
       return res.status(200).json({
         status: "success",
         data: {
-          content,
+          createdContents,
         },
       });
     } catch (error) {

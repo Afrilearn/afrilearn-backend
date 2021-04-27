@@ -14,6 +14,12 @@ const SchoolSchema = new mongoose.Schema(
     regNumber: {
       type: String,
     },
+    phone: {
+      type: String,
+    },
+    website: {
+      type: String,
+    },
     location: {
       type: String,
     },
