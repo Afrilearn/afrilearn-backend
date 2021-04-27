@@ -15,11 +15,11 @@ class AssignContent {
    */
   static validateData() {
     return [
-      check('lessonId')
+      check('lessonIds')
         .exists()
-        .withMessage('Lesson ID is required')
-        .isMongoId()
-        .withMessage('Lesson ID should be a mongoID'),
+        .withMessage('Lesson IDs are required')
+        .isArray()
+        .withMessage('Lesson IDs should be an array'), 
       check('description')
         .exists()
         .withMessage('Description is required')

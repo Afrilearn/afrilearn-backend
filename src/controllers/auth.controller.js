@@ -439,6 +439,7 @@ class AuthController {
       await ClassMember.create({
         userId: result._id,
         classId,
+        status: "approved",
       });
 
       await EnrolledCourse.create({
@@ -978,6 +979,8 @@ class AuthController {
           await clazz.save();
         }
       }
+      //update related admins
+      await AdminRole.findOneAndDelete({ userId, schoolId });
 
       const message = `Hi ${existingSchoolTeacher.fullName}, ${existingSchool.name} deleted your account.`;
       const adminMessage = ` ${existingSchool.name} just deleted ${existingSchoolTeacher.fullName}'s account.`;
@@ -1058,6 +1061,8 @@ class AuthController {
           await clazz.save();
         }
       }
+      //update related admins
+      await AdminRole.findOneAndDelete({ userId, schoolId });
 
       const message = `Hi ${existingSchoolTeacher.fullName}, ${existingSchool.name} unlinked your account.`;
       const adminMessage = ` ${existingSchool.name} just unlink ${existingSchoolTeacher.fullName}'s account.`;
@@ -1851,7 +1856,14 @@ class AuthController {
    */
   static async updateSchoolProfile(req, res) {
     const updates = Object.keys(req.body);
-    const allowedUpdates = ["name", "description", "regNumber", "location"];
+    const allowedUpdates = [
+      "name",
+      "description",
+      "regNumber",
+      "location",
+      "phone",
+      "website",
+    ];
     const isValidOperation = updates.every((update) =>
       allowedUpdates.includes(update)
     );
