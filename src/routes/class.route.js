@@ -80,6 +80,7 @@ router.get(
   ClassController.getClassAssignedContents
 );
 router.get("/:classId", ClassController.getClassById);
+router.get("/:classId/mobile", ClassController.getClassByIdMobile);
 router.get("/", ClassController.getClasses);
 router.post(
   "/:classId/assign-content",
