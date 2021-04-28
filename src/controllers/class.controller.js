@@ -398,7 +398,7 @@ class ClassController {
         .populate("schoolId")
         .populate({
           path:
-            "relatedSubjects relatedPastQuestions userId courseId enrolledCourse",
+            "relatedSubjects relatedPastQuestions userId courseId enrolledCourse", //can remove relatedLessons
           populate: {
             path: "mainSubjectId relatedLessons pastQuestionTypeId",
             populate: "questions",
@@ -419,6 +419,64 @@ class ClassController {
             { path: "lessonId", model: Lesson },
             { path: "userId", model: User },
           ],
+        });
+      const classMembers = await ClassMember.find({
+        classId: req.params.classId,
+      })
+        .populate("userId")
+        .select("status userId fullName email role");
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          class: clazz,
+          classMembers,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading class",
+      });
+    }
+  }
+
+  /**
+   * Get a class by ID
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getClassByIdMobile(req, res) {
+    try {
+      // if classmember with userId, and classId exist, allow, else deny
+      const clazz = await ClassModel.findById(req.params.classId)
+        .populate("schoolId")
+        .populate({
+          path: "userId", //can remove relatedLessons
+          select: "fullName email",
+        })
+        .populate({
+          path: "courseId", //can remove relatedLessons
+          select: "name alias imageUrl enrollee subjects",
+        })
+        .populate({
+          path: "enrolledCourse", //can remove relatedLessons
+        })
+        .populate({
+          path: "relatedSubjects", //can remove relatedLessons
+          populate: {
+            path: "mainSubjectId",
+            select: "name imageUrl",
+          },
+        })
+        .populate({
+          path: "relatedPastQuestions", //can remove relatedLessons
+          populate: {
+            path: "pastQuestionTypeId",
+          },
         });
       const classMembers = await ClassMember.find({
         classId: req.params.classId,
