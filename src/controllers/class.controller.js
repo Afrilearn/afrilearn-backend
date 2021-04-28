@@ -655,9 +655,11 @@ class ClassController {
    */
   static async getClassAssignedContents(req, res) {
     try {
-      const assignedContents = await TeacherAssignedContent.find({
-        classId: req.params.classId,
-      })
+      let searchData = { classId: req.params.classId };
+      if (req.body.userId) {
+        searchData.userId = req.body.userId;
+      }
+      const assignedContents = await TeacherAssignedContent.find(searchData)
         .populate({ path: "teacher", model: User, select: "fullName" })
         .populate({ path: "lessonId", model: Lesson, select: "title" })
         .populate({
