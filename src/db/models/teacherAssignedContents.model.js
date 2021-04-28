@@ -14,7 +14,7 @@ const teacherAssignedContentSchema = new mongoose.Schema(
       default: "single",
     },
     userId: {
-      type: mongoose.Schema.ObjectId,
+      type: mongoose.Schema.ObjectId, 
       ref: "User",
     },
     lessonId: {

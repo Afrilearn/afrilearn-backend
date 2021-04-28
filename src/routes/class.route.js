@@ -71,6 +71,14 @@ router.post(
   ClassController.makeCommentOnAssignedContent
 );
 router.get("/:classId/announcements", ClassController.getClassAnnouncements);
+router.get(
+  "/assigned-content/:classworkId",
+  ClassController.getAssignedContent
+);
+router.get(
+  "/:classId/assigned-contents",
+  ClassController.getClassAssignedContents
+);
 router.get("/:classId", ClassController.getClassById);
 router.get("/", ClassController.getClasses);
 router.post(
