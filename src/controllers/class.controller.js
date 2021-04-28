@@ -6,6 +6,7 @@ import ClassMember from "../db/models/classMembers.model";
 import Comment from "../db/models/comment.model";
 import CommentForAssignedContent from "../db/models/commentForAssignedContent.model";
 import Lesson from "../db/models/lessons.model";
+import Subject from "../db/models/subjects.model";
 import TeacherAssignedContent from "../db/models/teacherAssignedContents.model";
 import User from "../db/models/users.model";
 import sendEmail from "../utils/email.utils";
@@ -607,6 +608,115 @@ class ClassController {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error creating comment",
+      });
+    }
+  }
+
+  /**
+   * get class announcements
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getClassAnnouncements(req, res) {
+    try {
+      const announcements = await Announcement.find({
+        classId: req.params.classId,
+      })
+        .populate({
+          path: "comments",
+          model: Comment,
+          populate: { path: "student" },
+        })
+        .populate("teacher");
+      return res.status(200).json({
+        status: "success",
+        data: {
+          announcements,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error getting announcements",
+      });
+    }
+  }
+
+  /**
+   * get class assigned contents
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getClassAssignedContents(req, res) {
+    try {
+      const assignedContents = await TeacherAssignedContent.find({
+        classId: req.params.classId,
+      })
+        .populate({ path: "teacher", model: User, select: "fullName" })
+        .populate({ path: "lessonId", model: Lesson, select: "title" })
+        .populate({
+          path: "subjectId",
+          model: Subject,
+          select: "mainSubjectId",
+          populate: { path: "mainSubjectId", select: "name" },
+        });
+      return res.status(200).json({
+        status: "success",
+        data: {
+          assignedContents,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error getting assignedContents",
+      });
+    }
+  }
+
+  /**
+   * get single assigned content
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getAssignedContent(req, res) {
+    try {
+      const assignedContent = await TeacherAssignedContent.findOne({
+        _id: req.params.classworkId,
+      })
+        .select("teacher subjectId description dueDate createdAt")
+        .populate({ path: "teacher", model: User, select: "fullName" })
+        .populate({
+          path: "subjectId",
+          model: Subject,
+          select: "mainSubjectId",
+          populate: { path: "mainSubjectId", select: "name" },
+        })
+        .populate({
+          path: "comments",
+          model: CommentForAssignedContent,
+          select: "sender student text createdAt",
+          populate: { path: "student sender", select: "fullName" },
+        });
+      return res.status(200).json({
+        status: "success",
+        data: {
+          assignedContent,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error getting assignedContent",
       });
     }
   }
