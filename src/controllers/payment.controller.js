@@ -358,15 +358,17 @@ class PaymentController {
                   courseId,
                   userId: clientUserId,
                 }
-
+                if (req.body.newClassName) {
+                  condition['classId'] = newClass.id
+                }
                 let existingEnrolledCourse = await EnrolledCourse.findOne(condition);
 
                 if (!existingEnrolledCourse) {
-                  if (role === '602f3ce39b146b3201c2dc1d' && req.body.newClassName) {
-                    console.log('attash class id')
-                    console.log(newClass)
-                    condition['classId'] = newClass.id;
-                  }
+                  // if (role === '602f3ce39b146b3201c2dc1d' && req.body.newClassName) {
+                  //   console.log('attash class id')
+                  //   console.log(newClass)
+                  //   condition['classId'] = newClass.id;
+                  // }
                   existingEnrolledCourse = await EnrolledCourse.create(condition);
                 }
 
