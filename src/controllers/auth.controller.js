@@ -193,7 +193,7 @@ class AuthController {
       }
       //send teacher email to join this school as a teacher
 
-      const message = `Hi ${existingUser.fullName}, ${existingSchool.name} is requesting you to join ${existingSchool.name} as a Teacher. \n Click this link to accept the request https://www.myafrilearn.com/accept-teacher-request?role=teacher&email=${email}&schoolId=${schoolId}&classId=${classId}`;
+      const message = `Hi ${existingUser.fullName}, ${existingSchool.name} is requesting you to join ${existingSchool.name} as a Teacher. \n Click this link to accept the request https://www.myafrilearn.com/accept-request?role=teacher&email=${email}&schoolId=${schoolId}&classId=${classId}`;
       const adminMessage = ` ${existingSchool.name}, your teacher request has been sent to ${existingUser.fullName}.`;
 
       sendEmail(email, "Teacher request", message);
@@ -256,7 +256,7 @@ class AuthController {
         });
       }
 
-      const message = `Hi ${existingUser.fullName}, ${existingSchool.name} is requesting you to join ${existingSchool.name} as an Admin. \n Click this link to accept the request https://www.myafrilearn.com/accept-teacher-request?role=admin&email=${email}&schoolId=${schoolId}&classId=${classId}`;
+      const message = `Hi ${existingUser.fullName}, ${existingSchool.name} is requesting you to join ${existingSchool.name} as an Admin. \n Click this link to accept the request https://www.myafrilearn.com/accept-request?role=admin&email=${email}&schoolId=${schoolId}&classId=${classId}`;
 
       const adminMessage = ` ${existingSchool.name}, your Admin request has been sent to ${existingUser.fullName}.`;
 
@@ -722,7 +722,7 @@ class AuthController {
       // await existingUser.save();
       //send child request
 
-      const message = `Hi, ${existingUser.fullName}, ${existingParent.fullName} is requesting to add you to their children list. \n Click this link to accept the request https://www.myafrilearn.com/accept-teacher-request?role=child&email=${email}&parentId=${parentId}`;
+      const message = `Hi, ${existingUser.fullName}, ${existingParent.fullName} is requesting to add you to their children list. \n Click this link to accept the request https://www.myafrilearn.com/accept-request?role=child&email=${email}&parentId=${parentId}`;
       const parentMessage = ` ${existingParent.fullName} your parent request was sent to ${existingUser.fullName} `;
 
       sendEmail(email, "Your parent sent you a request", message);
