@@ -25,6 +25,8 @@ const SchoolSchema = new mongoose.Schema(
     },
     logo: {
       type: String,
+      default:
+        "https://afrilearn-media.s3.eu-west-3.amazonaws.com/dummy-images/schoolDummyLogo.png",
     },
     coverPhoto: {
       type: String,

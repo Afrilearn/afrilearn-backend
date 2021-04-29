@@ -104,10 +104,22 @@ router.post(
   AuthController.schoolAddExistingTeacher
 );
 router.post(
+  "/school/accept-teacher-request",
+  AddUserAsTeacher.validateData(),
+  AddUserAsTeacher.myValidationResult,
+  AuthController.acceptTeacherRequest
+);
+router.post(
   "/school/add-teacher-as-admin",
   MaketeacherAnAdmin.validateData(),
   MaketeacherAnAdmin.myValidationResult,
   AuthController.makeTeacherAdmin
+);
+router.post(
+  "/school/accept-admin-request",
+  MaketeacherAnAdmin.validateData(),
+  MaketeacherAnAdmin.myValidationResult,
+  AuthController.acceptAdminRequest
 );
 router.post(
   "/parent/add-course-for-child",
@@ -132,6 +144,12 @@ router.post(
   AddUserAsChild.validateData(),
   AddUserAsChild.myValidationResult,
   AuthController.addExistingUserAsChild
+);
+router.post(
+  "/accept-parent-request",
+  AddUserAsChild.validateData(),
+  AddUserAsChild.myValidationResult,
+  AuthController.acceptParentReuest
 );
 router.patch(
   "/unlink-child-account",
