@@ -191,46 +191,19 @@ class AuthController {
           error: "Class not registered to this school",
         });
       }
+      //send teacher email to join this school as a teacher
 
-      existingUser.schoolId = schoolId;
-      await existingUser.save();
-      if (classHasExistingTeacher && classHasExistingTeacher.userId) {
-        //add new teacher to admins
-        const newAdmin = await AdminRole.create({
-          roleDescription: "Teacher",
-          userId: existingUser._id,
-          classId,
-          schoolId,
-        });
-        const message = `Hi, ${existingUser.fullName}, your school just created a new Admin account for you.`;
-        const adminMessage = ` ${existingSchool.name} just created a new Admin account for ${existingUser.fullName}.`;
+      const message = `Hi ${existingUser.fullName}, ${existingSchool.name} is requesting you to join ${existingSchool.name} as a Teacher. \n Click this link to accept the request https://www.myafrilearn.com/accept-teacher-request?role=teacher&email=${email}&schoolId=${schoolId}&classId=${classId}`;
+      const adminMessage = ` ${existingSchool.name}, your teacher request has been sent to ${existingUser.fullName}.`;
 
-        sendEmail(email, "Welcome to Afrilearn", message);
-        sendEmail("africustomers@gmail.com", "New Customer", adminMessage);
-        sendEmail(existingSchool.email, "Student Registered", adminMessage);
-        return res.status(201).json({
-          status: "success",
-          data: {
-            user: existingUser,
-          },
-        });
-      } else {
-        //Add  teacher to class s
-        classHasExistingTeacher.userId = existingUser._id;
-        await classHasExistingTeacher.save();
-      }
-
-      const message = `Hi ${existingUser.fullName}, your school just created a new ${customerRole}'s account for you.`;
-      const adminMessage = ` ${existingSchool.name}, just created a new ${customerRole}'s account for ${existingUser.fullName}.`;
-
-      sendEmail(email, "Welcome to Afrilearn", message);
-      sendEmail("africustomers@gmail.com", "New Customer", adminMessage);
-      sendEmail(existingSchool.email, "Student Registered", adminMessage);
+      sendEmail(email, "Teacher request", message);
+      // sendEmail("africustomers@gmail.com", "New Customer", adminMessage);
+      sendEmail(existingSchool.email, "Teacher request sent", adminMessage);
 
       return res.status(201).json({
         status: "success",
         data: {
-          user: existingUser,
+          message: "Request sent",
         },
       });
     } catch (err) {
@@ -275,7 +248,7 @@ class AuthController {
         _id: classId,
         schoolId,
       });
-      console.log("existingClass", existingClass);
+
       if (classId && !existingClass) {
         return res.status(404).json({
           status: "404 Not found",
@@ -283,23 +256,166 @@ class AuthController {
         });
       }
 
+      const message = `Hi ${existingUser.fullName}, ${existingSchool.name} is requesting you to join ${existingSchool.name} as an Admin. \n Click this link to accept the request https://www.myafrilearn.com/accept-teacher-request?role=admin&email=${email}&schoolId=${schoolId}&classId=${classId}`;
+
+      const adminMessage = ` ${existingSchool.name}, your Admin request has been sent to ${existingUser.fullName}.`;
+
+      sendEmail(email, "Admin request", message);
+      sendEmail(existingSchool.email, "Admin request sent", adminMessage);
+      return res.status(201).json({
+        status: "success",
+        data: {
+          message: "Admin request has been sent",
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error sending request",
+      });
+    }
+  }
+
+  /**
+   * Accept School admin request.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async acceptTeacherRequest(req, res) {
+    try {
+      const { email, schoolId, classId } = req.body;
+
+      const existingSchool = await School.findOne({ _id: schoolId });
+      if (!existingSchool) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "School is not registered",
+        });
+      }
+
+      const existingUser = await Auth.findOne({
+        email,
+      });
+      if (!existingUser) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error: "Your email is not registered",
+        });
+      }
+
+      const classHasExistingTeacher = await Class.findOne({
+        _id: classId,
+        schoolId,
+      });
+      if (!classHasExistingTeacher) {
+        return res.status(404).json({
+          status: "404 Bad request",
+          error: "Class not registered to this school",
+        });
+      }
+
+      existingUser.schoolId = schoolId;
+      await existingUser.save();
+
+      if (classHasExistingTeacher && classHasExistingTeacher.userId) {
+        //add new teacher to admins
+        await AdminRole.create({
+          roleDescription: "Teacher",
+          userId: existingUser._id,
+          classId,
+          schoolId,
+        });
+        const message = `Hi, ${existingUser.fullName}, your are now an Admin at ${existingSchool.name}.\n Click this link to continue to your dashboard https://www.myafrilearn.com/dashboard`;
+        const adminMessage = ` ${existingSchool.name}, ${existingUser.fullName} accepted your request.`;
+
+        sendEmail(email, "Congratulations!", message);
+        sendEmail(existingSchool.email, "Request Accepted", adminMessage);
+        return res.status(201).json({
+          status: "success",
+          data: {
+            message: "Request Accepted",
+          },
+        });
+      }
+      //Add  teacher to class s
+      classHasExistingTeacher.userId = existingUser._id;
+      await classHasExistingTeacher.save();
+
+      // Send Admin request email
+
+      const message = `Hi ${existingUser.fullName}, you are now a Teacher at ${existingSchool.name}. \n Click this link to continue to your dashboard https://www.myafrilearn.com/dashboard`;
+
+      const adminMessage = ` ${existingSchool.name},  ${existingUser.fullName} is now a Teacher at your school.`;
+
+      sendEmail(email, "Congratulations! ", message);
+      sendEmail(existingSchool.email, "Teacher request accepted", adminMessage);
+      return res.status(201).json({
+        status: "success",
+        data: {
+          message: "Request Accepted",
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error accepting request",
+      });
+    }
+  }
+
+  /**
+   * Accept School admin request.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async acceptAdminRequest(req, res) {
+    try {
+      const { email, schoolId, classId } = req.body;
+
+      const existingSchool = await School.findOne({ _id: schoolId });
+      if (!existingSchool) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "School is not registered",
+        });
+      }
+
+      const existingUser = await Auth.findOne({
+        email,
+      });
+      if (!existingUser) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error: "Your email is not registered",
+        });
+      }
+
       //add teacher to admins
+      existingUser.schoolId = schoolId;
+      existingUser.save();
       const admin = await AdminRole.create({
         roleDescription: "Admin",
         userId: existingUser._id,
         classId,
         schoolId,
       });
-      const message = `Hi, ${existingUser.fullName}, ${existingSchool.name} made you an Admin`;
-      const adminMessage = ` ${existingSchool.name} added ${existingUser.fullName} as Admin.`;
 
-      sendEmail(email, "You are now an Admin", message);
-      sendEmail("africustomers@gmail.com", "New Admin", adminMessage);
-      sendEmail(existingSchool.email, "Admin Added", adminMessage);
+      // Send Admin request email
+
+      const message = `Hi ${existingUser.fullName}, you are now an Admin at ${existingSchool.name}. \n Click this link to continue to your dashboard https://www.myafrilearn.com/dashboard`;
+
+      const adminMessage = ` ${existingSchool.name},  ${existingUser.fullName} is now an Admin at your school.`;
+
+      sendEmail(email, "Congratulations! You are an Admin", message);
+      sendEmail(existingSchool.email, "Admin request accepted", adminMessage);
       return res.status(201).json({
         status: "success",
         data: {
-          admin,
+          message: "Request Accepted",
         },
       });
     } catch (err) {
@@ -566,10 +682,8 @@ class AuthController {
       const { email, parentId } = req.body;
       const existingUser = await Auth.findOne({
         email: email,
-      }).populate({
-        path: "enrolledCourses",
-        populate: "courseId",
       });
+
       const existingParent = await Auth.findOne({ _id: parentId });
       if (!existingParent) {
         return res.status(404).json({
@@ -604,31 +718,104 @@ class AuthController {
         });
       }
 
-      existingUser.parentId = parentId;
-      await existingUser.save();
+      // existingUser.parentId = parentId;
+      // await existingUser.save();
+      //send child request
 
-      const message = `Hi, ${existingUser.fullName}, ${existingParent.fullName} added you to children list.`;
-      const adminMessage = ` ${existingParent.fullName} just added ${existingUser.fullName} to their children list.`;
-      const parentMessage = `You just added ${existingUser.fullName} to your children list.`;
+      const message = `Hi, ${existingUser.fullName}, ${existingParent.fullName} is requesting to add you to their children list. \n Click this link to accept the request https://www.myafrilearn.com/accept-teacher-request?role=child&email=${email}&parentId=${parentId}`;
+      const parentMessage = ` ${existingParent.fullName} your parent request was sent to ${existingUser.fullName} `;
 
-      sendEmail(email, "You parent added you", message);
-      sendEmail("africustomers@gmail.com", "New Customer", adminMessage);
+      sendEmail(email, "Your parent sent you a request", message);
       sendEmail(
         existingParent.email,
-        "Your Child is Registered",
+        "Your parent request was sent",
         parentMessage
       );
 
       return res.status(200).json({
         status: "success",
         data: {
-          user: existingUser,
+          message: "Your parent request was sent",
         },
       });
     } catch (err) {
       return res.status(500).json({
         status: "500 Internal server error",
-        error: "Error Adding user",
+        error: "Error sending request",
+      });
+    }
+  }
+
+  /**
+   * Accept Parent request.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async acceptParentReuest(req, res) {
+    try {
+      const { email, parentId } = req.body;
+      const existingUser = await Auth.findOne({
+        email: email,
+      });
+      const existingParent = await Auth.findOne({ _id: parentId });
+      if (!existingParent) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "Parent is not registered",
+        });
+      }
+
+      if (!existingUser) {
+        return res.status(404).json({
+          status: "404 Bad request",
+          error: "Your email is not registered",
+        });
+      }
+
+      const existingParentChild = await Auth.findOne({
+        email,
+        parentId,
+      });
+
+      if (existingParentChild) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error: "You are already registered to this Parent",
+        });
+      }
+
+      if (existingUser.parentId && existingUser.parentId !== parentId) {
+        return res.status(400).json({
+          status: "400 Bad request",
+          error: "You have been registered to another parent",
+        });
+      }
+
+      existingUser.parentId = parentId;
+      await existingUser.save();
+
+      const message = `Hi, ${existingUser.fullName}, you have joined ${existingParent.fullName}'s children list.`;
+      const parentMessage = ` ${existingParent.fullName} your parent request has been accepted by ${existingUser.fullName} `;
+
+      sendEmail(email, "Congratulations! ", message);
+      sendEmail(
+        existingParent.email,
+        "Your parent request was sent",
+        parentMessage
+      );
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          message: "Request accepted",
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error sending request",
       });
     }
   }
