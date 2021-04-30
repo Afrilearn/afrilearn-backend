@@ -790,7 +790,7 @@ class AuthController {
         return res.status(400).json({
           status: "400 Bad request",
           error: "You have been registered to another parent",
-        });
+        }); 
       }
 
       existingUser.parentId = parentId;
