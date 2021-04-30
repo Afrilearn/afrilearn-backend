@@ -28,7 +28,7 @@ export default {
           populate: { path: "classId", populate: "enrolledCourse" },
         })
         .populate({ path: "usersReferred", select: "fullName" })
-        .populate({ path: "schoolOwnership"});
+        .populate({ path: "schoolOwnership" });
 
       return user;
     } catch (err) {
@@ -102,8 +102,14 @@ export default {
           name: `${course.name}-${school.name}`,
           classCode: `${trimmedSchoolName}${classCode}`,
         };
-
-        await Class.create({ ...classData });
+        const classCreated = await Class.create({ ...classData });
+        const enrollCourseData = {
+          userId: user._id,
+          courseId: course._id,
+          schoolId: school._id,
+          classId: classCreated._id,
+        };
+        await EnrolledCourse.create({ ...enrollCourseData });
       }
       return "success";
 
