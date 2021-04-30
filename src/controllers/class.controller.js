@@ -550,9 +550,16 @@ class ClassController {
 
         if (req.body.audience === "all") {
           assignedContentData.audience = "all";
-          const content = await TeacherAssignedContent.create(
+          const contentOne = await TeacherAssignedContent.create(
             assignedContentData
           );
+          const content = await TeacherAssignedContent.findOne({
+            _id: contentOne._id,
+          }).populate({
+            path: "teacher userId",
+            model: User,
+            select: "role email fullName",
+          });
           createdContents.push(content);
         } else if (
           req.body.audience !== "all" &&
@@ -561,9 +568,17 @@ class ClassController {
           for (let index = 0; index < req.body.userIds.length; index++) {
             const userId = req.body.userIds[index];
             assignedContentData.userId = userId;
-            const content = await TeacherAssignedContent.create(
+            const contentOne = await TeacherAssignedContent.create(
               assignedContentData
             );
+            const content = await TeacherAssignedContent.findOne({
+              _id: contentOne._id,
+            }).populate({
+              path: "teacher userId",
+              model: User,
+              select: "role email fullName",
+            });
+            // await content.execPopulate();
             createdContents.push(content);
           }
         }
