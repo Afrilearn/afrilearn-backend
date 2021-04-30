@@ -346,7 +346,7 @@ class ClassController {
         classId: req.params.classId,
       })
         .select("userId -_id")
-        .populate("userId", "fullName");
+        .populate({ path: "userId", select: "fullName email" });
       const teacher = await Class.findOne({
         _id: req.params.classId,
       }).populate({ path: "userId", populate: "role" });

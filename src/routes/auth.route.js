@@ -137,7 +137,7 @@ router.post(
   "/sign-up-for-a-child",
   SignupForChild.validateData(),
   SignupForChild.myValidationResult,
-  AuthController.signUpForChild
+  AuthController.signUpForChild 
 );
 router.post(
   "/add-user-as-child",
@@ -147,7 +147,7 @@ router.post(
 );
 router.post(
   "/accept-parent-request",
-  AddUserAsChild.validateData(),
+  AddUserAsChild.validateData(), 
   AddUserAsChild.myValidationResult,
   AuthController.acceptParentReuest
 );
