@@ -18,6 +18,7 @@ import UnlinkStudentAccount from "../validations/auth/unlinkStudentAccount.valid
 import AddUserAsTeacher from "../validations/auth/addUserAsTeacher.validator";
 import MaketeacherAnAdmin from "../validations/auth/makeTeacherAdmin.validator";
 import UnlinkChildrenAccounts from "../validations/auth/unlinkChildrenAccounts.validator";
+import SignupForAdmin from "../validations/auth/signupForAdmin.validator";
 
 const router = Router();
 
@@ -98,6 +99,12 @@ router.post(
   AuthController.signUpForTeacher
 );
 router.post(
+  "/school/sign-up-for-admin",
+  SignupForAdmin.validateData(),
+  SignupForAdmin.myValidationResult,
+  AuthController.signUpForSchoolAdmin
+);
+router.post(
   "/school/add-user-as-teacher",
   AddUserAsTeacher.validateData(),
   AddUserAsTeacher.myValidationResult,
@@ -137,7 +144,7 @@ router.post(
   "/sign-up-for-a-child",
   SignupForChild.validateData(),
   SignupForChild.myValidationResult,
-  AuthController.signUpForChild 
+  AuthController.signUpForChild
 );
 router.post(
   "/add-user-as-child",
@@ -147,7 +154,7 @@ router.post(
 );
 router.post(
   "/accept-parent-request",
-  AddUserAsChild.validateData(), 
+  AddUserAsChild.validateData(),
   AddUserAsChild.myValidationResult,
   AuthController.acceptParentReuest
 );
