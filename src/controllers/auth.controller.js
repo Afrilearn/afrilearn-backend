@@ -427,7 +427,78 @@ class AuthController {
   }
 
   /**
-   * School Create account for a student.
+   * School Create account for an Admin.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+  static async signUpForSchoolAdmin(req, res) {
+    try {
+      let customerRole = "Admin";
+      const { fullName, password, email, schoolId, roleDescription } = req.body;
+
+      const encryptpassword = await Helper.encrptPassword(password);
+
+      const existingUser = await Auth.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({
+          status: "400 Not found",
+          error: "Email already exist",
+        });
+      }
+
+      const existingSchool = await School.findOne({ _id: schoolId });
+      if (!existingSchool) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "School is not registered",
+        });
+      }
+
+      const newUser = {
+        fullName,
+        password: encryptpassword,
+        email,
+        role: "602f3ce39b146b3201c2dc1d",
+        schoolId,
+      };
+
+      const result = await Auth.create({ ...newUser });
+
+      // if teacher exists already, add the new teacher to admin
+
+      const data = {
+        roleDescription: roleDescription || "Admin",
+        userId: result.id,
+        schoolId,
+      };
+      await AdminRole.create({ ...data });
+
+      const message = `Hi, ${fullName},  ${existingSchool.name} just created a new ${customerRole}'s account for you.`;
+      const adminMessage = ` ${existingSchool.name}, just created a new ${customerRole}'s account for ${fullName}.`;
+
+      sendEmail(email, "Welcome to Afrilearn", message);
+      sendEmail("africustomers@gmail.com", "New Customer", adminMessage);
+      sendEmail(existingSchool.email, "Admin Registered", adminMessage);
+
+      return res.status(201).json({
+        status: "success",
+        data: {
+          user: result,
+          password,
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error creating new admin account",
+      });
+    }
+  }
+
+  /**
+   * School Create account for a Teacher.
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
    * @memberof AuthController
@@ -478,6 +549,7 @@ class AuthController {
           roleDescription: "teacher",
           userId: result.id,
           schoolId,
+          classId: existingTeacherforClass._id,
         };
         await AdminRole.create({ ...data });
       } else {
@@ -790,7 +862,7 @@ class AuthController {
         return res.status(400).json({
           status: "400 Bad request",
           error: "You have been registered to another parent",
-        }); 
+        });
       }
 
       existingUser.parentId = parentId;
