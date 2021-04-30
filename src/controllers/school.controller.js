@@ -29,14 +29,11 @@ class SchoolController {
                 schoolId,
                 role: "5fd08fba50964811309722d5"
             });
-            const numOfClassTeachers = await Auth.countDocuments({
-                schoolId,
-                role: "602f3ce39b146b3201c2dc1d"
-            });
+           
             const numOfAdminTeachers = await AdminRole.countDocuments({
                 schoolId
             });
-            const numOfTeachers = numOfClassTeachers + numOfAdminTeachers;
+           
 
             const schoolClasses = await ClassModel.find({
                 schoolId
@@ -45,7 +42,7 @@ class SchoolController {
                 userId:1,
                 courseId:1
             })
-
+            let overAllClassTeachers = 0;
             for(let i = 0; i<schoolClasses.length; i++){                         
                 let numOfClassTeachers = await AdminRole.countDocuments({
                     schoolId,
@@ -54,6 +51,7 @@ class SchoolController {
               
                 if(schoolClasses[i].userId){
                     ++numOfClassTeachers
+                    ++overAllClassTeachers
                 }  
                 
                 const data = {                   
@@ -64,7 +62,7 @@ class SchoolController {
                 }
                 schoolClassesData.push(data)
             }
-
+            const numOfTeachers = overAllClassTeachers + numOfAdminTeachers;
             return res.status(201).json({
                 status: "success",
                 data: {
