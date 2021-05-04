@@ -30,7 +30,7 @@ export default {
         .populate({ path: "usersReferred", select: "fullName" })
         .populate({ path: "schoolOwnership" })
         .populate({ path: "schoolId" });
-
+//plese work
       return user;
     } catch (err) {
       return res.status(500).json({
