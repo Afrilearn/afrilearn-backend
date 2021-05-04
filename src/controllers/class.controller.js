@@ -9,6 +9,7 @@ import Lesson from "../db/models/lessons.model";
 import Subject from "../db/models/subjects.model";
 import TeacherAssignedContent from "../db/models/teacherAssignedContents.model";
 import User from "../db/models/users.model";
+import School from "../db/models/schoolProfile";
 import sendEmail from "../utils/email.utils";
 import Helper from "../utils/user.utils";
 
@@ -31,7 +32,9 @@ class ClassController {
   static async addClass(req, res) {
     let classCode = await Helper.generateCode(8);
     try {
-      const existingClassCode = await ClassModel.findOne({ classCode });
+      const existingClassCode = await ClassModel.findOne({
+        classCode
+      });
 
       if (existingClassCode) {
         classCode = await Helper.generateCode(9);
@@ -45,7 +48,9 @@ class ClassController {
       if (req.body.schoolId) {
         classData.schoolId = req.body.schoolId;
       }
-      const newClass = await ClassModel.create({ ...classData });
+      const newClass = await ClassModel.create({
+        ...classData
+      });
 
       return res.status(200).json({
         status: "success",
@@ -97,11 +102,11 @@ class ClassController {
   static async updateClassName(req, res) {
     try {
       const existingClass = await ClassModel.findByIdAndUpdate(
-        req.params.classId,
-        {
+        req.params.classId, {
           name: req.body.name,
-        },
-        { new: true }
+        }, {
+          new: true
+        }
       );
       if (!existingClass) {
         return res.status(404).json({
@@ -134,7 +139,9 @@ class ClassController {
    */
   static async sendClassRequest(req, res) {
     try {
-      const clazz = await ClassModel.findOne({ classCode: req.body.classCode });
+      const clazz = await ClassModel.findOne({
+        classCode: req.body.classCode
+      });
       if (!clazz) {
         return res.status(404).json({
           status: "404 not found",
@@ -157,13 +164,14 @@ class ClassController {
           error: "You are already a member of this class",
         });
       }
-      const classMember = await ClassMember.create({ ...classMemberData });
+      const classMember = await ClassMember.create({
+        ...classMemberData
+      });
 
       return res.status(200).json({
         status: "success",
         data: {
-          message:
-            "Your class request was sent, wait for teacher to let you in",
+          message: "Your class request was sent, wait for teacher to let you in",
           classMember,
         },
       });
@@ -231,7 +239,9 @@ class ClassController {
     try {
       // user lands on join class page with email and classid
       // if user exists
-      const user = await User.findOne({ email: req.body.email });
+      const user = await User.findOne({
+        email: req.body.email
+      });
 
       // yes? add user to class
       if (user) {
@@ -242,8 +252,7 @@ class ClassController {
         if (existingClassMember) {
           return res.status(400).json({
             status: "400 Bad request",
-            error:
-              "Classmember already exist. Access your classes on your dashboard",
+            error: "Classmember already exist. Access your classes on your dashboard",
           });
         }
         const classMember = await ClassMember.create({
@@ -304,13 +313,13 @@ class ClassController {
         classId: req.body.classId,
         userId: req.body.userId,
       };
-      const classMember = await ClassMember.findOneAndUpdate(
-        { ...classMemberData },
-        { status: req.body.status },
-        {
-          new: true,
-        }
-      );
+      const classMember = await ClassMember.findOneAndUpdate({
+        ...classMemberData
+      }, {
+        status: req.body.status
+      }, {
+        new: true,
+      });
       if (!classMember) {
         return res.status(404).json({
           status: "404 not found",
@@ -343,16 +352,22 @@ class ClassController {
   static async getStudentsInClass(req, res) {
     try {
       const classMembers = await ClassMember.find({
-        classId: req.params.classId,
-      })
+          classId: req.params.classId,
+        })
         .select("userId -_id")
-        .populate({ path: "userId", select: "fullName email" });
+        .populate({
+          path: "userId",
+          select: "fullName email"
+        });
       const teacher = await Class.findOne({
         _id: req.params.classId,
-      }).populate({ path: "userId", populate: "role" });
+      }).populate({
+        path: "userId",
+        populate: "role"
+      });
       const admins = await AdminRole.find({
-        classId: req.params.classId,
-      })
+          classId: req.params.classId,
+        })
         .select("userId roleDescription")
         .populate({
           path: "userId",
@@ -395,10 +410,12 @@ class ClassController {
     try {
       // if classmember with userId, and classId exist, allow, else deny
       const clazz = await ClassModel.findById(req.params.classId)
-        .populate("schoolId")
         .populate({
-          path:
-            "relatedSubjects relatedPastQuestions userId courseId enrolledCourse", //can remove relatedLessons
+          path: "schoolId",
+          model: School
+        })
+        .populate({
+          path: "relatedSubjects relatedPastQuestions userId courseId enrolledCourse", //can remove relatedLessons
           populate: {
             path: "mainSubjectId relatedLessons pastQuestionTypeId",
             populate: "questions",
@@ -406,23 +423,40 @@ class ClassController {
         })
         .populate({
           path: "classAnnouncements",
-          populate: { path: "comments teacher", populate: "student" },
+          populate: {
+            path: "comments teacher",
+            populate: "student"
+          },
           model: Announcement,
           sort: ["createdAt", 1],
         })
         .populate({
           path: "teacherAssignedContents",
-          populate: [
-            { path: "teacher", model: User },
-            { path: "subjectId", populate: "mainSubjectId" },
-            { path: "comments", populate: "sender" },
-            { path: "lessonId", model: Lesson },
-            { path: "userId", model: User },
+          populate: [{
+              path: "teacher",
+              model: User
+            },
+            {
+              path: "subjectId",
+              populate: "mainSubjectId"
+            },
+            {
+              path: "comments",
+              populate: "sender"
+            },
+            {
+              path: "lessonId",
+              model: Lesson
+            },
+            {
+              path: "userId",
+              model: User
+            },
           ],
         });
       const classMembers = await ClassMember.find({
-        classId: req.params.classId,
-      })
+          classId: req.params.classId,
+        })
         .populate("userId")
         .select("status userId fullName email role");
 
@@ -453,7 +487,10 @@ class ClassController {
     try {
       // if classmember with userId, and classId exist, allow, else deny
       const clazz = await ClassModel.findById(req.params.classId)
-        .populate("schoolId")
+        .populate({
+          path: "schoolId",
+          model: School         
+        })
         .populate({
           path: "userId", //can remove relatedLessons
           select: "fullName email",
@@ -479,8 +516,8 @@ class ClassController {
           },
         });
       const classMembers = await ClassMember.find({
-        classId: req.params.classId,
-      })
+          classId: req.params.classId,
+        })
         .populate("userId")
         .select("status userId fullName email role");
 
@@ -535,7 +572,11 @@ class ClassController {
    */
   static async assignContent(req, res) {
     try {
-      const lessons = await Lesson.find({ _id: { $in: req.body.lessonIds } });
+      const lessons = await Lesson.find({
+        _id: {
+          $in: req.body.lessonIds
+        }
+      });
       const createdContents = [];
       for (let index = 0; index < lessons.length; index++) {
         const lesson = lessons[index];
@@ -696,12 +737,14 @@ class ClassController {
   static async getClassAnnouncements(req, res) {
     try {
       const announcements = await Announcement.find({
-        classId: req.params.classId,
-      })
+          classId: req.params.classId,
+        })
         .populate({
           path: "comments",
           model: Comment,
-          populate: { path: "student" },
+          populate: {
+            path: "student"
+          },
         })
         .populate("teacher");
       return res.status(200).json({
@@ -728,18 +771,31 @@ class ClassController {
    */
   static async getClassAssignedContents(req, res) {
     try {
-      let searchData = { classId: req.params.classId };
+      let searchData = {
+        classId: req.params.classId
+      };
       if (req.body.userId) {
         searchData.userId = req.body.userId;
       }
       const assignedContents = await TeacherAssignedContent.find(searchData)
-        .populate({ path: "teacher", model: User, select: "fullName" })
-        .populate({ path: "lessonId", model: Lesson, select: "title" })
+        .populate({
+          path: "teacher",
+          model: User,
+          select: "fullName"
+        })
+        .populate({
+          path: "lessonId",
+          model: Lesson,
+          select: "title"
+        })
         .populate({
           path: "subjectId",
           model: Subject,
           select: "mainSubjectId",
-          populate: { path: "mainSubjectId", select: "name" },
+          populate: {
+            path: "mainSubjectId",
+            select: "name"
+          },
         });
       return res.status(200).json({
         status: "success",
@@ -766,21 +822,31 @@ class ClassController {
   static async getAssignedContent(req, res) {
     try {
       const assignedContent = await TeacherAssignedContent.findOne({
-        _id: req.params.classworkId,
-      })
+          _id: req.params.classworkId,
+        })
         .select("teacher subjectId description dueDate createdAt")
-        .populate({ path: "teacher", model: User, select: "fullName" })
+        .populate({
+          path: "teacher",
+          model: User,
+          select: "fullName"
+        })
         .populate({
           path: "subjectId",
           model: Subject,
           select: "mainSubjectId",
-          populate: { path: "mainSubjectId", select: "name" },
+          populate: {
+            path: "mainSubjectId",
+            select: "name"
+          },
         })
         .populate({
           path: "comments",
           model: CommentForAssignedContent,
           select: "sender student text createdAt",
-          populate: { path: "student sender", select: "fullName" },
+          populate: {
+            path: "student sender",
+            select: "fullName"
+          },
         });
       return res.status(200).json({
         status: "success",
@@ -807,12 +873,14 @@ class ClassController {
   static async getClassAnnouncements(req, res) {
     try {
       const announcements = await Announcement.find({
-        classId: req.params.classId,
-      })
+          classId: req.params.classId,
+        })
         .populate({
           path: "comments",
           model: Comment,
-          populate: { path: "student" },
+          populate: {
+            path: "student"
+          },
         })
         .populate("teacher");
       return res.status(200).json({
