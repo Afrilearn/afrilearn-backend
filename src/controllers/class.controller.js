@@ -874,15 +874,17 @@ class ClassController {
     try {
       const announcements = await Announcement.find({
           classId: req.params.classId,
-        })
+        }).sort({ createdAt: -1 })
+        .limit(5)
         .populate({
           path: "comments",
-          model: Comment,
+          model: Comment,         
           populate: {
-            path: "student"
+            path: "student",
+            select:"fullName role",
           },
         })
-        .populate("teacher");
+        .populate({ path: "teacher", select: "fullName role" })
       return res.status(200).json({
         status: "success",
         data: {
