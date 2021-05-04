@@ -23,16 +23,6 @@ export default {
         })
         .populate({ path: "classOwnership", populate: "enrolledCourse" })
         .populate({
-          path: 'classMembership',
-          select: '_id status',
-          model: ClassMembers,
-          populate: {
-            path: 'classId',
-            select: 'name classCode',
-            populate: { path: 'courseId', select: 'name imageUrl' },
-          },
-        })
-        .populate({
           path: "adminRoles",
           model: AdminRole,
           populate: { path: "classId", populate: "enrolledCourse" },
