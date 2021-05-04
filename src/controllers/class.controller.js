@@ -652,11 +652,23 @@ class ClassController {
         teacher: req.data.id,
         classId: req.params.classId,
         text: req.body.text,
-      });
+      })
+     
+      const newData = await Announcement.findOne({_id:announcement._id})
+      .populate({
+        path: "comments",
+        model: Comment,         
+        populate: {
+          path: "student",
+          select:"fullName role",
+        },
+      })
+      .populate({ path: "teacher", select: "fullName role" })
+
       return res.status(201).json({
         status: "success",
         data: {
-          announcement,
+          announcement:newData,
         },
       });
     } catch (error) {
@@ -726,41 +738,7 @@ class ClassController {
     }
   }
 
-  /**
-   * get class announcements
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof ClassController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
-  static async getClassAnnouncements(req, res) {
-    try {
-      const announcements = await Announcement.find({
-          classId: req.params.classId,
-        })
-        .populate({
-          path: "comments",
-          model: Comment,
-          populate: {
-            path: "student"
-          },
-        })
-        .populate("teacher");
-      return res.status(200).json({
-        status: "success",
-        data: {
-          announcements,
-        },
-      });
-    } catch (error) {
-      return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error getting announcements",
-      });
-    }
-  }
-
+  
   /**
    * get class assigned contents
    * @param {Request} req - Response object.
