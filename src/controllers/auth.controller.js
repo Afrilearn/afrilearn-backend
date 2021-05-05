@@ -89,7 +89,8 @@ class AuthController {
           courseCategoryId: req.body.courseCategoryId,
           creator: result._id          
         });
-
+        result.schoolId = school._id;
+        await
         await EnrolledCourse.create({
           userId: result._id,
           schoolId: school._id,
