@@ -40,12 +40,7 @@ class AuthController {
   static async signUp(req, res) {
     try {
       let customerRole = "Student";
-      const {
-        fullName,
-        password,
-        email,
-        role
-      } = req.body;
+      const { fullName, password, email, role } = req.body;
 
       const encryptpassword = await Helper.encrptPassword(password);
 
@@ -90,7 +85,7 @@ class AuthController {
           creator: result._id,
         });
         await result.updateOne({
-          schoolId: school._id
+          schoolId: school._id,
         });
         await result.save();
 
@@ -121,11 +116,14 @@ class AuthController {
           classCode,
         });
 
-        await enrolledCourse.update({
-          classId: newClass._id,
-        }, {
-          new: true,
-        });
+        await enrolledCourse.update(
+          {
+            classId: newClass._id,
+          },
+          {
+            new: true,
+          }
+        );
         await enrolledCourse.save();
       }
 
@@ -161,11 +159,7 @@ class AuthController {
   static async schoolAddExistingTeacher(req, res) {
     try {
       let customerRole = "Teacher";
-      const {
-        email,
-        schoolId,
-        classId
-      } = req.body;
+      const { email, schoolId, classId } = req.body;
 
       const existingSchool = await School.findOne({
         _id: schoolId,
@@ -183,7 +177,8 @@ class AuthController {
       if (!existingUser) {
         return res.status(400).json({
           status: "400 Bad request",
-          error: "Teacher with this email not found, Add a name and password to craete a new account",
+          error:
+            "Teacher with this email not found, Add a name and password to craete a new account",
         });
       }
       if (
@@ -248,11 +243,7 @@ class AuthController {
    */
   static async makeTeacherAdmin(req, res) {
     try {
-      const {
-        email,
-        schoolId,
-        classId
-      } = req.body;
+      const { email, schoolId, classId } = req.body;
 
       const existingSchool = await School.findOne({
         _id: schoolId,
@@ -270,7 +261,8 @@ class AuthController {
       if (!existingUser) {
         return res.status(400).json({
           status: "400 Bad request",
-          error: "Teacher with this email not found, Add a name and password to craete a new account",
+          error:
+            "Teacher with this email not found, Add a name and password to craete a new account",
         });
       }
 
@@ -315,11 +307,7 @@ class AuthController {
    */
   static async acceptTeacherRequest(req, res) {
     try {
-      const {
-        email,
-        schoolId,
-        classId
-      } = req.body;
+      const { email, schoolId, classId } = req.body;
 
       const existingSchool = await School.findOne({
         _id: schoolId,
@@ -410,11 +398,7 @@ class AuthController {
    */
   static async acceptAdminRequest(req, res) {
     try {
-      const {
-        email,
-        schoolId,
-        classId
-      } = req.body;
+      const { email, schoolId, classId } = req.body;
 
       const existingSchool = await School.findOne({
         _id: schoolId,
@@ -478,13 +462,7 @@ class AuthController {
   static async signUpForSchoolAdmin(req, res) {
     try {
       let customerRole = "Admin";
-      const {
-        fullName,
-        password,
-        email,
-        schoolId,
-        roleDescription
-      } = req.body;
+      const { fullName, password, email, schoolId, roleDescription } = req.body;
 
       const encryptpassword = await Helper.encrptPassword(password);
 
@@ -563,13 +541,7 @@ class AuthController {
   static async signUpForTeacher(req, res) {
     try {
       let customerRole = "Teacher";
-      const {
-        fullName,
-        password,
-        email,
-        schoolId,
-        courseId
-      } = req.body;
+      const { fullName, password, email, schoolId, courseId } = req.body;
 
       const encryptpassword = await Helper.encrptPassword(password);
 
@@ -743,13 +715,7 @@ class AuthController {
   static async signUpForChild(req, res) {
     try {
       let customerRole = "Student";
-      const {
-        fullName,
-        password,
-        email,
-        courseId,
-        parentId
-      } = req.body;
+      const { fullName, password, email, courseId, parentId } = req.body;
 
       const encryptpassword = await Helper.encrptPassword(password);
       const existingParent = await Auth.findOne({
@@ -837,10 +803,7 @@ class AuthController {
    */
   static async addExistingUserAsChild(req, res) {
     try {
-      const {
-        email,
-        parentId
-      } = req.body;
+      const { email, parentId } = req.body;
       const existingUser = await Auth.findOne({
         email: email,
       });
@@ -918,10 +881,7 @@ class AuthController {
    */
   static async acceptParentReuest(req, res) {
     try {
-      const {
-        email,
-        parentId
-      } = req.body;
+      const { email, parentId } = req.body;
       const existingUser = await Auth.findOne({
         email: email,
       });
@@ -996,10 +956,7 @@ class AuthController {
    * @returns {JSON} - A JSON success response.
    */
   static async unlinkChildAccount(req, res) {
-    const {
-      userId,
-      parentId
-    } = req.body;
+    const { userId, parentId } = req.body;
     try {
       const existingParentChild = await Auth.findOne({
         _id: userId,
@@ -1061,10 +1018,7 @@ class AuthController {
    * @returns {JSON} - A JSON success response.
    */
   static async unlinkChildrenAccounts(req, res) {
-    const {
-      childrenIds,
-      parentId
-    } = req.body;
+    const { childrenIds, parentId } = req.body;
     try {
       const existingParent = await Auth.findOne({
         _id: parentId,
@@ -1094,7 +1048,8 @@ class AuthController {
           }
           return res.status(400).json({
             status: "400 Bad request",
-            error: "You have no parent relationship with " +
+            error:
+              "You have no parent relationship with " +
               text +
               ". Select only your children.",
           });
@@ -1150,10 +1105,7 @@ class AuthController {
    * @returns {JSON} - A JSON success response.
    */
   static async deleteChildAccount(req, res) {
-    const {
-      userId,
-      parentId
-    } = req.body;
+    const { userId, parentId } = req.body;
     try {
       const existingParentChild = await Auth.findOne({
         _id: userId,
@@ -1221,10 +1173,7 @@ class AuthController {
    * @returns {JSON} - A JSON success response.
    */
   static async deleteChildrenAccounts(req, res) {
-    const {
-      childrenIds,
-      parentId
-    } = req.body;
+    const { childrenIds, parentId } = req.body;
     try {
       const existingParent = await Auth.findOne({
         _id: parentId,
@@ -1255,7 +1204,8 @@ class AuthController {
           }
           return res.status(400).json({
             status: "400 Bad request",
-            error: "You have no parent relationship with " +
+            error:
+              "You have no parent relationship with " +
               text +
               ". Select only your children.",
           });
@@ -1317,10 +1267,7 @@ class AuthController {
    * @returns {JSON} - A JSON success response.
    */
   static async deleteTeacherAccount(req, res) {
-    const {
-      userId,
-      schoolId
-    } = req.body;
+    const { userId, schoolId } = req.body;
     try {
       const existingSchool = await School.findOne({
         _id: schoolId,
@@ -1405,10 +1352,7 @@ class AuthController {
    * @returns {JSON} - A JSON success response.
    */
   static async unlinkTeacherAccount(req, res) {
-    const {
-      userId,
-      schoolId
-    } = req.body;
+    const { userId, schoolId } = req.body;
     try {
       const existingSchool = await School.findOne({
         _id: schoolId,
@@ -1445,7 +1389,7 @@ class AuthController {
           const clazz = classes[index];
           // clazz.userId = "";
           await clazz.updateOne({
-            userId: null
+            userId: null,
           });
           await clazz.save();
         }
@@ -1501,10 +1445,7 @@ class AuthController {
    * @returns {JSON} - A JSON success response.
    */
   static async deleteStudentAccount(req, res) {
-    const {
-      userId,
-      schoolId
-    } = req.body;
+    const { userId, schoolId } = req.body;
     try {
       const existingSchool = await School.findOne({
         _id: schoolId,
@@ -1572,10 +1513,7 @@ class AuthController {
    * @returns {JSON} - A JSON success response.
    */
   static async unlinkStudentAccount(req, res) {
-    const {
-      userId,
-      schoolId
-    } = req.body;
+    const { userId, schoolId } = req.body;
     try {
       const existingSchool = await School.findOne({
         _id: schoolId,
@@ -1587,12 +1525,15 @@ class AuthController {
         });
       }
 
-      const existingSchoolStudent = await Auth.findOneAndUpdate({
-        _id: userId,
-        schoolId,
-      }, {
-        schoolId: null,
-      });
+      const existingSchoolStudent = await Auth.findOneAndUpdate(
+        {
+          _id: userId,
+          schoolId,
+        },
+        {
+          schoolId: null,
+        }
+      );
 
       if (!existingSchoolStudent) {
         return res.status(400).json({
@@ -1611,7 +1552,7 @@ class AuthController {
           const clazz = classes[index];
           await ClassMember.findOneAndDelete({
             userId,
-            classId: clazz._id
+            classId: clazz._id,
           });
         }
       }
@@ -1659,10 +1600,7 @@ class AuthController {
    */
   static async enrollChildInCourse(req, res) {
     try {
-      const {
-        email,
-        courseId
-      } = req.body;
+      const { email, courseId } = req.body;
 
       const child = await Auth.findOne({
         email: email,
@@ -1726,9 +1664,7 @@ class AuthController {
    */
   static async activateAccount(req, res) {
     try {
-      const {
-        id
-      } = req.data;
+      const { id } = req.data;
 
       const newData = {
         isActivated: true,
@@ -1761,17 +1697,15 @@ class AuthController {
    */
   static async login(req, res) {
     try {
-      const {
-        email,
-        password
-      } = req.body;
+      const { email, password } = req.body;
       const lowerCaseEmail = email.toLowerCase();
       const user = await AuthServices.emailExist(lowerCaseEmail, res);
 
       if (!user) {
         return res.status(401).json({
           status: "401 Unauthorized",
-          error: "Sorry, your email was incorrect. Please double-check your email.",
+          error:
+            "Sorry, your email was incorrect. Please double-check your email.",
         });
       }
 
@@ -1783,7 +1717,8 @@ class AuthController {
       if (!confirmPassword) {
         return res.status(401).json({
           status: "401 Unauthorized",
-          error: "Sorry, your password was incorrect. Please double-check your password.",
+          error:
+            "Sorry, your password was incorrect. Please double-check your password.",
         });
       }
 
@@ -1803,7 +1738,8 @@ class AuthController {
     } catch (err) {
       return res.status(500).json({
         status: "500 Internal server error",
-        error: "Sorry, you are unable to login due to server issues. Please try again. Thank you.",
+        error:
+          "Sorry, you are unable to login due to server issues. Please try again. Thank you.",
       });
     }
   }
@@ -1817,9 +1753,7 @@ class AuthController {
    */
   static async resetPassword(req, res) {
     try {
-      const {
-        email
-      } = req.params;
+      const { email } = req.params;
       //
 
       const user = Auth.findOne({
@@ -1828,7 +1762,8 @@ class AuthController {
       if (!user) {
         return res.status(404).json({
           status: "404 Internal server error",
-          error: "Sorry, there’s no Afrilearn account with this email address. Click Register to create a free account.",
+          error:
+            "Sorry, there’s no Afrilearn account with this email address. Click Register to create a free account.",
         });
       }
 
@@ -1872,19 +1807,19 @@ class AuthController {
    */
   static async changePassword(req, res) {
     try {
-      const {
-        email,
-        password
-      } = req.body;
+      const { email, password } = req.body;
       const encryptpassword = await Helper.encrptPassword(password);
       const newData = {
         password: encryptpassword,
       };
-      await Auth.findOneAndUpdate({
-        email,
-      }, {
-        ...newData,
-      });
+      await Auth.findOneAndUpdate(
+        {
+          email,
+        },
+        {
+          ...newData,
+        }
+      );
 
       return res.status(200).json({
         status: "success",
@@ -1972,22 +1907,29 @@ class AuthController {
             classCode,
           });
 
-          await enrolledCourse.update({
-            classId: newClass._id,
-          }, {
-            new: true,
-          });
+          await enrolledCourse.update(
+            {
+              classId: newClass._id,
+            },
+            {
+              new: true,
+            }
+          );
           await enrolledCourse.save();
         }
       }
 
       //if school role, create school profile
-      if (req.body.role === "607ededa2712163504210684" && req.body.courseCategoryId && req.body.schoolName) {
+      if (
+        req.body.role === "607ededa2712163504210684" &&
+        req.body.courseCategoryId &&
+        req.body.schoolName
+      ) {
         const school = await School.create({
           name: req.body.schoolName,
           email: user.email,
           courseCategoryId: req.body.courseCategoryId,
-          creator: user._id
+          creator: user._id,
         });
 
         await EnrolledCourse.create({
@@ -2002,7 +1944,6 @@ class AuthController {
           res
         );
       }
-
 
       const token = await Helper.generateToken(
         user._id,
@@ -2224,13 +2165,17 @@ class AuthController {
       // }
       for (let index = 0; index < Students.data.users.length; index++) {
         const student = Students.data.users[index];
-        const existingUser = await Auth.findOneAndUpdate({
-          email: student.email,
-        }, {
-          referralLink: "classnote",
-        }, {
-          new: true,
-        });
+        const existingUser = await Auth.findOneAndUpdate(
+          {
+            email: student.email,
+          },
+          {
+            referralLink: "classnote",
+          },
+          {
+            new: true,
+          }
+        );
 
         // const enrolledCourse = await EnrolledCourse.findOneAndUpdate(
         //   {
@@ -2273,13 +2218,17 @@ class AuthController {
       // user lands on join class page with email and classid
       // if user exists
 
-      const user = await Auth.findOneAndUpdate({
-        _id: req.data.id,
-      }, {
-        profilePhotoUrl: req.file.location,
-      }, {
-        new: true,
-      });
+      const user = await Auth.findOneAndUpdate(
+        {
+          _id: req.data.id,
+        },
+        {
+          profilePhotoUrl: req.file.location,
+        },
+        {
+          new: true,
+        }
+      );
 
       if (!user) {
         return res.status(404).json({
@@ -2422,14 +2371,18 @@ class AuthController {
    */
   static async uploadSchoolLogo(req, res) {
     try {
-      const school = await School.findOneAndUpdate({
-        creator: req.data.id,
-        _id: req.params.schoolId,
-      }, {
-        logo: req.file.location,
-      }, {
-        new: true,
-      });
+      const school = await School.findOneAndUpdate(
+        {
+          creator: req.data.id,
+          _id: req.params.schoolId,
+        },
+        {
+          logo: req.file.location,
+        },
+        {
+          new: true,
+        }
+      );
       if (!school) {
         return res.status(404).json({
           status: "404 Not found",
@@ -2461,14 +2414,18 @@ class AuthController {
    */
   static async uploadSchoolCoverPhoto(req, res) {
     try {
-      const school = await School.findOneAndUpdate({
-        creator: req.data.id,
-        _id: req.params.schoolId,
-      }, {
-        coverPhoto: req.file.location,
-      }, {
-        new: true,
-      });
+      const school = await School.findOneAndUpdate(
+        {
+          creator: req.data.id,
+          _id: req.params.schoolId,
+        },
+        {
+          coverPhoto: req.file.location,
+        },
+        {
+          new: true,
+        }
+      );
       if (!school) {
         return res.status(404).json({
           status: "404 Not found",
