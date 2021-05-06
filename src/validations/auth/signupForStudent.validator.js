@@ -44,16 +44,6 @@ class SignupForStudent {
         .withMessage("Password should be at least 6 characters long")
         .trim()
         .escape(),
-      check("confirmPassword")
-        .exists()
-        .withMessage("Confirm password is required")
-        .not()
-        .isEmpty()
-        .withMessage("Confirm password cannot be empty")
-        .trim()
-        .escape()
-        .custom((value, { req }) => value === req.body.password)
-        .withMessage("Confirm password does not match"),
       check("classId")
         .exists()
         .withMessage("classId is required")
