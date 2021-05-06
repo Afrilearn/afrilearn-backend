@@ -14,11 +14,12 @@ router.post(
   AddTransaction.myValidationResult,
   PaymentController.addTransaction,
 );
-router.post('/verify-payment', PaymentController.verifyPayment);
-router.post(
-  '/verify-paystack-payment',
-  PaymentController.verifyPaystackPayment,
+
+router.post('/verify-paystack-payment',
+  validateToken,
+  PaymentController.verifyPaystackPayment
 );
+
 router.post(
   '/verify-google-payment',
   validateToken, 

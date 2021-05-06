@@ -75,17 +75,19 @@ export default {
       });
     }
   },
-  async createClassesForSchool(courseCategoryId, school, user, res) {
+  async createClassesForSchool(courseCategoryId, school, res) {
+    // console.log('am in')
     try {
       // 605b21868636bc00158b4ad6 primary
       // 605b218f8636bc00158b4ad7 secondary
-      const courses = await Course.find({ categoryId: courseCategoryId });
-      if (courses.length === 0) {
+      const courses = await Course.find({ categoryId: courseCategoryId });      
+      if (courses.length === 0) {        
         return res.status(400).json({
           status: "400 Invalid Data",
           error: "Select a valid class category",
         });
       }
+
       for (let index = 0; index < courses.length; index++) {
         const course = courses[index];
 
@@ -96,6 +98,7 @@ export default {
         if (existingClassCode) {
           classCode = await Helper.generateCode(9);
         }
+      
         const trimmedSchoolName = school.name.replace(/\s/g, "");
         const classData = {
           courseId: course._id,
@@ -104,8 +107,7 @@ export default {
           classCode: `${trimmedSchoolName}${classCode}`,
         };
         const classCreated = await Class.create({ ...classData });
-        const enrollCourseData = {
-          userId: user._id,
+        const enrollCourseData = {         
           courseId: course._id,
           schoolId: school._id,
           classId: classCreated._id,
@@ -116,6 +118,7 @@ export default {
 
       // const user = await Auth.findOne(condition);
     } catch (err) {
+      console.log('error occured')
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error creating classes",

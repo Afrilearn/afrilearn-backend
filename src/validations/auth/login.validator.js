@@ -19,10 +19,13 @@ class Login {
         .exists()
         .withMessage('Email is required')
         .not()
-        .isEmpty()
+        .isEmpty()        
         .withMessage('Email cannot be empty')
+        .trim()
         .isEmail()
-        .withMessage('Email should be a valid email address'),
+        .withMessage('Email should be a valid email address')
+        .trim()
+        .escape(),
       check('password')
         .exists()
         .withMessage('Password is required')
