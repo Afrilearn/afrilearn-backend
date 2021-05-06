@@ -640,17 +640,7 @@ describe("Auth Route Endpoints", () => {
         });
     });
 
-    it("should NOT update user profile if update is Invalid", (done) => {
-      chai
-        .request(app)
-        .patch("/api/v1/auth/profile-update")
-        .set("token", token)
-        .send({ password: "Updated Name" })
-        .end((err, res) => {
-          res.should.have.status(400);
-          done();
-        });
-    });
+ 
 
     it("Should fake server error", (done) => {
       const req = { body: {} };
