@@ -106,7 +106,10 @@ class SchoolController {
       const schoolCourses = await Course.find({
         categoryId: school.courseCategoryId,
       })
-        .populate({ path: "relatedSubjects", populate: "mainSubjectId" })
+        .populate({
+          path: "relatedSubjects",
+          populate: "mainSubjectId courseId",
+        })
         .populate({
           path: "relatedPastQuestions",
           populate: "pastQuestionTypes",
