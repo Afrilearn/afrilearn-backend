@@ -29,10 +29,12 @@ class CourseController {
    */
   static async loadCourses(req, res) {
     try {
-      const courses = await Course.find({}).populate({
-        path: "relatedSubjects",
-        populate: { path: "mainSubjectId relatedLessons" },
-      });
+      const courses = await Course.find({})
+        .populate({
+          path: "relatedSubjects",
+          populate: { path: "mainSubjectId relatedLessons" },
+        })
+        .sort({ categoryId: -1, _id: 1 });
 
       return res.status(200).json({
         status: "success",
@@ -327,7 +329,7 @@ class CourseController {
             courseId: req.params.courseId,
             pastQuestionCategoryId: item.categoryId,
           };
-  
+
           const pastQuestionResults = await PastQuestionQuizResult.find(
             pastQuestionResultCondition
           );

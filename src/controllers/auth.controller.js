@@ -2037,7 +2037,7 @@ class AuthController {
   static async getRoles(req, res) {
     try {
       let roles = await Role.find();
-      const courses = await Course.find();
+      const courses = await Course.find({}).sort({ categoryId: -1, _id: 1 });
       const courseCategories = await CourseCategory.find();
       const students = await Auth.countDocuments({
         role: "5fd08fba50964811309722d5",
