@@ -1881,7 +1881,7 @@ class AuthController {
     try {
 
       const user = await Auth.findOne({
-        _id: req.data.id
+        _id: '608830649776170015f3f1ff'
       });
 
       if(req.body.fullName){
@@ -1921,7 +1921,7 @@ class AuthController {
       }
 
       await user.save();
-      
+      // for a teacher that came in through social login
       if (req.body.courseId) {
         const enrolledCourse = await EnrolledCourse.create({
           userId: user._id,
@@ -1954,7 +1954,28 @@ class AuthController {
           await enrolledCourse.save();
         }
       }
+      
+       //if school role, create school profile
+       if (req.body.role === "607ededa2712163504210684" && req.body.courseCategoryId && req.body.schoolName) {
+        const school = await School.create({
+          name: req.body.schoolName,
+          email: user.email,
+          courseCategoryId: req.body.courseCategoryId,
+          creator: user._id          
+        });
 
+        await EnrolledCourse.create({
+          userId: user._id,
+          schoolId: school._id,
+        });
+
+        //create classes according to the course category
+        await AuthServices.createClassesForSchool(
+          req.body.courseCategoryId,
+          school,         
+          res
+        );
+      }
 
 
       const token = await Helper.generateToken(

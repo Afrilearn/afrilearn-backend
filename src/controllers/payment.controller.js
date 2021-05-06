@@ -1,14 +1,11 @@
 import moment from "moment";
 import iap from "iap";
-
-// import crypto from 'crypto';
-
 import EnrolledCourse from "../db/models/enrolledCourses.model";
 import PaymentPlan from "../db/models/paymentPlans.model";
 import Transaction from "../db/models/transaction.model";
 import Helper from "../utils/user.utils";
 import ClassModel from "../db/models/classes.model";
-
+import axios from 'axios';
 /**
  *Contains Payment Controller
  *
@@ -123,62 +120,7 @@ class PaymentController {
       });
     }
   }
-
-  /**
-   * Verify a Paystack Payment
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof PaymentController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
-  static async verifyPaystackPayment(req, res) {
-    // const secret = 'sk_test_a0ed224ebc90b07788dc7a4865a5b48d039986c7';
-    try {
-      // await Transaction.create({ flutterWaveResponse: req.body });
-
-      // validate event
-      // var hash = crypto
-      //   .createHmac("sha512", secret)
-      //   .update(JSON.stringify(req.body))
-      //   .digest("hex");
-      // console.log(hash);
-      // if (hash == req.headers["x-paystack-signature"]) {
-      //   // Retrieve the request's body
-      //   var event = req.body;
-      //   console.log(event);
-      //   if (event.event === "charge.success") {
-      //     // Do something with event
-      //     console.log("success");
-      //   } else {
-      //     console.log("not success");
-      //   }
-      // }
-
-      // check succes
-      if (req.body.event === "charge.success") {
-        // if existing transaction
-        const existingTransaction = await Transaction.findOne({
-          tx_ref: req.body.data.reference,
-        });
-        if (existingTransaction) {
-          await existingTransaction.update({
-            flutterWaveResponse: req.body,
-            status: "successful",
-          });
-          await existingTransaction.save();
-        }
-      }
-
-      res.send(200);
-    } catch (error) {
-      return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Verifying payment",
-      });
-    }
-  }
-
+  
   /**
    * Get payment plans
    * @param {Request} req - Response object.
@@ -320,8 +262,8 @@ class PaymentController {
       };
 
       iap.verifyPayment(platform, payment, function (error, response) {
-        if (error) {      
-          console.log(error)          
+        if (error) {
+          console.log(error)
           return res.status(400).json({
             status: "error",
             error
@@ -464,22 +406,22 @@ class PaymentController {
             return res.status(200).json({
               status: "success",
               data: {
-                verified:true,
-                purchaseState:response.receipt.purchaseState
+                verified: true,
+                purchaseState: response.receipt.purchaseState
               }
             });
-          }else{
+          } else {
             return res.status(200).json({
               status: "success",
               data: {
-                verified:false,
-                purchaseState:response
+                verified: false,
+                purchaseState: response
                 // purchaseState:response.receipt.purchaseState
               }
             });
           }
         }
-      });     
+      });
     } catch (error) {
       return res.status(500).json({
         status: "500 Internal server error",
@@ -487,6 +429,196 @@ class PaymentController {
       });
     }
   }
+
+  /**
+   * Verify a Paystack Payment
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof PaymentController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+   static async verifyPaystackPayment(req, res) {
+    try {
+      let verified = null;
+      let condition = null;
+      let newClass = null;
+
+      const {
+        reference,
+        productId,
+        courseId,
+        clientUserId
+      } = req.body;      
+    
+      const {
+        role
+      } = req.data;
+           
+      const response = await axios({
+        method: "get",
+        url: `https://api.paystack.co/transaction/verify/${reference}`,
+        headers: { Authorization:"Bearer sk_live_2f8db2451fe941ccc22b7d13f3e6a47ddb84e0ce"}      
+      });      
+     
+      if(response.data.status === true){
+        if(response.data.data.status === 'success'){
+          verified = true
+          if (role === '602f3ce39b146b3201c2dc1d') {
+            (async () => {
+              if (req.body.newClassName) {
+                let classCode = await Helper.generateCode(8);
+
+                const existingClassCode = await ClassModel.findOne({
+                  classCode
+                });
+                if (existingClassCode) {
+                  classCode = await Helper.generateCode(9);
+                }
+
+                condition = {
+                  userId: clientUserId,
+                  name: req.body.newClassName,
+                  courseId,
+                  classCode
+                }
+
+                newClass = await ClassModel.create(condition);
+                console.log(newClass)
+              }
+
+              // check whether the user is already enrolled for this course
+              condition = {
+                courseId,
+                userId: clientUserId,
+              }
+              if (req.body.newClassName) {
+                condition['classId'] = newClass.id
+              }
+              let existingEnrolledCourse = await EnrolledCourse.findOne(condition);
+
+              if (!existingEnrolledCourse) {             
+                existingEnrolledCourse = await EnrolledCourse.create(condition);
+              }
+
+              // Get payment plan length and amount
+              condition = {
+                _id: productId,
+              }
+              const paymentPlan = await PaymentPlan.findOne({
+                _id: productId,
+              }, {
+                amount: 1,
+                duration: 1
+              });
+
+              //credit the user
+              const startdate = moment().toDate();
+              const endDate = moment(startdate, "DD-MM-YYYY")
+                .add(paymentPlan.duration, "months")
+                .toDate();
+
+              existingEnrolledCourse.startDate = startdate;
+              existingEnrolledCourse.endDate = endDate;
+              existingEnrolledCourse.status = "paid";
+              existingEnrolledCourse.save();
+
+              // // Create the transaction
+              condition = {
+                tx_ref: reference,
+                amount: paymentPlan.amount,
+                status: 'successful',
+                userId: clientUserId,
+                enrolledCourseId: existingEnrolledCourse._id,
+                paymentPlanId: productId
+              }
+              await Transaction.create(condition)
+            })()
+
+          } else {
+            // if is not a teacher do this
+            (async () => {
+              // check whether the user is already enrolled for this course
+              condition = {
+                courseId,
+                userId: clientUserId,
+              }
+
+              let existingEnrolledCourse = await EnrolledCourse.findOne(condition);
+
+              if (!existingEnrolledCourse) {               
+                existingEnrolledCourse = await EnrolledCourse.create(condition);
+              }
+
+              // Get payment plan length and amount
+              condition = {
+                _id: productId,
+              }
+              const paymentPlan = await PaymentPlan.findOne({
+                _id: productId,
+              }, {
+                amount: 1,
+                duration: 1
+              });
+
+              //credit the user
+              const startdate = moment().toDate();
+              const endDate = moment(startdate, "DD-MM-YYYY")
+                .add(paymentPlan.duration, "months")
+                .toDate();
+
+              existingEnrolledCourse.startDate = startdate;
+              existingEnrolledCourse.endDate = endDate;
+              existingEnrolledCourse.status = "paid";
+              existingEnrolledCourse.save();
+
+              // // Create the transaction
+              condition = {
+                tx_ref: reference,
+                amount: paymentPlan.amount,
+                status: 'successful',
+                userId: clientUserId,
+                enrolledCourseId: existingEnrolledCourse._id,
+                paymentPlanId: productId
+              }
+              await Transaction.create(condition)
+            })()
+
+          }
+          return res.status(200).json({
+            status: "success",
+            data: {
+              verified: true              
+            }
+          });
+        }else{
+          return res.status(200).json({
+            status: "success",
+            data: {
+              verified: false            
+            }
+          });
+        }        
+      }else{
+        return res.status(200).json({
+          status: "success",
+          data: {
+            verified: false            
+          }
+        });
+      }
+      return res.status(200).json({
+        status: "success1"
+      });
+    } catch (error) {
+      console.log(error.response.data)
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Verifying paystack payment",
+      });
+    }
+  }
+
 
   /**
    * Student transaction
@@ -509,10 +641,7 @@ class PaymentController {
     }
   }
 
+
+
 }
 export default PaymentController;
-/*
-
- order.eta = moment(order.eta).add(req.body.eta, "days").toDate();
-
-*/
