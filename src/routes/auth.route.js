@@ -187,7 +187,7 @@ router.patch(
   "/school/unlink-teacher-account",
   UnlinkStudentAccount.validateData(),
   UnlinkStudentAccount.myValidationResult,
-  AuthController.unlinkTeacherAccount
+  AuthController.unlinkTeacherAccount 
 );
 router.delete(
   "/school/delete-teacher-account",
