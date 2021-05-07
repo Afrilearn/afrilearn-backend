@@ -20,8 +20,13 @@ export default {
             path: "courseId",
             select: "name imageUrl",
           },
+          options: { sort: { createdAt: -1 } },
         })
-        .populate({ path: "classOwnership", populate: "enrolledCourse" })
+        .populate({
+          path: "classOwnership",
+          populate: "enrolledCourse",
+          options: { sort: { createdAt: -1 } },
+        })
         .populate({
           path: "adminRoles",
           model: AdminRole,
@@ -80,8 +85,8 @@ export default {
     try {
       // 605b21868636bc00158b4ad6 primary
       // 605b218f8636bc00158b4ad7 secondary
-      const courses = await Course.find({ categoryId: courseCategoryId });      
-      if (courses.length === 0) {        
+      const courses = await Course.find({ categoryId: courseCategoryId });
+      if (courses.length === 0) {
         return res.status(400).json({
           status: "400 Invalid Data",
           error: "Select a valid class category",
@@ -98,7 +103,7 @@ export default {
         if (existingClassCode) {
           classCode = await Helper.generateCode(9);
         }
-      
+
         const trimmedSchoolName = school.name.replace(/\s/g, "");
         const classData = {
           courseId: course._id,
@@ -107,7 +112,7 @@ export default {
           classCode: `${trimmedSchoolName}${classCode}`,
         };
         const classCreated = await Class.create({ ...classData });
-        const enrollCourseData = {         
+        const enrollCourseData = {
           courseId: course._id,
           schoolId: school._id,
           classId: classCreated._id,
@@ -118,7 +123,7 @@ export default {
 
       // const user = await Auth.findOne(condition);
     } catch (err) {
-      console.log('error occured')
+      console.log("error occured");
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error creating classes",

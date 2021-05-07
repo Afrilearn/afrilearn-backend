@@ -1468,6 +1468,20 @@ class AuthController {
           error: "Student is not registered with this School",
         });
       }
+      //update related classes
+      const classes = await Class.find({
+        schoolId,
+      });
+
+      if (classes.length > 0) {
+        for (let index = 0; index < classes.length; index++) {
+          const clazz = classes[index];
+          await ClassMember.findOneAndDelete({
+            userId,
+            classId: clazz._id,
+          });
+        }
+      }
 
       await existingSchoolStudent.delete();
 
