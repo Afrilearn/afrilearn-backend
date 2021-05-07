@@ -6,6 +6,8 @@ import Transaction from "../db/models/transaction.model";
 import Helper from "../utils/user.utils";
 import ClassModel from "../db/models/classes.model";
 import axios from 'axios';
+import { config } from 'dotenv';
+config();
 /**
  *Contains Payment Controller
  *
@@ -458,7 +460,7 @@ class PaymentController {
       const response = await axios({
         method: "get",
         url: `https://api.paystack.co/transaction/verify/${reference}`,
-        headers: { Authorization:"Bearer sk_live_2f8db2451fe941ccc22b7d13f3e6a47ddb84e0ce"}      
+        headers: { Authorization:process.env.PAYSTACK_SECRET_KEY}      
       });      
      
       if(response.data.status === true){
