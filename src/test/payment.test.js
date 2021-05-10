@@ -179,17 +179,7 @@ describe('Past Questions ', () => {
   //     });
   // });
 
-  it('should NOT update enrolled course if payment FAILED with status 500', (done) => {
-    chai
-      .request(app)
-      .post('/api/v1/payments/verify-payment')
-      .send(unSuccesfulRefReq)
-      .set('verif-hash', 'afrilearnofafrica')
-      .end((err, res) => {
-        res.should.have.status(500);
-        done();
-      });
-  });
+  
 
   it('should NOT update enrolled course if payment ref is not found', (done) => {
     chai
@@ -203,16 +193,7 @@ describe('Past Questions ', () => {
       });
   });
 
-  it('should NOT update enrolled course if verif-hash is not found', (done) => {
-    chai
-      .request(app)
-      .post('/api/v1/payments/verify-payment')
-      .send(failedPaymentRefReq)
-      .end((err, res) => {
-        res.should.have.status(401);
-        done();
-      });
-  });
+  
 
   it('should NOT update enrolled course if verif-hash is not match', (done) => {
     chai
