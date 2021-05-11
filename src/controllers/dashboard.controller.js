@@ -48,8 +48,11 @@ class DashboardController {
         })
         .populate({
           path: "recommended",
-          select: "title videoUrls",
-          populate: { path: "_id" },
+          select: "title videoUrls subjectId courseId",
+          populate: {
+            path: "_id subjectId courseId",
+            populate: "mainSubjectId",
+          },
         });
       const data = {
         classMembership,
@@ -150,18 +153,7 @@ class DashboardController {
    */
   static async getUserDashboardWebVersion(req, res) {
     try {
-      const classMembership = await ClassMember.find({
-        userId: req.data.id,
-      })
-        .populate({ path: "classId", select: "name classCode" })
-        .populate({
-          path: "userId",
-          select: "fullName email role parentId schoolId",
-          populate: "schoolId",
-        });
-      const data = {
-        classMembership,
-      };
+      const data = {};
       if (req.body.enrolledCourseId) {
         const enrolledCourse = await EnrolledCourse.findOne({
           _id: req.body.enrolledCourseId,
@@ -207,9 +199,11 @@ class DashboardController {
     try {
       const classMembership = await ClassMember.find({
         userId: req.data.id,
-      })
-        .populate({ path: "classId" })
-        .populate({ path: "userId", select: "fullName" });
+      }).populate({
+        path: "classId",
+        populate: { path: "userId", select: "fullName" },
+      });
+
       return res.status(200).json({
         status: "success",
         data: { classMembership },
@@ -322,16 +316,19 @@ class DashboardController {
           path: "reason",
           select: "title",
           populate: {
-            path: "_id",
-            select: "subjectId courseId creatorId termId title videoUrl",
+            path: "_id subjectId courseId",
+            select:
+              "subjectId courseId creatorId termId title videoUrl name title",
           },
         })
         .populate({
           path: "recommended",
           select: "title videoUrls",
           populate: {
-            path: "_id",
-            select: "subjectId courseId creatorId termId title videoUrl",
+            path: "_id subjectId courseId",
+            select:
+              "subjectId courseId creatorId termId title videoUrl name mainSubectId",
+            populate: { path: "mainSubjectId", select: "name" },
           },
         });
 
