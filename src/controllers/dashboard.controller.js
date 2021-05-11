@@ -141,6 +141,61 @@ class DashboardController {
   }
 
   /**
+   * Get a user's dashboard on web
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof DashboardController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getUserDashboardWebVersion(req, res) {
+    try {
+      const classMembership = await ClassMember.find({
+        userId: req.data.id,
+      })
+        .populate({ path: "classId", select: "name classCode" })
+        .populate({
+          path: "userId",
+          select: "fullName email role parentId schoolId",
+          populate: "schoolId",
+        });
+      const data = {
+        classMembership,
+      };
+      if (req.body.enrolledCourseId) {
+        const enrolledCourse = await EnrolledCourse.findOne({
+          _id: req.body.enrolledCourseId,
+          userId: req.data.id,
+        })
+          .select("courseId paymentIsActive")
+          .populate({
+            path: "courseId",
+            select: "name alias imageUrl categoryId",
+            populate: {
+              path: "relatedPastQuestions relatedSubjects",
+              populate: {
+                path: "pastQuestionTypes mainSubjectId relatedLessons",
+                select: "name imageUrl title videoUrls",
+              },
+            },
+          });
+
+        data.enrolledCourse = enrolledCourse;
+      }
+
+      return res.status(200).json({
+        status: "success",
+        data,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading Dashboard",
+      });
+    }
+  }
+
+  /**
    * Get a user's classMembership
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
@@ -152,7 +207,9 @@ class DashboardController {
     try {
       const classMembership = await ClassMember.find({
         userId: req.data.id,
-      }).populate({ path: "classId userId", populate: "userId" });
+      })
+        .populate({ path: "classId" })
+        .populate({ path: "userId", select: "fullName" });
       return res.status(200).json({
         status: "success",
         data: { classMembership },
@@ -179,6 +236,7 @@ class DashboardController {
         userId: req.data.id,
       })
         .sort({ createdAt: -1 })
+        .limit(3)
         .populate({
           path: "lessonId",
           select: "title subjectId",
@@ -259,15 +317,22 @@ class DashboardController {
         userId: req.data.id,
       })
         .sort({ createdAt: -1 })
+        .limit(3)
         .populate({
           path: "reason",
           select: "title",
-          populate: { path: "_id" },
+          populate: {
+            path: "_id",
+            select: "subjectId courseId creatorId termId title videoUrl",
+          },
         })
         .populate({
           path: "recommended",
           select: "title videoUrls",
-          populate: { path: "_id" },
+          populate: {
+            path: "_id",
+            select: "subjectId courseId creatorId termId title videoUrl",
+          },
         });
 
       return res.status(200).json({
@@ -333,9 +398,10 @@ class DashboardController {
       }).populate({
         path: "courseId",
         populate: {
-          path: "relatedPastQuestions relatedSubjects",
+          path: "relatedSubjects",
           populate: {
-            path: "pastQuestionTypes mainSubjectId quizResults relatedLessons",
+            path: "mainSubjectId",
+            select: "name",
           },
         },
       });

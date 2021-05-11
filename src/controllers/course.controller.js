@@ -480,6 +480,275 @@ class CourseController {
   }
 
   /**
+   * Get past Question performance for a Cousre
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof CourseController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getCoursePastQuestionPerformance(req, res) {
+    try {
+      const userID = req.body.userId || req.data.id;
+      /* pq */
+      const relatedPq = await RelatedPastQuestion.find({
+        courseId: req.params.courseId,
+      }).populate({
+        path: "pastQuestionTypes",
+        select: "name categoryId",
+        model: PastQuestionType,
+      });
+      const examsList = [];
+      // relatedPq.forEach(pq => {
+
+      // });
+      for (let index = 0; index < relatedPq.length; index++) {
+        const pq = relatedPq[index];
+
+        for (let index = 0; index < pq.pastQuestionTypes.length; index++) {
+          const item = pq.pastQuestionTypes[index];
+
+          /* Total performance */
+          const pastQuestionResultCondition = {
+            userId: userID,
+            courseId: req.params.courseId,
+            pastQuestionCategoryId: item.categoryId,
+          };
+          if (req.body.classId) {
+            pastQuestionResultCondition.classId = req.body.classId;
+          } else {
+            pastQuestionResultCondition.classId = null;
+          }
+          const pastQuestionResults = await PastQuestionQuizResult.find(
+            pastQuestionResultCondition
+          );
+          let pqTotalScore = 0;
+          let totalTimeSpentOnQuestion = 0;
+          pastQuestionResults.forEach((result) => {
+            pqTotalScore += result.score;
+            totalTimeSpentOnQuestion += parseInt(result.timeSpent, 10);
+          });
+          const pqPerformance = pqTotalScore / pastQuestionResults.length;
+          const averageTimePerSubject =
+            totalTimeSpentOnQuestion / pastQuestionResults.length;
+          /* Total performance */
+
+          /* progress */
+          const { data: totalSubjects } = await axios.get(
+            `https://api.exambly.com/adminpanel/v2/getMySubjects/${item.categoryId}`,
+            {
+              headers: {
+                "Content-type": "application/json",
+                authorization:
+                  "F0c7ljTmi25e7LMIF0Wz01lZlkHX9b57DFTqUHFyWeVOlKAsKR0E5JdBOvdunpqv",
+              },
+            }
+          );
+          /* subjectIDs */
+          const subjectIds = [];
+          const perSubjectResults = [];
+          if (totalSubjects.subjects) {
+            totalSubjects.subjects.forEach((subject) => {
+              const result = pastQuestionResults.find(
+                (rslt) => rslt.subjectCategoryId === parseInt(subject.id, 10)
+              );
+              perSubjectResults.push({
+                name: subject.subject,
+                score: result ? result.score : 0,
+              });
+            });
+          }
+
+          const pastQuestionProgressData = {
+            userId: req.body.userId ? req.body.userId : req.data.id,
+            courseId: req.params.courseId,
+            pastQuestionCategoryId: item.categoryId,
+          };
+          if (req.body.classId) {
+            pastQuestionProgressData.classId = req.body.classId;
+          } else {
+            pastQuestionProgressData.classId = null;
+          }
+          const pqSubjectProgress = await PastQuestionProgress.find({
+            ...pastQuestionProgressData,
+          }).countDocuments();
+          //   /* progress */
+          const toPush = {
+            name: item.name,
+            exam_id: item.categoryId,
+            performance: pqPerformance,
+            averageTimePerSubject,
+            subjectsAttempted: pqSubjectProgress,
+            perSubjectResults,
+          };
+          if (totalSubjects.subjects) {
+            toPush.totalSubjectsCount = totalSubjects.subjects.length;
+          }
+          examsList.push(toPush);
+        }
+      }
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          examsList,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading course",
+      });
+    }
+  }
+
+  /**
+   * Get subject performance for a Cousre
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof CourseController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getCourseSubjectPerformance(req, res) {
+    try {
+      const userID = req.body.userId || req.data.id;
+
+      const subjects = await Subject.find({
+        courseId: req.params.courseId,
+      })
+        .populate({
+          path: "mainSubjectId",
+          select: "name imageUrl classification -_id",
+          model: MainSubject,
+        })
+        .populate({
+          path: "relatedLessons",
+          select: "title",
+        });
+      const subjectsList = [];
+      for (let index = 0; index < subjects.length; index++) {
+        const subject = subjects[index];
+
+        /* performance */
+        const resultCondition = {
+          userId: userID,
+          courseId: req.params.courseId,
+          subjectId: subject._id,
+        };
+        if (req.body.classId) {
+          resultCondition.classId = req.body.classId;
+        } else {
+          resultCondition.classId = null;
+        }
+        const results = await QuizResult.find(resultCondition);
+        let totalScore = 0;
+        let totalQuestionsCorrect = 0;
+        let totalQuestions = 0;
+        let totalTimeSpent = 0;
+        results.forEach((result) => {
+          totalScore += result.score;
+          totalQuestionsCorrect += result.numberOfCorrectAnswers;
+          totalQuestions +=
+            result.numberOfCorrectAnswers +
+            result.numberOfWrongAnswers +
+            result.numberOfSkippedQuestions;
+          totalTimeSpent += result.timeSpent;
+        });
+        const performance = totalScore / results.length;
+        const averageTimePerTest = totalTimeSpent / results.length;
+        /* performance */
+
+        subjectsList.push({
+          subject: subject.mainSubjectId.name,
+          performance,
+          totalQuestionsCorrect,
+          totalQuestions,
+          averageTimePerTest,
+          numberOfTests: results.length,
+          totalTests: subject.relatedLessons.length,
+        });
+      }
+      return res.status(200).json({
+        status: "success",
+        data: {
+          subjectsList,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading course",
+      });
+    }
+  }
+
+  /**
+   * Get progress for a Cousre
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof CourseController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getCourseProgress(req, res) {
+    try {
+      const userID = req.body.userId || req.data.id;
+      const subjects = await Subject.find({
+        courseId: req.params.courseId,
+      })
+        .populate({
+          path: "mainSubjectId",
+          select: "name imageUrl classification -_id",
+          model: MainSubject,
+        })
+        .populate({
+          path: "relatedLessons",
+          select: "title",
+        });
+
+      const subjectsList = [];
+      for (let index = 0; index < subjects.length; index++) {
+        const subject = subjects[index];
+
+        /* progress */
+        const subjectProgressData = {
+          userId: userID,
+          courseId: req.params.courseId,
+          subjectId: subject._id,
+        };
+        if (req.body.classId) {
+          subjectProgressData.classId = req.body.classId;
+        } else {
+          subjectProgressData.classId = null;
+        }
+        const incomingSubjectProgress = await SubjectProgress.find(
+          subjectProgressData
+        ).countDocuments();
+        const subjectProgress =
+          (incomingSubjectProgress / subject.relatedLessons.length) * 100;
+        /* progress */
+
+        subjectsList.push({
+          subject: subject.mainSubjectId.name,
+          progress: subjectProgress,
+        });
+      }
+      return res.status(200).json({
+        status: "success",
+        data: {
+          subjectsList,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading course",
+      });
+    }
+  }
+
+  /**
    * Get all Subjects for a course
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.

@@ -6,6 +6,11 @@ const router = Router();
 
 router.post("/", validateToken, DashboardController.getUserDashboard);
 router.post(
+  "/web",
+  validateToken,
+  DashboardController.getUserDashboardWebVersion
+);
+router.post(
   "/class-membership",
   validateToken,
   DashboardController.getUserDashboardClassMembership
