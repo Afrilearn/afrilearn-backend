@@ -75,6 +75,10 @@ router.get(
   "/assigned-content/:classworkId",
   ClassController.getAssignedContent
 );
+router.delete(
+  "/assigned-content/:classworkId",
+  ClassController.deleteAssignContent
+);
 router.get(
   "/:classId/assigned-contents",
   ClassController.getClassAssignedContents

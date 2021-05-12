@@ -33,7 +33,7 @@ class ClassController {
     let classCode = await Helper.generateCode(8);
     try {
       const existingClassCode = await ClassModel.findOne({
-        classCode
+        classCode,
       });
 
       if (existingClassCode) {
@@ -49,7 +49,7 @@ class ClassController {
         classData.schoolId = req.body.schoolId;
       }
       const newClass = await ClassModel.create({
-        ...classData
+        ...classData,
       });
 
       return res.status(200).json({
@@ -102,10 +102,12 @@ class ClassController {
   static async updateClassName(req, res) {
     try {
       const existingClass = await ClassModel.findByIdAndUpdate(
-        req.params.classId, {
+        req.params.classId,
+        {
           name: req.body.name,
-        }, {
-          new: true
+        },
+        {
+          new: true,
         }
       );
       if (!existingClass) {
@@ -140,7 +142,7 @@ class ClassController {
   static async sendClassRequest(req, res) {
     try {
       const clazz = await ClassModel.findOne({
-        classCode: req.body.classCode
+        classCode: req.body.classCode,
       });
       if (!clazz) {
         return res.status(404).json({
@@ -165,13 +167,14 @@ class ClassController {
         });
       }
       const classMember = await ClassMember.create({
-        ...classMemberData
+        ...classMemberData,
       });
 
       return res.status(200).json({
         status: "success",
         data: {
-          message: "Your class request was sent, wait for teacher to let you in",
+          message:
+            "Your class request was sent, wait for teacher to let you in",
           classMember,
         },
       });
@@ -240,7 +243,7 @@ class ClassController {
       // user lands on join class page with email and classid
       // if user exists
       const user = await User.findOne({
-        email: req.body.email
+        email: req.body.email,
       });
 
       // yes? add user to class
@@ -252,7 +255,8 @@ class ClassController {
         if (existingClassMember) {
           return res.status(400).json({
             status: "400 Bad request",
-            error: "Classmember already exist. Access your classes on your dashboard",
+            error:
+              "Classmember already exist. Access your classes on your dashboard",
           });
         }
         const classMember = await ClassMember.create({
@@ -313,13 +317,17 @@ class ClassController {
         classId: req.body.classId,
         userId: req.body.userId,
       };
-      const classMember = await ClassMember.findOneAndUpdate({
-        ...classMemberData
-      }, {
-        status: req.body.status
-      }, {
-        new: true,
-      });
+      const classMember = await ClassMember.findOneAndUpdate(
+        {
+          ...classMemberData,
+        },
+        {
+          status: req.body.status,
+        },
+        {
+          new: true,
+        }
+      );
       if (!classMember) {
         return res.status(404).json({
           status: "404 not found",
@@ -352,22 +360,22 @@ class ClassController {
   static async getStudentsInClass(req, res) {
     try {
       const classMembers = await ClassMember.find({
-          classId: req.params.classId,
-        })
+        classId: req.params.classId,
+      })
         .select("userId -_id")
         .populate({
           path: "userId",
-          select: "fullName email"
+          select: "fullName email",
         });
       const teacher = await Class.findOne({
         _id: req.params.classId,
       }).populate({
         path: "userId",
-        populate: "role"
+        populate: "role",
       });
       const admins = await AdminRole.find({
-          classId: req.params.classId,
-        })
+        classId: req.params.classId,
+      })
         .select("userId roleDescription")
         .populate({
           path: "userId",
@@ -412,10 +420,11 @@ class ClassController {
       const clazz = await ClassModel.findById(req.params.classId)
         .populate({
           path: "schoolId",
-          model: School
+          model: School,
         })
         .populate({
-          path: "relatedSubjects relatedPastQuestions userId courseId enrolledCourse", //can remove relatedLessons
+          path:
+            "relatedSubjects relatedPastQuestions userId courseId enrolledCourse", //can remove relatedLessons
           populate: {
             path: "mainSubjectId relatedLessons pastQuestionTypeId",
             populate: "questions",
@@ -425,38 +434,39 @@ class ClassController {
           path: "classAnnouncements",
           populate: {
             path: "comments teacher",
-            populate: "student"
+            populate: "student",
           },
           model: Announcement,
           sort: ["createdAt", 1],
         })
         .populate({
           path: "teacherAssignedContents",
-          populate: [{
+          populate: [
+            {
               path: "teacher",
-              model: User
+              model: User,
             },
             {
               path: "subjectId",
-              populate: "mainSubjectId"
+              populate: "mainSubjectId courseId",
             },
             {
               path: "comments",
-              populate: "sender"
+              populate: "sender",
             },
             {
               path: "lessonId",
-              model: Lesson
+              model: Lesson,
             },
             {
               path: "userId",
-              model: User
+              model: User,
             },
           ],
         });
       const classMembers = await ClassMember.find({
-          classId: req.params.classId,
-        })
+        classId: req.params.classId,
+      })
         .populate("userId")
         .select("status userId fullName email role");
 
@@ -489,7 +499,7 @@ class ClassController {
       const clazz = await ClassModel.findById(req.params.classId)
         .populate({
           path: "schoolId",
-          model: School         
+          model: School,
         })
         .populate({
           path: "userId", //can remove relatedLessons
@@ -516,8 +526,8 @@ class ClassController {
           },
         });
       const classMembers = await ClassMember.find({
-          classId: req.params.classId,
-        })
+        classId: req.params.classId,
+      })
         .populate("userId")
         .select("status userId fullName email role");
 
@@ -574,8 +584,8 @@ class ClassController {
     try {
       const lessons = await Lesson.find({
         _id: {
-          $in: req.body.lessonIds
-        }
+          $in: req.body.lessonIds,
+        },
       });
       const createdContents = [];
       for (let index = 0; index < lessons.length; index++) {
@@ -596,11 +606,17 @@ class ClassController {
           );
           const content = await TeacherAssignedContent.findOne({
             _id: contentOne._id,
-          }).populate({
-            path: "teacher userId",
-            model: User,
-            select: "role email fullName",
-          });
+          })
+            .populate({
+              path: "teacher userId",
+              model: User,
+              select: "role email fullName",
+            })
+            .populate({
+              path: "subjectId",
+              select: "mainSubjectId",
+              populate: { path: "mainSubjectId", select: "name" },
+            });
           createdContents.push(content);
         } else if (
           req.body.audience !== "all" &&
@@ -639,6 +655,33 @@ class ClassController {
   }
 
   /**
+   * Teacher Delete Assigned Content
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async deleteAssignContent(req, res) {
+    try {
+      const createdContent = await TeacherAssignedContent.findOneAndDelete({
+        _id: req.params.classworkId,
+      });
+      return res.status(200).json({
+        status: "success",
+        data: {
+          createdContent,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Deleting Assigned content",
+      });
+    }
+  }
+
+  /**
    * Teacher make announcement to Student
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
@@ -652,23 +695,23 @@ class ClassController {
         teacher: req.data.id,
         classId: req.params.classId,
         text: req.body.text,
-      })
-     
-      const newData = await Announcement.findOne({_id:announcement._id})
-      .populate({
-        path: "comments",
-        model: Comment,         
-        populate: {
-          path: "student",
-          select:"fullName role",
-        },
-      })
-      .populate({ path: "teacher", select: "fullName role" })
+      });
+
+      const newData = await Announcement.findOne({ _id: announcement._id })
+        .populate({
+          path: "comments",
+          model: Comment,
+          populate: {
+            path: "student",
+            select: "fullName role",
+          },
+        })
+        .populate({ path: "teacher", select: "fullName role" });
 
       return res.status(201).json({
         status: "success",
         data: {
-          announcement:newData,
+          announcement: newData,
         },
       });
     } catch (error) {
@@ -738,7 +781,6 @@ class ClassController {
     }
   }
 
-  
   /**
    * get class assigned contents
    * @param {Request} req - Response object.
@@ -750,7 +792,7 @@ class ClassController {
   static async getClassAssignedContents(req, res) {
     try {
       let searchData = {
-        classId: req.params.classId
+        classId: req.params.classId,
       };
       if (req.body.userId) {
         searchData.userId = req.body.userId;
@@ -759,12 +801,12 @@ class ClassController {
         .populate({
           path: "teacher",
           model: User,
-          select: "fullName"
+          select: "fullName",
         })
         .populate({
           path: "lessonId",
           model: Lesson,
-          select: "title"
+          select: "title",
         })
         .populate({
           path: "subjectId",
@@ -772,7 +814,7 @@ class ClassController {
           select: "mainSubjectId",
           populate: {
             path: "mainSubjectId",
-            select: "name"
+            select: "name",
           },
         });
       return res.status(200).json({
@@ -800,13 +842,13 @@ class ClassController {
   static async getAssignedContent(req, res) {
     try {
       const assignedContent = await TeacherAssignedContent.findOne({
-          _id: req.params.classworkId,
-        })
+        _id: req.params.classworkId,
+      })
         .select("teacher subjectId description dueDate createdAt")
         .populate({
           path: "teacher",
           model: User,
-          select: "fullName"
+          select: "fullName",
         })
         .populate({
           path: "subjectId",
@@ -814,7 +856,7 @@ class ClassController {
           select: "mainSubjectId",
           populate: {
             path: "mainSubjectId",
-            select: "name"
+            select: "name",
           },
         })
         .populate({
@@ -823,7 +865,7 @@ class ClassController {
           select: "sender student text createdAt",
           populate: {
             path: "student sender",
-            select: "fullName"
+            select: "fullName",
           },
         });
       return res.status(200).json({
@@ -851,18 +893,19 @@ class ClassController {
   static async getClassAnnouncements(req, res) {
     try {
       const announcements = await Announcement.find({
-          classId: req.params.classId,
-        }).sort({ createdAt: -1 })
+        classId: req.params.classId,
+      })
+        .sort({ createdAt: -1 })
         .limit(5)
         .populate({
           path: "comments",
-          model: Comment,         
+          model: Comment,
           populate: {
             path: "student",
-            select:"fullName role",
+            select: "fullName role",
           },
         })
-        .populate({ path: "teacher", select: "fullName role" })
+        .populate({ path: "teacher", select: "fullName role" });
       return res.status(200).json({
         status: "success",
         data: {
