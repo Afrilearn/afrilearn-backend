@@ -20,9 +20,16 @@ class RecentActivityController {
       const latestRecentActivity = await RecentActivity.find()
         .sort({ createdAt: -1 })
         .limit(1); // latest docs
+      console.log("latestRecentActivity", latestRecentActivity);
+      let existingRecentActivity = false;
+      if (
+        latestRecentActivity.length > 0 &&
+        latestRecentActivity[0].lessonId === req.body.lessonId
+      ) {
+        existingRecentActivity = true;
+      }
 
-      const existingRecentActivity =
-        latestRecentActivity[0].lessonId == req.body.lessonId;
+      console.log("existingRecentActivity", existingRecentActivity);
       if (!existingRecentActivity) {
         const recentActivity = await RecentActivity.create({
           ...req.body,
@@ -59,7 +66,7 @@ class RecentActivityController {
       const recentActivities = await RecentActivity.find({
         userId: req.data.id,
       })
-        .limit(5) 
+        .limit(5)
         .sort("-createdAt")
         .populate("quizResults");
       return res.status(200).json({
