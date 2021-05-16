@@ -47,8 +47,11 @@ router.patch(
   AcceptRejectClassRequest.myValidationResult,
   validateToken,
   ClassController.acceptRejectRetractClassRequest
-);
+); 
 router.get("/:classId/students", ClassController.getStudentsInClass);
+router.get("/:classId/basic-details", ClassController.getClassBasicDetails);
+router.get("/:classId/subjects", ClassController.getClassSubjects);
+router.get("/:classId/past-questions", ClassController.getClassPastQuestions);
 router.post(
   "/:classId/announce",
   validateToken,

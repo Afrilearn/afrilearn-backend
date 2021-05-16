@@ -362,7 +362,7 @@ class ClassController {
       const classMembers = await ClassMember.find({
         classId: req.params.classId,
       })
-        .select("userId -_id")
+        .select("userId  status")
         .populate({
           path: "userId",
           select: "fullName email",
@@ -441,6 +441,7 @@ class ClassController {
         })
         .populate({
           path: "teacherAssignedContents",
+          options: { sort: { dueDate: -1 } },
           populate: [
             {
               path: "teacher",
@@ -481,6 +482,102 @@ class ClassController {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Loading class",
+      });
+    }
+  }
+
+  /**
+   * Get a class basic details
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getClassBasicDetails(req, res) {
+    try {
+      const clazz = await ClassModel.findOne({ _id: req.params.classId })
+        .populate({
+          path: "schoolId",
+          model: School,
+        })
+        .populate({ path: "enrolledCourse" })
+        .populate({ path: "userId", select: "email fullName isActivated" })
+        .populate({ path: "courseId", select: "name alias imageUrl" });
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          class: clazz,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading class",
+      });
+    }
+  }
+
+  /**
+   * Get past questions in a class
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getClassPastQuestions(req, res) {
+    try {
+      const clazz = await ClassModel.findOne({
+        _id: req.params.classId,
+      }).populate({
+        path: "relatedPastQuestions",
+        populate: {
+          path: "pastQuestionTypeId",
+        },
+      });
+      return res.status(200).json({
+        status: "success",
+        data: {
+          relatedPastQuestions: clazz.relatedPastQuestions,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading class related Past Questions",
+      });
+    }
+  }
+
+  /**
+   * Get subjects in a class
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ClassController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getClassSubjects(req, res) {
+    try {
+      const clazz = await ClassModel.findById(req.params.classId).populate({
+        path: "relatedSubjects",
+        populate: {
+          path: "mainSubjectId relatedLessons",
+          select: "name title imageUrl termId",
+        },
+      });
+      return res.status(200).json({
+        status: "success",
+        data: {
+          subjects: clazz.relatedSubjects,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading class subjects",
       });
     }
   }
@@ -798,6 +895,12 @@ class ClassController {
         searchData.userId = req.body.userId;
       }
       const assignedContents = await TeacherAssignedContent.find(searchData)
+        .sort({ dueDate: -1 })
+        .populate({
+          path: "userId",
+          model: User,
+          select: "fullName",
+        })
         .populate({
           path: "teacher",
           model: User,
@@ -806,17 +909,18 @@ class ClassController {
         .populate({
           path: "lessonId",
           model: Lesson,
-          select: "title",
         })
         .populate({
           path: "subjectId",
           model: Subject,
-          select: "mainSubjectId",
+          select: "mainSubjectId courseId",
           populate: {
-            path: "mainSubjectId",
+            path: "mainSubjectId courseId",
             select: "name",
           },
-        });
+        })
+        .populate({ path: "comments", populate: "sender" });
+
       return res.status(200).json({
         status: "success",
         data: {
@@ -844,18 +948,21 @@ class ClassController {
       const assignedContent = await TeacherAssignedContent.findOne({
         _id: req.params.classworkId,
       })
-        .select("teacher subjectId description dueDate createdAt")
         .populate({
           path: "teacher",
           model: User,
           select: "fullName",
         })
         .populate({
+          path: "lessonId",
+          model: Lesson,
+        })
+        .populate({
           path: "subjectId",
           model: Subject,
-          select: "mainSubjectId",
+          select: "mainSubjectId courseId",
           populate: {
-            path: "mainSubjectId",
+            path: "mainSubjectId courseId",
             select: "name",
           },
         })
@@ -864,7 +971,7 @@ class ClassController {
           model: CommentForAssignedContent,
           select: "sender student text createdAt",
           populate: {
-            path: "student sender",
+            path: "sender",
             select: "fullName",
           },
         });
