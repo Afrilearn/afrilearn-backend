@@ -44,4 +44,5 @@ node_modules/
 coverage/
 .nyc_output/
 .env
-googleplay-keystore.json
+googleplay-keystore.json,
+gcpconfig.json
