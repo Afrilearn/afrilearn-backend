@@ -4,6 +4,7 @@
   "description": "Afrilearn is an education technology corporation leveraging seasoned teachers, animators and developers to deliver affordable, world-class education for Africans, anywhere.",
   "main": "index.js",
   "scripts": {
+    "preinstall" : "node src/gcpSetup.js",
     "start": "node -r esm src/",
     "dev": "nodemon -r esm src/",
     "test": "env-cmd ./test.env nyc --reporter=html --reporter=text mocha src/**/*.test.js -r esm  --timeout 90000  --recursive --exit",

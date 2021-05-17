@@ -258,20 +258,21 @@ class PaymentController {
         receipt: purchaseToken,
         productId,
         packageName: 'com.afrilearn',
+        keyObject: require('./gcpconfig.json'),
         // secret: 'password',
         // subscription: true,	// optional, if google play subscription
-        keyObject: {
-          "type": process.env.GOOGLE_PAYEMENT_TYPE,
-          "project_id": process.env.GOOGLE_PAYEMENT_PROJECT_ID,
-          "private_key_id": process.env.GOOGLE_PAYEMENT_PRIVATE_kEY_ID,
-          "private_key": process.env.GOOGLE_PAYEMENT_PRIVATE_KEY,
-          "client_email": process.env.GOOGLE_PAYEMENT_CLIENT_EMAIL,
-          "client_id": process.env.GOOGLE_PAYEMENT_CLIENT_ID,
-          "auth_uri": process.env.GOOGLE_PAYEMENT_AUTH_URL,
-          "token_uri": process.env.GOOGLE_PAYEMENT_TOKEN_URL,
-          "auth_provider_x509_cert_url": process.env.GOOGLE_PAYEMENT_AUTH_PROVIDER_X509_CERT_URL,
-          "client_x509_cert_url": process.env.GOOGLE_PAYEMENT_CLIENT_X509_CERT_URL
-        }, // required, if google    
+        // keyObject: {
+        //   "type": process.env.GOOGLE_PAYEMENT_TYPE,
+        //   "project_id": process.env.GOOGLE_PAYEMENT_PROJECT_ID,
+        //   "private_key_id": process.env.GOOGLE_PAYEMENT_PRIVATE_kEY_ID,
+        //   "private_key": process.env.GOOGLE_PAYEMENT_PRIVATE_KEY,
+        //   "client_email": process.env.GOOGLE_PAYEMENT_CLIENT_EMAIL,
+        //   "client_id": process.env.GOOGLE_PAYEMENT_CLIENT_ID,
+        //   "auth_uri": process.env.GOOGLE_PAYEMENT_AUTH_URL,
+        //   "token_uri": process.env.GOOGLE_PAYEMENT_TOKEN_URL,
+        //   "auth_provider_x509_cert_url": process.env.GOOGLE_PAYEMENT_AUTH_PROVIDER_X509_CERT_URL,
+        //   "client_x509_cert_url": process.env.GOOGLE_PAYEMENT_CLIENT_X509_CERT_URL
+        // },   
       };
 
       iap.verifyPayment(platform, payment, function (error, response) {
