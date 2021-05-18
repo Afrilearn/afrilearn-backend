@@ -13,6 +13,7 @@ import termRouter from "./term.route";
 import dashboardRouter from "./dashboard.route";
 import adminRoleRouter from "./adminRole.route";
 import schoolRouter from "./school.route";
+import thirdParty from "./thirdParty.route";
 
 const router = Router();
 
@@ -30,5 +31,7 @@ router.use("/past-questions", pastQuestionRouter);
 router.use("/dashboard", dashboardRouter);
 router.use("/terms", termRouter);
 router.use("/payments", paymentRouter);
+router.use("/thirdParty", thirdParty);
+
 
 export default router;

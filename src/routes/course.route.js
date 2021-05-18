@@ -7,8 +7,7 @@ import SubjectProgressValidator from "../validations/courses/subjectProgress.val
 
 const router = Router();
 
-router.get("/", CourseController.loadCourses);
-router.get("/:courseId", CourseController.getCourse);
+
 router.post(
   "/:courseId/progress",
   validateToken,
@@ -44,5 +43,8 @@ router.post(
   // SubjectProgressValidator.progressExist,
   CourseController.subjectProgress
 );
+
+router.get("/", CourseController.loadCourses);
+router.get("/:courseId", CourseController.getCourse);
 
 export default router;

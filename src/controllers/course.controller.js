@@ -32,9 +32,14 @@ class CourseController {
       const courses = await Course.find({})
         .populate({
           path: "relatedSubjects",
-          populate: { path: "mainSubjectId relatedLessons" },
+          populate: {
+            path: "mainSubjectId relatedLessons"
+          },
         })
-        .sort({ categoryId: -1, _id: 1 });
+        .sort({
+          categoryId: -1,
+          _id: 1
+        });
 
       return res.status(200).json({
         status: "success",
@@ -75,7 +80,10 @@ class CourseController {
         courseId: req.body.courseId,
       });
       await course
-        .populate({ path: "courseId", select: "name imageUrl" })
+        .populate({
+          path: "courseId",
+          select: "name imageUrl"
+        })
         .execPopulate();
 
       return res.status(200).json({
@@ -106,7 +114,9 @@ class CourseController {
         path: "relatedSubjects",
         populate: {
           path: "mainSubjectId relatedLessons",
-          populate: { path: "questions" },
+          populate: {
+            path: "questions"
+          },
         },
       });
       const numOfUsers = await EnrolledCourse.countDocuments({
@@ -182,13 +192,13 @@ class CourseController {
             /* Total performance */
 
             /* progress */
-            const { data: totalSubjects } = await axios.get(
-              `https://api.exambly.com/adminpanel/v2/getMySubjects/${item.categoryId}`,
-              {
+            const {
+              data: totalSubjects
+            } = await axios.get(
+              `https://api.exambly.com/adminpanel/v2/getMySubjects/${item.categoryId}`, {
                 headers: {
                   "Content-type": "application/json",
-                  authorization:
-                    "F0c7ljTmi25e7LMIF0Wz01lZlkHX9b57DFTqUHFyWeVOlKAsKR0E5JdBOvdunpqv",
+                  authorization: "F0c7ljTmi25e7LMIF0Wz01lZlkHX9b57DFTqUHFyWeVOlKAsKR0E5JdBOvdunpqv",
                 },
               }
             );
@@ -233,8 +243,8 @@ class CourseController {
         }
         /* pq */
         const subjects = await Subject.find({
-          courseId: req.params.courseId,
-        })
+            courseId: req.params.courseId,
+          })
           .populate({
             path: "mainSubjectId",
             select: "name imageUrl classification -_id",
@@ -346,12 +356,10 @@ class CourseController {
           /* progress */
 
           const response = await axios.get(
-            `https://api.exambly.com/adminpanel/v2/getMySubjects/${item.categoryId}`,
-            {
+            `https://api.exambly.com/adminpanel/v2/getMySubjects/${item.categoryId}`, {
               headers: {
                 "Content-type": "application/json",
-                authorization:
-                  "F0c7ljTmi25e7LMIF0Wz01lZlkHX9b57DFTqUHFyWeVOlKAsKR0E5JdBOvdunpqv",
+                authorization: "F0c7ljTmi25e7LMIF0Wz01lZlkHX9b57DFTqUHFyWeVOlKAsKR0E5JdBOvdunpqv",
               },
             }
           );
@@ -397,8 +405,8 @@ class CourseController {
       }
       /* pq */
       const subjects = await Subject.find({
-        courseId: req.params.courseId,
-      })
+          courseId: req.params.courseId,
+        })
         .populate({
           path: "mainSubjectId",
           select: "name imageUrl classification -_id",
@@ -534,13 +542,13 @@ class CourseController {
           /* Total performance */
 
           /* progress */
-          const { data: totalSubjects } = await axios.get(
-            `https://api.exambly.com/adminpanel/v2/getMySubjects/${item.categoryId}`,
-            {
+          const {
+            data: totalSubjects
+          } = await axios.get(
+            `https://api.exambly.com/adminpanel/v2/getMySubjects/${item.categoryId}`, {
               headers: {
                 "Content-type": "application/json",
-                authorization:
-                  "F0c7ljTmi25e7LMIF0Wz01lZlkHX9b57DFTqUHFyWeVOlKAsKR0E5JdBOvdunpqv",
+                authorization: "F0c7ljTmi25e7LMIF0Wz01lZlkHX9b57DFTqUHFyWeVOlKAsKR0E5JdBOvdunpqv",
               },
             }
           );
@@ -615,8 +623,8 @@ class CourseController {
       const userID = req.body.userId || req.data.id;
 
       const subjects = await Subject.find({
-        courseId: req.params.courseId,
-      })
+          courseId: req.params.courseId,
+        })
         .populate({
           path: "mainSubjectId",
           select: "name imageUrl classification -_id",
@@ -695,8 +703,8 @@ class CourseController {
     try {
       const userID = req.body.userId || req.data.id;
       const subjects = await Subject.find({
-        courseId: req.params.courseId,
-      })
+          courseId: req.params.courseId,
+        })
         .populate({
           path: "mainSubjectId",
           select: "name imageUrl classification -_id",
@@ -767,10 +775,13 @@ class CourseController {
       });
 
       const relatedPastQuestions = await RelatedPastQuestion.find({
-        courseId: req.params.courseId,
-      })
+          courseId: req.params.courseId,
+        })
         .select("pastQuestionTypeId")
-        .populate({ path: "pastQuestionTypeId", select: "name categoryId" });
+        .populate({
+          path: "pastQuestionTypeId",
+          select: "name categoryId"
+        });
       return res.status(200).json({
         status: "success",
         data: {
@@ -786,6 +797,7 @@ class CourseController {
     }
   }
 
+
   /**
    * Submit subject progress
    * @param {Request} req - Response object.
@@ -795,19 +807,27 @@ class CourseController {
    *
    */
   static async subjectProgress(req, res) {
-    const { courseId, subjectId, lessonId } = req.body;
+    const {
+      courseId,
+      subjectId,
+      lessonId
+    } = req.body;
     try {
       const otherLessons = await Lesson.find({
         courseId,
         subjectId,
-        _id: { $ne: lessonId },
+        _id: {
+          $ne: lessonId
+        },
       });
 
       const randomLesson =
         otherLessons[Math.floor(Math.random() * otherLessons.length)];
       const recommended = randomLesson._id;
       const latestRecommendation = await Recommendation.find()
-        .sort({ createdAt: -1 })
+        .sort({
+          createdAt: -1
+        })
         .limit(1); // latest docs
       const existingRecommendation =
         latestRecommendation &&
@@ -847,6 +867,6 @@ class CourseController {
         error: "Error submitting progress",
       });
     }
-  }
+  }  
 }
 export default CourseController;
