@@ -35,6 +35,10 @@ const LessonSchema = new mongoose.Schema(
         },
       },
     ],
+    views: {
+      type: Number,
+      default:0
+    },
   },
   {
     toJSON: { virtuals: true },
