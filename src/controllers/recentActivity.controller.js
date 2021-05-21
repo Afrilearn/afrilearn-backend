@@ -1,4 +1,6 @@
 import RecentActivity from "../db/models/recentActivities.model";
+import Lesson from "../db/models/lessons.model";
+
 /**
  *Contains Lesson Controller
  *
@@ -17,19 +19,26 @@ class RecentActivityController {
    */
   static async addItemToRecentActivity(req, res) {
     try {
-      const latestRecentActivity = await RecentActivity.find()
+      // first increment lesson count
+      const result = await Lesson.findOne({_id:req.body.lessonId});
+      let viewCount = ++result.views;
+      result.views = viewCount;
+      result.save();
+           
+      // Store recent activities
+      const latestRecentActivity = await RecentActivity.find({ userId: req.data.id })
         .sort({ createdAt: -1 })
         .limit(1); // latest docs
-      console.log("latestRecentActivity", latestRecentActivity);
+     
       let existingRecentActivity = false;
+
       if (
         latestRecentActivity.length > 0 &&
         latestRecentActivity[0].lessonId === req.body.lessonId
       ) {
         existingRecentActivity = true;
       }
-
-      console.log("existingRecentActivity", existingRecentActivity);
+    
       if (!existingRecentActivity) {
         const recentActivity = await RecentActivity.create({
           ...req.body,

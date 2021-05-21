@@ -4,6 +4,8 @@ import QuizResult from "../db/models/quizResults.model";
 import RecentActivity from "../db/models/recentActivities.model";
 import Recommendation from "../db/models/recommendation.model";
 import SubjectProgress from "../db/models/subjectProgresses.model";
+import ResumePlaying from "../db/models/resumePlaying.model";
+import Lesson from "../db/models/lessons.model";
 /**
  *Contains Dashboard Controller
  *
@@ -24,11 +26,16 @@ class DashboardController {
     try {
       const classMembership = await ClassMember.find({
         userId: req.data.id,
-      }).populate({ path: "classId userId", populate: "userId" });
+      }).populate({
+        path: "classId userId",
+        populate: "userId"
+      });
       const recentActivities = await RecentActivity.find({
-        userId: req.data.id,
-      })
-        .sort({ createdAt: -1 })
+          userId: req.data.id,
+        })
+        .sort({
+          createdAt: -1
+        })
         .populate({
           path: "lessonId",
           select: "title subjectId",
@@ -38,13 +45,17 @@ class DashboardController {
           },
         });
       const recommendation = await Recommendation.find({
-        userId: req.data.id,
-      })
-        .sort({ createdAt: -1 })
+          userId: req.data.id,
+        })
+        .sort({
+          createdAt: -1
+        })
         .populate({
           path: "reason",
           select: "title",
-          populate: { path: "_id" },
+          populate: {
+            path: "_id"
+          },
         })
         .populate({
           path: "recommended",
@@ -68,17 +79,14 @@ class DashboardController {
           populate: {
             path: "relatedPastQuestions relatedSubjects",
             populate: {
-              path:
-                "pastQuestionTypes mainSubjectId quizResults relatedLessons",
+              path: "pastQuestionTypes mainSubjectId quizResults relatedLessons",
             },
           },
         });
         const subjectsList = [];
         if (enrolledCourse) {
           for (
-            let index = 0;
-            index < enrolledCourse.courseId.relatedSubjects.length;
-            index++
+            let index = 0; index < enrolledCourse.courseId.relatedSubjects.length; index++
           ) {
             const subject = enrolledCourse.courseId.relatedSubjects[index];
 
@@ -156,9 +164,9 @@ class DashboardController {
       const data = {};
       if (req.body.enrolledCourseId) {
         const enrolledCourse = await EnrolledCourse.findOne({
-          _id: req.body.enrolledCourseId,
-          userId: req.data.id,
-        })
+            _id: req.body.enrolledCourseId,
+            userId: req.data.id,
+          })
           .select("courseId paymentIsActive")
           .populate({
             path: "courseId",
@@ -201,12 +209,17 @@ class DashboardController {
         userId: req.data.id,
       }).populate({
         path: "classId",
-        populate: { path: "userId", select: "fullName" },
+        populate: {
+          path: "userId",
+          select: "fullName"
+        },
       });
 
       return res.status(200).json({
         status: "success",
-        data: { classMembership },
+        data: {
+          classMembership
+        },
       });
     } catch (error) {
       return res.status(500).json({
@@ -227,9 +240,11 @@ class DashboardController {
   static async getUserDashboardRecentActivities(req, res) {
     try {
       const recentActivities = await RecentActivity.find({
-        userId: req.data.id,
-      })
-        .sort({ createdAt: -1 })
+          userId: req.data.id,
+        })
+        .sort({
+          createdAt: -1
+        })
         .limit(3)
         .populate({
           path: "lessonId",
@@ -242,7 +257,9 @@ class DashboardController {
 
       return res.status(200).json({
         status: "success",
-        data: { recentActivities },
+        data: {
+          recentActivities
+        },
       });
     } catch (error) {
       return res.status(500).json({
@@ -261,22 +278,30 @@ class DashboardController {
    *
    */
   static async getUserDashboardRecentActivitiesTimeBased(req, res) {
-    const { startDate, endDate } = req.body;
+    const {
+      startDate,
+      endDate
+    } = req.body;
     try {
       const recentActivities = await RecentActivity.find({
-        userId: req.body.userId,
-        createdAt: {
-          $gte: startDate,
-          $lte: endDate,
-        },
-      })
-        .sort({ createdAt: -1 })
+          userId: req.body.userId,
+          createdAt: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+        })
+        .sort({
+          createdAt: -1
+        })
         .populate({
           path: "lessonId",
           select: "title subjectId courseId",
           populate: {
             path: "subjectId",
-            populate: { path: "mainSubjectId", select: "-introText" },
+            populate: {
+              path: "mainSubjectId",
+              select: "-introText"
+            },
           },
         })
         .populate({
@@ -287,7 +312,9 @@ class DashboardController {
 
       return res.status(200).json({
         status: "success",
-        data: { recentActivities },
+        data: {
+          recentActivities
+        },
       });
     } catch (error) {
       return res.status(500).json({
@@ -308,17 +335,18 @@ class DashboardController {
   static async getUserDashboardRecommendations(req, res) {
     try {
       const recommendation = await Recommendation.find({
-        userId: req.data.id,
-      })
-        .sort({ createdAt: -1 })
+          userId: req.data.id,
+        })
+        .sort({
+          createdAt: -1
+        })
         .limit(3)
         .populate({
           path: "reason",
           select: "title",
           populate: {
             path: "_id subjectId courseId",
-            select:
-              "subjectId courseId creatorId termId title videoUrl name title",
+            select: "subjectId courseId creatorId termId title videoUrl name title",
           },
         })
         .populate({
@@ -326,15 +354,19 @@ class DashboardController {
           select: "title videoUrls",
           populate: {
             path: "_id subjectId courseId",
-            select:
-              "subjectId courseId creatorId termId title videoUrl name mainSubectId",
-            populate: { path: "mainSubjectId", select: "name" },
+            select: "subjectId courseId creatorId termId title videoUrl name mainSubectId",
+            populate: {
+              path: "mainSubjectId",
+              select: "name"
+            },
           },
         });
 
       return res.status(200).json({
         status: "success",
-        data: { recommendation },
+        data: {
+          recommendation
+        },
       });
     } catch (error) {
       return res.status(500).json({
@@ -369,7 +401,9 @@ class DashboardController {
 
       return res.status(200).json({
         status: "success",
-        data: { enrolledCourse },
+        data: {
+          enrolledCourse
+        },
       });
     } catch (error) {
       return res.status(500).json({
@@ -405,9 +439,7 @@ class DashboardController {
       const subjectsList = [];
       if (enrolledCourse) {
         for (
-          let index = 0;
-          index < enrolledCourse.courseId.relatedSubjects.length;
-          index++
+          let index = 0; index < enrolledCourse.courseId.relatedSubjects.length; index++
         ) {
           const subject = enrolledCourse.courseId.relatedSubjects[index];
 
@@ -465,6 +497,91 @@ class DashboardController {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Loading Dashboard EnrolledCourse",
+      });
+    }
+  }
+
+  /**
+   * Get a user's unfinished videos
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof DashboardController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getUserUnFinishedVideos(req, res) {
+    try {
+      const unFinishedVideos = await ResumePlaying.find({
+          userId: req.data.id,
+        })
+        .sort({
+          createdAt: -1
+        })
+        .limit(6)
+        .populate({
+          path: 'lessonId',
+          select: "title"
+        })
+        .populate({
+          path: 'courseId',
+          select: "name"
+        })
+        .populate({
+          path: 'subjectId',
+          populate: 'mainSubjectId',
+          select: "name"
+        })
+      return res.status(200).json({
+        status: "success",
+        data: {
+          unFinishedVideos
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading Dashboard unfinished videos",
+      });
+    }
+  }
+
+  /**
+   * Get a user's course top 10 videos
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof DashboardController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getCourseTopTen(req, res) {
+    try {
+      const enrolledCourse = await EnrolledCourse.findOne({
+        _id: req.body.enrolledCourseId
+      })
+      console.log(req.body) 
+      const lessons = await Lesson.find({
+          courseId: enrolledCourse.courseId
+        }).select('title courseId views subjectId termId videoUrls').limit(20).sort({
+          views: -1
+        }).populate({
+          path: 'courseId',
+          select: "name"
+        })
+        .populate({
+          path: 'subjectId',
+          populate: 'mainSubjectId',
+          select: "name"
+        })
+      return res.status(200).json({
+        status: "success",
+        data: {
+          lessons
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading Dashboard top ten videos",
       });
     }
   }

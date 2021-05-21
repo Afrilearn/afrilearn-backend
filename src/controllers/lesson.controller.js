@@ -3,6 +3,7 @@ import QuizResult from "../db/models/quizResults.model";
 import Lesson from "../db/models/lessons.model";
 import Subject from "../db/models/subjects.model";
 import EnrolledCourse from "../db/models/enrolledCourses.model";
+import ResumePlaying from "../db/models/resumePlaying.model";
 /**
  *Contains Lesson Controller
  *
@@ -21,7 +22,9 @@ class LessonController {
    */
   static async loadTest(req, res) {
     try {
-      const questions = await Question.find({ lessonId: req.params.lessonId });
+      const questions = await Question.find({
+        lessonId: req.params.lessonId
+      });
       return res.status(200).json({
         status: "success",
         data: {
@@ -51,7 +54,10 @@ class LessonController {
         .populate({
           path: "subjectId",
           select: "mainSubjectId",
-          populate: { path: "mainSubjectId", select: "name" },
+          populate: {
+            path: "mainSubjectId",
+            select: "name"
+          },
         });
       return res.status(200).json({
         status: "success",
@@ -78,13 +84,17 @@ class LessonController {
   static async searchLessons(req, res) {
     try {
       let result;
-      const { keywords } = req.params;
+      const {
+        keywords
+      } = req.params;
       const searchQuery = new RegExp(`.*${keywords}.*`, "i");
       if (Object.keys(req.body).includes("details")) {
-        result = await Lesson.find(
-          { title: searchQuery },
-          { title: 1, content: 1 }
-        )
+        result = await Lesson.find({
+            title: searchQuery
+          }, {
+            title: 1,
+            content: 1
+          })
           .limit(18)
           .populate({
             path: "subjectId courseId termId",
@@ -95,7 +105,11 @@ class LessonController {
             },
           });
       } else {
-        result = await Lesson.find({ title: searchQuery }, { title: 1 }).limit(
+        result = await Lesson.find({
+          title: searchQuery
+        }, {
+          title: 1
+        }).limit(
           18
         );
       }
@@ -148,13 +162,13 @@ class LessonController {
         score: req.body.score,
         remark: req.body.remark,
       };
-      const existingQuizResult = await QuizResult.findOneAndUpdate(
-        {
+      const existingQuizResult = await QuizResult.findOneAndUpdate({
           lessonId: req.params.lessonId,
           userId: req.data.id,
         },
-        quizResultData,
-        { new: true }
+        quizResultData, {
+          new: true
+        }
       );
       if (existingQuizResult) {
         return res.status(200).json({
@@ -164,7 +178,9 @@ class LessonController {
           },
         });
       }
-      const quizResult = await QuizResult.create({ ...quizResultData });
+      const quizResult = await QuizResult.create({
+        ...quizResultData
+      });
 
       return res.status(200).json({
         status: "success",
@@ -244,7 +260,10 @@ class LessonController {
       });
       return res.status(200).json({
         status: "success",
-        data: { subject, numOfUsers },
+        data: {
+          subject,
+          numOfUsers
+        },
       });
     } catch (error) {
       return res.status(500).json({
@@ -276,7 +295,9 @@ class LessonController {
 
       return res.status(200).json({
         status: "success",
-        data: { lesson },
+        data: {
+          lesson
+        },
       });
     } catch (error) {
       return res.status(500).json({
@@ -287,7 +308,7 @@ class LessonController {
   }
 
   /**
-   * Update lesson
+   * Get single lesson
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
    * @memberof LessonController
@@ -296,20 +317,99 @@ class LessonController {
    */
   static async getSingleLesson(req, res) {
     try {
-      const lesson = await Lesson.findOne(
-        {
-          _id: req.params.lessonId,
-        },
-        { title: 1, content: 1 }
-      );
+      const lesson = await Lesson.findOne({
+        _id: req.params.lessonId,
+      }, {
+        title: 1,
+        content: 1
+      });
       return res.status(200).json({
         status: "success",
-        data: { lesson },
+        data: {
+          lesson
+        },
       });
     } catch (error) {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Loading lessons",
+      });
+    }
+  }
+
+  /**
+   * Store unfinished videos
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof LessonController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async storeUnFinishedVideos(req, res) {
+    try {
+      const {userId, courseId, subjectId, lessonId, termId, videoId,videoPosition} = req.body;
+      const condition = {
+        userId,
+        courseId,
+        subjectId,
+        lessonId,
+        termId,
+        videoId,
+        videoPosition
+      }
+      let result = await ResumePlaying.findOne(condition);
+      
+      if(!result){
+        result = await ResumePlaying.create(req.body)
+      }else{
+        await ResumePlaying.findOneAndDelete(condition)
+        result = await ResumePlaying.create(req.body)
+      }
+      
+      return res.status(200).json({
+        status: "success",
+        data: { result }
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error setting resume playing",
+      });
+    }
+  }
+
+  /**
+   * Clean up watched video
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof LessonController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+   static async clearUnFinishedVideos(req, res) {
+    try {
+      const {userId, courseId, subjectId, lessonId, termId, videoId,videoPosition} = req.body;
+      const condition = {
+        userId,
+        courseId,
+        subjectId,
+        lessonId,
+        termId,
+        videoId,
+        videoPosition
+      }
+
+      await ResumePlaying.findOneAndDelete(condition);    
+      
+      return res.status(200).json({
+        status: "success",
+        data: { message:'Data delected successfully' }
+      });
+      
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error setting resume playing",
       });
     }
   }

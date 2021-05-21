@@ -1,8 +1,11 @@
-import { Router } from "express";
+import {
+  Router
+} from "express";
 import upload from "../config/bucket";
 import LessonController from "../controllers/lesson.controller";
 import verifyToken from "../middlewares/auth.middleware";
 import SaveQuizResults from "../validations/results/quizResults.validator";
+import ResumePlaying from "../validations/lessons/resumePlaying.validator";
 
 const router = Router();
 
@@ -27,4 +30,6 @@ router.post(
 );
 router.patch("/:lessonId/update", LessonController.updateLesson);
 router.get("/:lessonId/", LessonController.getSingleLesson);
+router.post("/storeUnFinishedVideos", ResumePlaying.validateData(), ResumePlaying.myValidationResult, LessonController.storeUnFinishedVideos);
+router.post("/clearUnFinishedVideos", ResumePlaying.validateData(), ResumePlaying.myValidationResult, LessonController.clearUnFinishedVideos);
 export default router;
