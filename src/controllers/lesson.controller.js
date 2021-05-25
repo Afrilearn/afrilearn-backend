@@ -4,6 +4,8 @@ import Lesson from "../db/models/lessons.model";
 import Subject from "../db/models/subjects.model";
 import EnrolledCourse from "../db/models/enrolledCourses.model";
 import ResumePlaying from "../db/models/resumePlaying.model";
+import Favourite from "../db/models/favourite.model";
+
 /**
  *Contains Lesson Controller
  *
@@ -409,9 +411,82 @@ class LessonController {
     } catch (error) {
       return res.status(500).json({
         status: "500 Internal server error",
-        error: "Error setting resume playing",
+        error: "Error removing video from resume watching list",
       });
     }
   }
+
+  /**
+   * Save Favourite lesson video
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof LessonController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+   static async saveFavouriteVideos(req, res) {
+    try {
+      const {userId, courseId, subjectId, lessonId, termId, videoId, videoPosition} = req.body;
+      const condition = {
+        userId,
+        courseId,
+        subjectId,
+        lessonId,
+        termId,
+        videoId,
+        videoPosition      
+      }
+     
+      let result = await Favourite.create(condition)
+      
+      
+      return res.status(200).json({
+        status: "success",
+        data: { result }
+      });
+    } catch (error) {
+      console.log(error)
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error saving favourite",
+      });
+    }
+  }
+
+   /**
+   * remove from favourite
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof LessonController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+    static async removeFromFavourite(req, res) {
+      try {
+        const {userId, courseId, subjectId, lessonId, termId, videoId} = req.body;
+        const condition = {
+          userId,
+          courseId,
+          subjectId,
+          lessonId,
+          termId,
+          videoId,
+          videoPosition         
+        }
+  
+        await Favourite.findOneAndDelete(condition);    
+        
+        return res.status(200).json({
+          status: "success",
+          data: { message:'Data delected successfully' }
+        });
+        
+      } catch (error) {
+        return res.status(500).json({
+          status: "500 Internal server error",
+          error: "Error removing video from favourite",
+        });
+      }
+    }
 }
 export default LessonController;
