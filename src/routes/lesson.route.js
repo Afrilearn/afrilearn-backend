@@ -1,11 +1,11 @@
 import {
   Router
 } from "express";
-import upload from "../config/bucket";
 import LessonController from "../controllers/lesson.controller";
 import verifyToken from "../middlewares/auth.middleware";
 import SaveQuizResults from "../validations/results/quizResults.validator";
 import ResumePlaying from "../validations/lessons/resumePlaying.validator";
+import Favourite from "../validations/lessons/favourite.validator";
 
 const router = Router();
 
@@ -31,5 +31,8 @@ router.post(
 router.patch("/:lessonId/update", LessonController.updateLesson);
 router.get("/:lessonId/", LessonController.getSingleLesson);
 router.post("/storeUnFinishedVideos", ResumePlaying.validateData(), ResumePlaying.myValidationResult, LessonController.storeUnFinishedVideos);
-router.post("/clearUnFinishedVideos", ResumePlaying.validateData(), ResumePlaying.myValidationResult, LessonController.clearUnFinishedVideos);
+router.delete("/clearUnFinishedVideos", ResumePlaying.validateData(), ResumePlaying.myValidationResult, LessonController.clearUnFinishedVideos);
+router.post("/saveFavouriteVideos", Favourite.validateData(), Favourite.myValidationResult, LessonController.saveFavouriteVideos);
+router.delete("/removeFavouriteVideos", Favourite.validateData(), Favourite.myValidationResult, LessonController.removeFromFavourite);
+
 export default router;

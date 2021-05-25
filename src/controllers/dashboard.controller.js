@@ -6,6 +6,8 @@ import Recommendation from "../db/models/recommendation.model";
 import SubjectProgress from "../db/models/subjectProgresses.model";
 import ResumePlaying from "../db/models/resumePlaying.model";
 import Lesson from "../db/models/lessons.model";
+import Favourite from "../db/models/favourite.model";
+import Auth from "../db/models/users.model";
 /**
  *Contains Dashboard Controller
  *
@@ -585,5 +587,49 @@ class DashboardController {
       });
     }
   }
+
+   /**
+   * Get a user's favourite videos
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof DashboardController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+    static async getUserFavouriteVideos(req, res) {
+      try {         
+        const favouriteVideos = await Favourite.find({
+            userId: req.data.id,
+          })
+          .sort({
+            createdAt: -1
+          })
+          .limit(6)
+          .populate({
+            path: 'lessonId',
+            select: "title"
+          })
+          .populate({
+            path: 'courseId',
+            select: "name"
+          })
+          .populate({
+            path: 'subjectId',
+            populate: 'mainSubjectId',
+            select: "name"
+          })
+        return res.status(200).json({
+          status: "success",
+          data: {
+            favouriteVideos
+          },
+        });       
+      } catch (error) {
+        return res.status(500).json({
+          status: "500 Internal server error",
+          error: "Error Loading Dashboard favourite videos",
+        });
+      }
+    }
 }
 export default DashboardController;
