@@ -1,51 +1,53 @@
 import mongoose from "mongoose";
 
-const LessonSchema = new mongoose.Schema(
-  {
-    subjectId: {
-      type: mongoose.Schema.ObjectId,
-      ref: "subject",
-    },
-    courseId: {
-      type: mongoose.Schema.ObjectId,
-      ref: "course",
-    },
-    creatorId: {
-      type: mongoose.Schema.ObjectId,
-      ref: "user",
-    },
-    termId: {
-      type: mongoose.Schema.ObjectId,
-      ref: "term",
-    },
-    title: {
-      type: String,
-      required: true,
-    },
-    content: {
-      type: String,
-    },
-    videoUrls: [
-      {
-        videoUrl: {
-          type: String,
-        },
-        transcript: {
-          type: String,
-        },
-      },
-    ],
-    views: {
-      type: Number,
-      default:0
-    },
+const LessonSchema = new mongoose.Schema({
+  subjectId: {
+    type: mongoose.Schema.ObjectId,
+    ref: "subject",
   },
-  {
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
-    timestamps: true,
-  }
-);
+  courseId: {
+    type: mongoose.Schema.ObjectId,
+    ref: "course",
+  },
+  creatorId: {
+    type: mongoose.Schema.ObjectId,
+    ref: "user",
+  },
+  termId: {
+    type: mongoose.Schema.ObjectId,
+    ref: "term",
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  content: {
+    type: String,
+  },
+  videoUrls: [{
+    videoUrl: {
+      type: String,
+    },
+    transcript: {
+      type: String,
+    },
+  }, ],
+  likes: [{
+    type: String
+  }],
+  views: {
+    type: Number,
+    default: 0
+  },
+}, {
+  toJSON: {
+    virtuals: true
+  },
+  toObject: {
+    virtuals: true
+  },
+  timestamps: true,
+});
 
 LessonSchema.virtual("questions", {
   ref: "question",

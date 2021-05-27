@@ -10,6 +10,7 @@ import Subject from "../db/models/subjects.model";
 import TeacherAssignedContent from "../db/models/teacherAssignedContents.model";
 import User from "../db/models/users.model";
 import School from "../db/models/schoolProfile";
+import EnrolledCourse from "../db/models/enrolledCourses.model";
 import sendEmail from "../utils/email.utils";
 import Helper from "../utils/user.utils";
 
@@ -200,13 +201,10 @@ class ClassController {
       const message = `
       Congratulations! <br/>
       
-      Your friend, ${fullName}, is inviting you to enjoy engaging video lessons, class notes, practice tests, live classes for best results in WASSCE, NECO, BECE, UTME, POST-UTME & more. Simply download the fun Afrilearn App or visit https://myafrilearn.com/ now. <br/>
+      ${fullName}, is inviting you to enjoy engaging video lessons, class notes, practice tests, live classes for best results in WASSCE, NECO, BECE, UTME, POST-UTME & more. Simply download the fun Afrilearn App at https://play.google.com/store/apps/details?id=com.afrilearn. <br/>
       
       Afrilearn transforms average students and outright failures into high flying students and highly successful people. <br/>
-      
-      Download the fun Afrilearn App or visit https://myafrilearn.com/ now.
-      <br/>
-      
+     
       Cheers to Academic Excellence! 
       <br/>
       Click this link to join the class ${req.body.link}`;
@@ -245,7 +243,9 @@ class ClassController {
       const user = await User.findOne({
         email: req.body.email,
       });
-
+      const classInfo = await Class.findOne({
+        _id: req.params.classId
+      });
       // yes? add user to class
       if (user) {
         const existingClassMember = await ClassMember.findOne({
@@ -259,11 +259,24 @@ class ClassController {
               "Classmember already exist. Access your classes on your dashboard",
           });
         }
+        //add to class
         const classMember = await ClassMember.create({
           classId: req.params.classId,
           userId: user._id,
           status: "approved",
         });
+
+        //check if user already have the class course if not enroll him
+        const alreadyClassCourseOwner = await EnrolledCourse.findOne({
+          courseId: classInfo.courseId,
+          userId: user._id,
+        });
+        if (!alreadyClassCourseOwner) {
+            await EnrolledCourse.create({           
+            userId: user._id,
+            courseId:classInfo.courseId
+          });
+        }
         return res.status(200).json({
           status: "success",
           data: {
@@ -284,6 +297,10 @@ class ClassController {
           classId: req.params.classId,
           userId: user._id,
           status: "approved",
+        });
+        await EnrolledCourse.create({           
+          userId: user._id,
+          courseId:classInfo.courseId
         });
 
         return res.status(200).json({
