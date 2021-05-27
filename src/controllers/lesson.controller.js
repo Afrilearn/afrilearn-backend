@@ -463,7 +463,7 @@ class LessonController {
    */
     static async removeFromFavourite(req, res) {
       try {
-        const {userId, courseId, subjectId, lessonId, termId, videoId} = req.body;
+        const {userId, courseId, subjectId, lessonId, termId, videoId, videoPosition} = req.body;
         const condition = {
           userId,
           courseId,
