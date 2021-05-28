@@ -349,7 +349,15 @@ class LessonController {
    */
   static async storeUnFinishedVideos(req, res) {
     try {
-      const {userId, courseId, subjectId, lessonId, termId, videoId,videoPosition} = req.body;
+      const {
+        userId,
+        courseId,
+        subjectId,
+        lessonId,
+        termId,
+        videoId,
+        videoPosition
+      } = req.body;
       const condition = {
         userId,
         courseId,
@@ -360,17 +368,19 @@ class LessonController {
         videoPosition
       }
       let result = await ResumePlaying.findOne(condition);
-      
-      if(!result){
+
+      if (!result) {
         result = await ResumePlaying.create(req.body)
-      }else{
+      } else {
         await ResumePlaying.findOneAndDelete(condition)
         result = await ResumePlaying.create(req.body)
       }
-      
+
       return res.status(200).json({
         status: "success",
-        data: { result }
+        data: {
+          result
+        }
       });
     } catch (error) {
       return res.status(500).json({
@@ -388,9 +398,17 @@ class LessonController {
    * @returns {JSON} - A JSON success response.
    *
    */
-   static async clearUnFinishedVideos(req, res) {
+  static async clearUnFinishedVideos(req, res) {
     try {
-      const {userId, courseId, subjectId, lessonId, termId, videoId,videoPosition} = req.body;
+      const {
+        userId,
+        courseId,
+        subjectId,
+        lessonId,
+        termId,
+        videoId,
+        videoPosition
+      } = req.body;
       const condition = {
         userId,
         courseId,
@@ -401,13 +419,15 @@ class LessonController {
         videoPosition
       }
 
-      await ResumePlaying.findOneAndDelete(condition);    
-      
+      await ResumePlaying.findOneAndDelete(condition);
+
       return res.status(200).json({
         status: "success",
-        data: { message:'Data delected successfully' }
+        data: {
+          message: 'Data delected successfully'
+        }
       });
-      
+
     } catch (error) {
       return res.status(500).json({
         status: "500 Internal server error",
@@ -424,9 +444,17 @@ class LessonController {
    * @returns {JSON} - A JSON success response.
    *
    */
-   static async saveFavouriteVideos(req, res) {
+  static async saveFavouriteVideos(req, res) {
     try {
-      const {userId, courseId, subjectId, lessonId, termId, videoId, videoPosition} = req.body;
+      const {
+        userId,
+        courseId,
+        subjectId,
+        lessonId,
+        termId,
+        videoId,
+        videoPosition
+      } = req.body;
       const condition = {
         userId,
         courseId,
@@ -434,15 +462,17 @@ class LessonController {
         lessonId,
         termId,
         videoId,
-        videoPosition      
+        videoPosition
       }
-     
+
       let result = await Favourite.create(condition)
-      
-      
+
+
       return res.status(200).json({
         status: "success",
-        data: { result }
+        data: {
+          result
+        }
       });
     } catch (error) {
       console.log(error)
@@ -453,7 +483,7 @@ class LessonController {
     }
   }
 
-   /**
+  /**
    * remove from favourite
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
@@ -461,30 +491,105 @@ class LessonController {
    * @returns {JSON} - A JSON success response.
    *
    */
-    static async removeFromFavourite(req, res) {
-      try {
-        const {userId, courseId, subjectId, lessonId, termId, videoId, videoPosition} = req.body;
-        const condition = {
-          userId,
-          courseId,
-          subjectId,
-          lessonId,
-          termId,
-          videoId,
-          videoPosition         
+  static async removeFromFavourite(req, res) {
+    try {
+      const {
+        userId,
+        courseId,
+        subjectId,
+        lessonId,
+        termId,
+        videoId,
+        videoPosition
+      } = req.body;
+      const condition = {
+        userId,
+        courseId,
+        subjectId,
+        lessonId,
+        termId,
+        videoId,
+        videoPosition
+      }
+
+      await Favourite.findOneAndDelete(condition);
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          message: 'Data delected successfully'
         }
-  
-        await Favourite.findOneAndDelete(condition);    
+      });
+
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error removing video from favourite",
+      });
+    }
+  }
+
+  /**
+   * Save liked lesson video
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof LessonController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async saveLikedVideo(req, res) {
+    try {
+      const {
+        userId,
+        lessonId
+      } = req.body;
+
+      let selectedLesson = await Lesson.findById(lessonId);
+      selectedLesson.likes = selectedLesson.likes.slice(); // Clone the tags array
+      selectedLesson.likes.push(userId);
+      selectedLesson.save();
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          selectedLesson
+        }
+      });
+    } catch (error) {
+      console.log(error)
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error saving like",
+      });
+    }
+  }
+
+    /**
+   * Remove liked lesson video
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof LessonController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+     static async removeLikedVideo(req, res) {
+      try {
+        const { userId, lessonId } = req.body;
+             
+        let selectedLesson = await Lesson.findById(lessonId);
+        selectedLesson.likes = selectedLesson.likes.slice(); // Clone the tags array
+        selectedLesson.likes.pull(userId);
+        selectedLesson.save(); 
         
         return res.status(200).json({
           status: "success",
-          data: { message:'Data delected successfully' }
+          data: { selectedLesson }
         });
-        
       } catch (error) {
+        console.log(error)
         return res.status(500).json({
           status: "500 Internal server error",
-          error: "Error removing video from favourite",
+          error: "Error removing liked video",
         });
       }
     }
