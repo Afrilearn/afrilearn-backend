@@ -44,5 +44,6 @@ router.post(
 router.get('/unfinishedVideos', validateToken, DashboardController.getUserUnFinishedVideos);
 router.post('/topTen', validateToken, DashboardController.getCourseTopTen);
 router.post('/favourite', validateToken, DashboardController.getUserFavouriteVideos);
+router.get('/topTen', DashboardController.getAfrilearnTopTen);
 
 export default router;
