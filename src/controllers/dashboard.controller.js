@@ -559,11 +559,10 @@ class DashboardController {
     try {
       const enrolledCourse = await EnrolledCourse.findOne({
         _id: req.body.enrolledCourseId
-      })
-      console.log(req.body) 
+      })     
       const lessons = await Lesson.find({
           courseId: enrolledCourse.courseId
-        }).select('title courseId views subjectId termId videoUrls').limit(20).sort({
+        }).select('title courseId views subjectId termId videoUrls').limit(10).sort({
           views: -1
         }).populate({
           path: 'courseId',
@@ -588,7 +587,7 @@ class DashboardController {
     }
   }
 
-   /**
+  /**
    * Get a user's favourite videos
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
@@ -596,40 +595,75 @@ class DashboardController {
    * @returns {JSON} - A JSON success response.
    *
    */
-    static async getUserFavouriteVideos(req, res) {
-      try {         
-        const favouriteVideos = await Favourite.find({
-            userId: req.data.id,
-          })
-          .sort({
-            createdAt: -1
-          })
-          .limit(6)
-          .populate({
-            path: 'lessonId',
-            select: "title"
-          })
-          .populate({
-            path: 'courseId',
-            select: "name"
-          })
-          .populate({
-            path: 'subjectId',
-            populate: 'mainSubjectId',
-            select: "name"
-          })
-        return res.status(200).json({
-          status: "success",
-          data: {
-            favouriteVideos
-          },
-        });       
-      } catch (error) {
-        return res.status(500).json({
-          status: "500 Internal server error",
-          error: "Error Loading Dashboard favourite videos",
-        });
-      }
+  static async getUserFavouriteVideos(req, res) {
+    try {
+      const favouriteVideos = await Favourite.find({
+          userId: req.data.id,
+        })
+        .sort({
+          createdAt: -1
+        })
+        .limit(6)
+        .populate({
+          path: 'lessonId',
+          select: "title"
+        })
+        .populate({
+          path: 'courseId',
+          select: "name"
+        })
+        .populate({
+          path: 'subjectId',
+          populate: 'mainSubjectId',
+          select: "name"
+        })
+      return res.status(200).json({
+        status: "success",
+        data: {
+          favouriteVideos
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading Dashboard favourite videos",
+      });
     }
+  }
+
+  /**
+   * Get a Afrilearn top 10 videos
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof DashboardController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getAfrilearnTopTen(req, res) {
+    try {
+      const lessons = await Lesson.find().select('title courseId views subjectId termId videoUrls content').limit(10).sort({
+          views: -1
+        }).populate({
+          path: 'courseId',
+          select: "name"
+        })
+        .populate({
+          path: 'subjectId',
+          populate: 'mainSubjectId',
+          select: "name"
+        })
+      return res.status(200).json({
+        status: "success",
+        data: {
+          lessons
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading Afrilearn top ten videos",
+      });
+    }
+  }
 }
 export default DashboardController;
