@@ -42,19 +42,7 @@ import {
         .exists()
         .withMessage('Term ID is required')
         .isMongoId()
-        .withMessage('Term ID should be a mongoID'),
-        check('videoId')
-        .exists()
-        .withMessage("Video ID is required")
-        .not()
-        .isEmpty()
-        .withMessage("Video ID cannot be empty"),
-        check('videoPosition')
-        .exists()
-        .withMessage("Video position is required")
-        .not()
-        .isEmpty()
-        .withMessage("Video position cannot be empty")               
+        .withMessage('Term ID should be a mongoID')                   
       ];
     }
   

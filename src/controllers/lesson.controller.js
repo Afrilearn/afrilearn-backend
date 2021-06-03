@@ -446,28 +446,8 @@ class LessonController {
    */
   static async saveFavouriteVideos(req, res) {
     try {
-      const {
-        userId,
-        courseId,
-        subjectId,
-        lessonId,
-        termId,
-        videoId,
-        videoPosition
-      } = req.body;
-      const condition = {
-        userId,
-        courseId,
-        subjectId,
-        lessonId,
-        termId,
-        videoId,
-        videoPosition
-      }
-
-      let result = await Favourite.create(condition)
-
-
+     
+      let result = await Favourite.create(req.body)
       return res.status(200).json({
         status: "success",
         data: {
@@ -498,18 +478,14 @@ class LessonController {
         courseId,
         subjectId,
         lessonId,
-        termId,
-        videoId,
-        videoPosition
+        termId      
       } = req.body;
       const condition = {
         userId,
         courseId,
         subjectId,
         lessonId,
-        termId,
-        videoId,
-        videoPosition
+        termId       
       }
 
       await Favourite.findOneAndDelete(condition);
