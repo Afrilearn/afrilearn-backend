@@ -23,12 +23,10 @@ const FavouriteSchema = new mongoose.Schema(
       ref: "term",
     },
     videoId: {
-      type: String,
-      required: true,
+      type: String      
     },
     videoPosition: {
-      type: String,
-      required: true,
+      type: String     
     }         
   },
   {
