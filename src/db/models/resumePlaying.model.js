@@ -21,15 +21,7 @@ const ResumePlayingSchema = new mongoose.Schema(
     termId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "term",
-    },
-    videoId: {
-      type: String,
-      required: true,
-    },
-    videoPosition: {
-      type: String,
-      required: true,
-    }       
+    }   
   },
   {
     toJSON: { virtuals: true },

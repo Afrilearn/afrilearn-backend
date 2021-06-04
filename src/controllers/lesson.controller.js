@@ -354,19 +354,16 @@ class LessonController {
         courseId,
         subjectId,
         lessonId,
-        termId,
-        videoId,
-        videoPosition
+        termId       
       } = req.body;
       const condition = {
         userId,
         courseId,
         subjectId,
         lessonId,
-        termId,
-        videoId,
-        videoPosition
+        termId       
       }
+      
       let result = await ResumePlaying.findOne(condition);
 
       if (!result) {
@@ -405,18 +402,14 @@ class LessonController {
         courseId,
         subjectId,
         lessonId,
-        termId,
-        videoId,
-        videoPosition
+        termId     
       } = req.body;
       const condition = {
         userId,
         courseId,
         subjectId,
         lessonId,
-        termId,
-        videoId,
-        videoPosition
+        termId       
       }
 
       await ResumePlaying.findOneAndDelete(condition);

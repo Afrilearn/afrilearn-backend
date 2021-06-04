@@ -110,7 +110,7 @@ class CourseController {
         },
       });
       const numOfUsers = await EnrolledCourse.countDocuments({
-        courseId: req.params.courseId,
+        courseId: req.params.courseId        
       });
       return res.status(200).json({
         status: "success",

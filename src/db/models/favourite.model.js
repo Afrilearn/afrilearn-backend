@@ -21,13 +21,7 @@ const FavouriteSchema = new mongoose.Schema(
     termId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "term",
-    },
-    videoId: {
-      type: String      
-    },
-    videoPosition: {
-      type: String     
-    }         
+    }   
   },
   {
     toJSON: { virtuals: true },
