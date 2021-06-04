@@ -163,9 +163,11 @@ class DashboardController {
    */
   static async getUserDashboardWebVersion(req, res) {
     try {
-      const data = {};
+      const data = {};      
+      let numOfUsers;
+      let enrolledCourse;
       if (req.body.enrolledCourseId) {
-        const enrolledCourse = await EnrolledCourse.findOne({
+          enrolledCourse = await EnrolledCourse.findOne({
             _id: req.body.enrolledCourseId,
             userId: req.data.id,
           })
@@ -181,13 +183,18 @@ class DashboardController {
               },
             },
           });
-
-        data.enrolledCourse = enrolledCourse;
+       
+        numOfUsers = await EnrolledCourse.countDocuments({
+          courseId: enrolledCourse.courseId      
+        });
       }
 
       return res.status(200).json({
         status: "success",
-        data,
+        data:{
+          enrolledCourse,
+          numOfUsers
+        }
       });
     } catch (error) {
       return res.status(500).json({
@@ -400,11 +407,14 @@ class DashboardController {
           },
         },
       });
-
+      const numOfUsers = await EnrolledCourse.countDocuments({
+        courseId: enrolledCourse.courseId.id        
+      });
       return res.status(200).json({
         status: "success",
         data: {
-          enrolledCourse
+          enrolledCourse,
+          numOfUsers
         },
       });
     } catch (error) {
@@ -522,7 +532,7 @@ class DashboardController {
         .limit(6)
         .populate({
           path: 'lessonId',
-          select: "title"
+          select: "title videoUrls",          
         })
         .populate({
           path: 'courseId',
@@ -606,7 +616,7 @@ class DashboardController {
         .limit(6)
         .populate({
           path: 'lessonId',
-          select: "title"
+          select: "title videoUrls"
         })
         .populate({
           path: 'courseId',
@@ -641,7 +651,7 @@ class DashboardController {
    */
   static async getAfrilearnTopTen(req, res) {
     try {
-      const lessons = await Lesson.find().select('title courseId views subjectId termId videoUrls content').limit(10).sort({
+      const lessons = await Lesson.find().select('title courseId views subjectId termId videoUrls content thumbnailUrl').limit(4).sort({
           views: -1
         }).populate({
           path: 'courseId',

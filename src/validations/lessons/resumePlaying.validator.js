@@ -42,19 +42,7 @@ class ResumePlaying {
       .exists()
       .withMessage('Term ID is required')
       .isMongoId()
-      .withMessage('Term ID should be a mongoID'),
-      check('videoId')
-      .exists()
-      .withMessage("Video ID is required")
-      .not()
-      .isEmpty()
-      .withMessage("Video ID cannot be empty"),
-      check('videoPosition')
-      .exists()
-      .withMessage("Video Position is required")
-      .not()
-      .isEmpty()
-      .withMessage("Video Position cannot be empty")
+      .withMessage('Term ID should be a mongoID')     
     ];
   }
 
