@@ -64,6 +64,10 @@ const UserSchema = new mongoose.Schema(
     profilePhotoUrl: {
       type: String,
     },
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     toJSON: { virtuals: true },
