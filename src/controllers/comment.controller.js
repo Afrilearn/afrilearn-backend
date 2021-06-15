@@ -20,11 +20,14 @@ class CommentController {
     static async addLessonComment(req, res) {
         try {
             let comment = await LessonComment.create(req.body)
-            comment = await LessonComment.findById(comment.id).populate({path:"userId", select:"fullName profilePhotoUrl"})
-            .populate({
-                path: "commentReplies",
-                model: LessonCommentReplies
-            })
+            comment = await LessonComment.findById(comment.id).populate({
+                    path: "userId",
+                    select: "fullName profilePhotoUrl"
+                })
+                .populate({
+                    path: "commentReplies",
+                    model: LessonCommentReplies
+                })
             return res.status(200).json({
                 status: "success",
                 data: {
@@ -59,12 +62,15 @@ class CommentController {
             DComment.likes = DComment.likes.slice(); // Clone the tags array
             DComment.likes.push(userId);
             await DComment.save();
-            
-            let selectedComment = await LessonComment.findById(lessonCommentId).populate({path:"userId", select:"fullName profilePhotoUrl"})
-            .populate({
-                path: "commentReplies",
-                model: LessonCommentReplies
-            })
+
+            let selectedComment = await LessonComment.findById(lessonCommentId).populate({
+                    path: "userId",
+                    select: "fullName profilePhotoUrl"
+                })
+                .populate({
+                    path: "commentReplies",
+                    model: LessonCommentReplies
+                })
             return res.status(200).json({
                 status: "success",
                 data: {
@@ -124,16 +130,24 @@ class CommentController {
      *
      */
     static async getLessonComments(req, res) {
-        try {           
+        try {
             const comments = await LessonComment.find({
                     lessonId: req.params.lessonId,
                     commentSection: req.body.commentSection
-                }).sort({ createdAt: -1 })
-                .limit(30).populate({path:"userId", select:"fullName profilePhotoUrl"})
+                }).sort({
+                    createdAt: -1
+                })
+                .limit(30).populate({
+                    path: "userId",
+                    select: "fullName profilePhotoUrl"
+                })
                 .populate({
                     path: "commentReplies",
                     model: LessonCommentReplies,
-                    populate: { path: "userId", select:"fullName profilePhotoUrl" }
+                    populate: {
+                        path: "userId",
+                        select: "fullName profilePhotoUrl"
+                    }
                 })
             return res.status(200).json({
                 status: "success",
@@ -159,8 +173,11 @@ class CommentController {
      */
     static async addLessonCommentReply(req, res) {
         try {
-           let commentReply = await LessonCommentReplies.create(req.body)
-           commentReply = await LessonCommentReplies.findById(commentReply.id).populate({path:"userId", select:"fullName profilePhotoUrl"})         
+            let commentReply = await LessonCommentReplies.create(req.body)
+            commentReply = await LessonCommentReplies.findById(commentReply.id).populate({
+                path: "userId",
+                select: "fullName profilePhotoUrl"
+            })
             return res.status(200).json({
                 status: "success",
                 data: {
@@ -184,9 +201,13 @@ class CommentController {
      *
      */
     static async deleteLessonComment(req, res) {
-        try {                       
-            await LessonComment.findOneAndDelete({_id:req.params.lessonCommentId});
-            await LessonCommentReplies.deleteMany({lessonCommentId:req.params.lessonCommentId});
+        try {
+            await LessonComment.findOneAndDelete({
+                _id: req.params.lessonCommentId
+            });
+            await LessonCommentReplies.deleteMany({
+                lessonCommentId: req.params.lessonCommentId
+            });
             return res.status(200).json({
                 status: "success",
                 data: {
@@ -197,6 +218,45 @@ class CommentController {
             return res.status(500).json({
                 status: "500 Internal server error",
                 error: "Error deleting lesson comment",
+            });
+        }
+    }
+
+    /**
+     * update a lesson comment
+     * @param {Request} req - Response object.
+     * @param {Response} res - The payload.
+     * @memberof LessonController
+     * @returns {JSON} - A JSON success response.
+     *
+     */
+    static async updateLessonComment(req, res) {
+        try {            
+            let comment = await LessonComment.findOneAndUpdate({
+                _id: req.params.lessonCommentId
+            }, {
+                text: req.body.text,
+            }, {
+                new: true,
+            });
+            comment = await LessonComment.findById(comment.id).populate({
+                path: "userId",
+                select: "fullName profilePhotoUrl"
+            })
+            .populate({
+                path: "commentReplies",
+                model: LessonCommentReplies
+            })
+            return res.status(200).json({
+                status: "success",
+                data: {
+                    comment
+                }
+            });
+        } catch (error) {
+            return res.status(500).json({
+                status: "500 Internal server error",
+                error: "Error updating lesson comment",
             });
         }
     }
