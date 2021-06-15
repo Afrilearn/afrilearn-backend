@@ -19,6 +19,8 @@ import AddUserAsTeacher from "../validations/auth/addUserAsTeacher.validator";
 import MaketeacherAnAdmin from "../validations/auth/makeTeacherAdmin.validator";
 import UnlinkChildrenAccounts from "../validations/auth/unlinkChildrenAccounts.validator";
 import SignupForAdmin from "../validations/auth/signupForAdmin.validator";
+import SchoolController from "../controllers/school.controller";
+import ParentController from "../controllers/parent.controller";
 
 const router = Router();
 
@@ -90,123 +92,126 @@ router.post(
   "/school/sign-up-for-student",
   SignupForStudent.validateData(),
   SignupForStudent.myValidationResult,
-  AuthController.signUpForStudent
+  SchoolController.signUpForStudent
 );
 router.post(
   "/school/sign-up-for-teacher",
   SignupForTeacher.validateData(),
   SignupForTeacher.myValidationResult,
-  AuthController.signUpForTeacher
+  SchoolController.signUpForTeacher
 );
 router.post(
   "/school/sign-up-for-admin",
   SignupForAdmin.validateData(),
   SignupForAdmin.myValidationResult,
-  AuthController.signUpForSchoolAdmin
+  SchoolController.signUpForSchoolAdmin
 );
 router.post(
   "/school/add-user-as-teacher",
   AddUserAsTeacher.validateData(),
   AddUserAsTeacher.myValidationResult,
-  AuthController.schoolAddExistingTeacher
+  SchoolController.schoolAddExistingTeacher
 );
 router.post(
   "/school/accept-teacher-request",
   AddUserAsTeacher.validateData(),
   AddUserAsTeacher.myValidationResult,
-  AuthController.acceptTeacherRequest
+  SchoolController.acceptTeacherRequest
 );
 router.post(
   "/school/add-teacher-as-admin",
   MaketeacherAnAdmin.validateData(),
   MaketeacherAnAdmin.myValidationResult,
-  AuthController.makeTeacherAdmin
+  SchoolController.makeTeacherAdmin
 );
 router.post(
   "/school/accept-admin-request",
   MaketeacherAnAdmin.validateData(),
   MaketeacherAnAdmin.myValidationResult,
-  AuthController.acceptAdminRequest
+  SchoolController.acceptAdminRequest
 );
+
 router.post(
   "/parent/add-course-for-child",
   verifyToken,
   AddCourseForChild.validateData(),
   AddCourseForChild.myValidationResult,
-  AuthController.enrollChildInCourse
+  ParentController.enrollChildInCourse
 );
 router.get(
   "/parent/children",
   verifyToken,
-  AuthController.populateParentDashboard
+  ParentController.populateParentDashboard
 );
 router.post(
   "/sign-up-for-a-child",
   SignupForChild.validateData(),
   SignupForChild.myValidationResult,
-  AuthController.signUpForChild
+  ParentController.signUpForChild
 );
 router.post(
   "/add-user-as-child",
   AddUserAsChild.validateData(),
   AddUserAsChild.myValidationResult,
-  AuthController.addExistingUserAsChild
+  ParentController.addExistingUserAsChild
 );
 router.post(
   "/accept-parent-request",
   AddUserAsChild.validateData(),
   AddUserAsChild.myValidationResult,
-  AuthController.acceptParentReuest
+  ParentController.acceptParentReuest
 );
 router.patch(
   "/unlink-child-account",
   UnlinkChildAccount.validateData(),
   UnlinkChildAccount.myValidationResult,
-  AuthController.unlinkChildAccount
+  ParentController.unlinkChildAccount
 );
 
 router.patch(
   "/unlink-children-accounts",
   UnlinkChildrenAccounts.validateData(),
   UnlinkChildrenAccounts.myValidationResult,
-  AuthController.unlinkChildrenAccounts
+  ParentController.unlinkChildrenAccounts
 );
 router.delete(
   "/delete-children-accounts",
   UnlinkChildrenAccounts.validateData(),
   UnlinkChildrenAccounts.myValidationResult,
-  AuthController.deleteChildrenAccounts
+  ParentController.deleteChildrenAccounts
 );
 router.delete(
   "/delete-child-account",
   UnlinkChildAccount.validateData(),
   UnlinkChildAccount.myValidationResult,
-  AuthController.deleteChildAccount
+  ParentController.deleteChildAccount
 );
+
 router.patch(
   "/school/unlink-teacher-account",
   UnlinkStudentAccount.validateData(),
   UnlinkStudentAccount.myValidationResult,
-  AuthController.unlinkTeacherAccount 
+  SchoolController.unlinkTeacherAccount
 );
 router.delete(
   "/school/delete-teacher-account",
   UnlinkStudentAccount.validateData(),
   UnlinkStudentAccount.myValidationResult,
-  AuthController.deleteTeacherAccount
+  SchoolController.deleteTeacherAccount
 );
 router.patch(
   "/school/unlink-student-account",
   UnlinkStudentAccount.validateData(),
   UnlinkStudentAccount.myValidationResult,
-  AuthController.unlinkStudentAccount
+  SchoolController.unlinkStudentAccount
 );
 router.delete(
   "/school/delete-student-account",
   UnlinkStudentAccount.validateData(),
   UnlinkStudentAccount.myValidationResult,
-  AuthController.deleteStudentAccount
+  SchoolController.deleteStudentAccount
 );
+
 router.post("/move-users", AuthController.moveUsers);
 router.patch(
   "/update-profile-pic",
@@ -214,21 +219,23 @@ router.patch(
   verifyToken,
   AuthController.uploadProfilePic
 );
+
 router.patch(
   "/school/update-logo/:schoolId",
   upload.single("logo"),
   verifyToken,
-  AuthController.uploadSchoolLogo
+  SchoolController.uploadSchoolLogo
 );
 router.patch(
   "/school/update-cover-photo/:schoolId",
   upload.single("coverPhoto"),
   verifyToken,
-  AuthController.uploadSchoolCoverPhoto
+  SchoolController.uploadSchoolCoverPhoto
 );
 router.patch(
   "/school/update-profile/:schoolId",
   verifyToken,
-  AuthController.updateSchoolProfile
+  SchoolController.updateSchoolProfile
 );
+
 export default router;
