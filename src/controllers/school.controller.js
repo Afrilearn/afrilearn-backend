@@ -756,7 +756,7 @@ class SchoolController {
       await existingSchoolTeacher.save();
 
       //update related classes
-      const classes = await Class.find({
+      const classes = await ClassModel.find({
         userId,
         schoolId,
       });
