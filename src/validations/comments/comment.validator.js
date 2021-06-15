@@ -106,6 +106,22 @@ class CommentValidator {
   }
 
   /**
+   * validate Add/Remove comment data.
+   * @memberof CommentValidator
+   * @returns {null} - No response.
+   */
+   static validateCommentUpdate() {
+    return [      
+      check('text')
+      .exists()
+      .withMessage('Comment text is required')
+      .not()
+      .isEmpty()
+      .withMessage('Comment text must not be empty')     
+    ];
+  }
+
+  /**
    * validate Add EnrolledCourse data.
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.

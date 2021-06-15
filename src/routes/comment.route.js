@@ -52,4 +52,12 @@ router.delete(
   CommentController.deleteLessonComment
 );
 
+router.patch(
+  "/:lessonCommentId",
+  validateToken,
+  CommentValidator.validateCommentUpdate(),
+  CommentValidator.myValidationResult,
+  CommentController.updateLessonComment
+);
+
 export default router;
