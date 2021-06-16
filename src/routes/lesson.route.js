@@ -7,6 +7,7 @@ import SaveQuizResults from "../validations/results/quizResults.validator";
 import ResumePlaying from "../validations/lessons/resumePlaying.validator";
 import Favourite from "../validations/lessons/favourite.validator";
 import Like from "../validations/lessons/like.validator";
+import Report from "../validations/lessons/report.validator";
 
 const router = Router();
 
@@ -37,4 +38,5 @@ router.post("/saveFavouriteVideos", Favourite.validateData(), Favourite.myValida
 router.delete("/removeFavouriteVideos", Favourite.validateData(), Favourite.myValidationResult, LessonController.removeFromFavourite);
 router.post("/saveLikedVideo", Like.validateData(), Like.myValidationResult, LessonController.saveLikedVideo);
 router.delete("/removeLikedVideo", Like.validateData(), Like.myValidationResult, LessonController.removeLikedVideo);
+router.post("/reportLesson", Report.validateData(), Report.myValidationResult, LessonController.reportLesson);
 export default router;
