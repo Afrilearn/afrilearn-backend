@@ -5,6 +5,7 @@ import Subject from "../db/models/subjects.model";
 import EnrolledCourse from "../db/models/enrolledCourses.model";
 import ResumePlaying from "../db/models/resumePlaying.model";
 import Favourite from "../db/models/favourite.model";
+import sendEmail from "../utils/email.utils";
 
 /**
  *Contains Lesson Controller
@@ -562,5 +563,32 @@ class LessonController {
         });
       }
     }
+
+     /**
+   * Report Lesson 
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof LessonController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async reportLesson(req, res) {
+    try {    
+       const {message} = req.body;
+       sendEmail("hello@myafrilearn.com", "Flagged Lesson", message);
+        return res.status(200).json({
+          status: "success",
+          data: {
+            message:'Lesson reported successfully'
+          }
+        });
+    } catch (error) {
+      console.log(error)
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error reporting lesson",
+      });
+    }
+  }
 }
 export default LessonController;
