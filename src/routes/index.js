@@ -16,6 +16,7 @@ import schoolRouter from "./school.route";
 import thirdPartyRoute from "./thirdParty.route";
 import commentRoute from "./comment.route";
 import parentRoute from "./parent.route";
+import feedRoute from "./feed.route";
 
 const router = Router();
 
@@ -35,6 +36,7 @@ router.use("/terms", termRouter);
 router.use("/payments", paymentRouter);
 router.use("/thirdParty", thirdPartyRoute);
 router.use("/comments", commentRoute);
+router.use("/feeds", feedRoute);
 router.use("/parents", parentRoute);
 
 export default router;

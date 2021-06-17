@@ -252,18 +252,6 @@ describe("Auth Route Endpoints", () => {
           done();
         });
     });
-
-    it("Should fake server error", (done) => {
-      const req = { body: {} };
-      const res = {
-        status() {},
-        send() {},
-      };
-      sinon.stub(res, "status").returnsThis();
-      AuthController.signUpForChild(req, res);
-      res.status.should.have.callCount(0);
-      done();
-    });
   });
 
   describe("POST api/v1/auth/activate_account", () => {
@@ -639,8 +627,6 @@ describe("Auth Route Endpoints", () => {
           done();
         });
     });
-
- 
 
     it("Should fake server error", (done) => {
       const req = { body: {} };
