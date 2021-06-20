@@ -1,5 +1,5 @@
 import { Router } from "express";
-import upload from "../config/bucket";
+import feedUpload from "../config/feedBucket";
 import FeedController from "../controllers/feed.controller";
 import verifyToken from "../middlewares/auth.middleware";
 
@@ -8,19 +8,19 @@ const router = Router();
 router.post(
   "/posts",
   verifyToken,
-  upload.single("image"),
+  feedUpload.single("image"),
   FeedController.sendAPost
 );
 router.patch(
   "/posts/:postId",
   verifyToken,
-  upload.single("image"),
+  feedUpload.single("image"),
   FeedController.editAPost
 );
 router.delete("/posts/:postId", verifyToken, FeedController.deleteAPost);
 router.post(
   "/comment/:postId",
-  upload.single("image"),
+  feedUpload.single("image"),
   verifyToken,
   FeedController.commentToAPost
 );

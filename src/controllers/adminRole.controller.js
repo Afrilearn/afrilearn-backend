@@ -1,5 +1,8 @@
 import AdminRole from "../db/models/adminRole.model";
 import ClassModel from "../db/models/classes.model";
+import User from "../db/models/users.model";
+import Helper from "../utils/user.utils";
+import sendEmail from "../utils/email.utils";
 
 /**
  *Contains AdminRole Controller
@@ -19,6 +22,21 @@ class AdminRoleController {
    */
   static async addAdminToClass(req, res) {
     try {
+      let customerRole = "Admin";
+      const { fullName, password, email, roleDescription } = req.body;
+
+      const encryptpassword = await Helper.encrptPassword(password);
+
+      const existingUser = await User.findOne({
+        email,
+      });
+
+      if (existingUser) {
+        return res.status(400).json({
+          status: "400 Bad Request",
+          error: "Email already exist",
+        });
+      }
       const existingClass = await ClassModel.findOne({ _id: req.body.classId });
 
       if (!existingClass) {
@@ -28,10 +46,31 @@ class AdminRoleController {
         });
       }
 
-      const admin = await AdminRole.create({
-        userId: req.body.userId,
+      const newUser = {
+        fullName,
+        password: encryptpassword,
+        email,
+        role: "602f3ce39b146b3201c2dc1d",
+      };
+
+      const result = await User.create({
+        ...newUser,
+      });
+
+      const adminResult = await AdminRole.create({
+        roleDescription: roleDescription || "Admin",
+        userId: result._id,
         classId: req.body.classId,
       });
+      const admin = await AdminRole.findOne({ _id: adminResult._id }).populate(
+        "userId"
+      );
+
+      const message = `Hi, ${fullName},  ${existingClass.name} just created a new ${customerRole}'s account for you.`;
+      const adminMessage = ` ${existingClass.name}, just created a new ${customerRole}'s account for ${fullName}.`;
+
+      sendEmail(email, "Welcome to Afrilearn", message);
+      sendEmail("africustomers@gmail.com", "New Customer", adminMessage);
 
       return res.status(200).json({
         status: "success",

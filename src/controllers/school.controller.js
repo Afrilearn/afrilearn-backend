@@ -378,7 +378,7 @@ class SchoolController {
         fullName,
         password: encryptpassword,
         email,
-        role: "602f3ce39b146b3201c2dc1d",
+        role: "607ededa2712163504210684",
         schoolId,
       };
 
@@ -390,7 +390,7 @@ class SchoolController {
 
       const data = {
         roleDescription: roleDescription || "Admin",
-        userId: result.id,
+        userId: result._id,
         schoolId,
       };
       await AdminRole.create({
