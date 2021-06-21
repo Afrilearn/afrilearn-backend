@@ -68,6 +68,12 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    followings: {
+      type: Array,
+    },
+    followers: {
+      type: Array,
+    },
   },
   {
     toJSON: { virtuals: true },
