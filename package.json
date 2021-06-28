@@ -4,7 +4,7 @@
   "description": "Afrilearn is an education technology corporation leveraging seasoned teachers, animators and developers to deliver affordable, world-class education for Africans, anywhere.",
   "main": "index.js",
   "scripts": {
-    "heroku-prebuild" : "node src/gcpSetup.js",
+    "heroku-prebuild": "node src/gcpSetup.js",
     "preinstall": "node src/gcpSetup.js",
     "start": "node -r esm src/",
     "dev": "nodemon -r esm src/",
@@ -43,6 +43,7 @@
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.1",
     "mongoose": "^5.10.4",
+    "mongoose-simple-random": "^0.4.1",
     "morgan": "^1.10.0",
     "multer": "^1.4.2",
     "multer-s3": "^2.9.0",

@@ -28,7 +28,7 @@ class FeedController {
         _id: req.params.userId,
       })
         .select(
-          "fullName email state country role followings followers enrolledCourses"
+          "fullName email state country role followings followers enrolledCourses profilePhotoUrl"
         )
         .populate({
           path: "role",
@@ -74,7 +74,11 @@ class FeedController {
   static async getMyFeed(req, res) {
     try {
       const posts = await Post.find({})
-        .sort({ createdAt: -1 })
+        .sort([
+          ["likes", -1],
+          ["comments", -1],
+          ["createdAt", -1],
+        ])
         .populate({
           path: "comments",
           model: PostComment,
@@ -345,6 +349,75 @@ class FeedController {
       });
     }
   }
+  /**
+   * Save liked  Comment
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof LessonController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async saveLikedComment(req, res) {
+    try {
+      let selectedComment = await PostComment.findById(req.params.commentId);
+      if (!selectedComment) {
+        return res.status(404).json({
+          status: "404 Internal server error",
+          error: "Post not found",
+        });
+      }
+      selectedComment.likes = selectedComment.likes.slice(); // Clone the tags array
+      selectedComment.likes.push(req.data.id);
+      selectedComment.save();
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          selectedComment,
+        },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error saving like",
+      });
+    }
+  }
+
+  /**
+   * Remove liked Comment
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof LessonController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async removeLikedComment(req, res) {
+    try {
+      let selectedComment = await PostComment.findById(req.params.commentId);
+      if (!selectedComment) {
+        return res.status(404).json({
+          status: "404 Internal server error",
+          error: "Comment not found",
+        });
+      }
+      selectedComment.likes = selectedComment.likes.slice(); // Clone the tags array
+      selectedComment.likes.pull(req.data.id);
+      selectedComment.save();
+
+      return res.status(200).json({
+        status: "success",
+        data: { selectedComment },
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error removing like",
+      });
+    }
+  }
 
   /**
    * Comment to a post
@@ -461,25 +534,32 @@ class FeedController {
       const followed = await Follow.findOne({
         followerId: req.data.id,
         userId: req.params.userId,
-      });
-      let userFollowing = await User.findOne({ _id: req.data.id });
-      let userBeingFollowed = await User.findOne({ _id: req.params.userId });
-      userFollowing.followings = userFollowing.followings.slice(); // Clone the tags array
-      userBeingFollowed.followers = userBeingFollowed.followers.slice(); // Clone the tags array
+      }).populate({ path: "userId", model: User });
+      const userFollowing = await User.findOne({ _id: req.data.id });
+      const userBeingFollowed = await User.findOne({ _id: req.params.userId });
+      let userSentBack = followed;
       if (followed) {
         await followed.remove();
-        userFollowing.followings.pull(req.params.userId);
-        userBeingFollowed.followers.pull(req.data.id);
+        userFollowing.followings = userFollowing.followings.filter(
+          (i) => i !== req.params.userId
+        );
+        userBeingFollowed.followers = userBeingFollowed.followers.filter(
+          (i) => i !== req.data.id
+        );
       } else {
-        await Follow.create({
+        const result = await Follow.create({
           followerId: req.data.id,
           userId: req.params.userId,
+        });
+        userSentBack = await Follow.findOne({ _id: result._id }).populate({
+          path: "userId",
+          model: User,
         });
         userFollowing.followings.push(req.params.userId);
         userBeingFollowed.followers.push(req.data.id);
       }
-      userFollowing.save();
-      userBeingFollowed.save();
+      await userFollowing.save();
+      await userBeingFollowed.save();
 
       const followings = await Follow.countDocuments({
         followerId: req.data.id,
@@ -493,6 +573,7 @@ class FeedController {
         data: {
           followings,
           followers,
+          followed: userSentBack,
         },
       });
     } catch (error) {
@@ -521,7 +602,9 @@ class FeedController {
           { subjectName: searchData },
           { courseName: searchData },
         ],
-      }).sort({ createdAt: -1 });
+      })
+        .sort({ createdAt: -1 })
+        .populate("userId comments");
 
       return res.status(200).json({
         status: "success",
@@ -563,6 +646,63 @@ class FeedController {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Searching",
+      });
+    }
+  }
+
+  /**
+   * get users for my feed
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof FeedController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getUsersForMyFeed(req, res) {
+    try {
+      const users = await User.aggregate([{ $sample: { size: 10 } }]);
+
+      return res.status(200).json({
+        status: "success",
+        data: { users },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error getting users",
+      });
+    }
+  }
+
+  /**
+   * get course and related subjects in feed
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof FeedController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getCourseAndRelatedSubjectsForFeed(req, res) {
+    try {
+      const courses = await Course.find({})
+        .select("mainSubjectId name alias")
+        .populate({
+          path: "relatedSubjects",
+          select: "mainSubjectId",
+          populate: {
+            path: "mainSubjectId relatedLessons",
+            select: "name title",
+          },
+        });
+
+      return res.status(200).json({
+        status: "success",
+        data: { courses },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error getting courses",
       });
     }
   }
