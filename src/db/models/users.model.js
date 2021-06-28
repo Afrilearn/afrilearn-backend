@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import random from "mongoose-simple-random";
 
 const UserSchema = new mongoose.Schema(
   {
@@ -82,6 +83,7 @@ const UserSchema = new mongoose.Schema(
   }
 );
 
+UserSchema.plugin(random);
 UserSchema.virtual("usersReferred", {
   ref: "user",
   localField: "_id",
