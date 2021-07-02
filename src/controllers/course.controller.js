@@ -110,7 +110,7 @@ class CourseController {
         },
       });
       const numOfUsers = await EnrolledCourse.countDocuments({
-        courseId: req.params.courseId        
+        courseId: req.params.courseId,
       });
       return res.status(200).json({
         status: "success",
@@ -659,8 +659,27 @@ class CourseController {
         const averageTimePerTest = totalTimeSpent / results.length;
         /* performance */
 
+        /* progress */
+        const subjectProgressData = {
+          userId: userID,
+          courseId: req.params.courseId,
+          subjectId: subject._id,
+        };
+        if (req.body.classId) {
+          subjectProgressData.classId = req.body.classId;
+        } else {
+          subjectProgressData.classId = null;
+        }
+        const incomingSubjectProgress = await SubjectProgress.find(
+          subjectProgressData
+        ).countDocuments();
+        const subjectProgress =
+          (incomingSubjectProgress / subject.relatedLessons.length) * 100;
+        /* progress */
+
         subjectsList.push({
           subject: subject.mainSubjectId.name,
+          progress: subjectProgress,
           performance,
           totalQuestionsCorrect,
           totalQuestions,
