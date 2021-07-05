@@ -244,7 +244,7 @@ class ClassController {
         email: req.body.email,
       });
       const classInfo = await Class.findOne({
-        _id: req.params.classId
+        _id: req.params.classId,
       });
       // yes? add user to class
       if (user) {
@@ -272,9 +272,9 @@ class ClassController {
           userId: user._id,
         });
         if (!alreadyClassCourseOwner) {
-            await EnrolledCourse.create({           
+          await EnrolledCourse.create({
             userId: user._id,
-            courseId:classInfo.courseId
+            courseId: classInfo.courseId,
           });
         }
         return res.status(200).json({
@@ -298,9 +298,9 @@ class ClassController {
           userId: user._id,
           status: "approved",
         });
-        await EnrolledCourse.create({           
+        await EnrolledCourse.create({
           userId: user._id,
-          courseId:classInfo.courseId
+          courseId: classInfo.courseId,
         });
 
         return res.status(200).json({
@@ -582,7 +582,6 @@ class ClassController {
         path: "relatedSubjects",
         populate: {
           path: "mainSubjectId relatedLessons",
-          select: "name title imageUrl termId",
         },
       });
       return res.status(200).json({
@@ -1026,10 +1025,10 @@ class ClassController {
           model: Comment,
           populate: {
             path: "student",
-            select: "fullName role",
+            select: "fullName role profilePhotoUrl",
           },
         })
-        .populate({ path: "teacher", select: "fullName role" });
+        .populate({ path: "teacher", select: "fullName role profilePhotoUrl" });
       return res.status(200).json({
         status: "success",
         data: {
