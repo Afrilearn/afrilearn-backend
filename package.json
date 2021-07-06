@@ -42,7 +42,7 @@
     "iap": "^1.1.1",
     "jsonwebtoken": "^8.5.1",
     "moment": "^2.29.1",
-    "mongoose": "^5.10.4",
+    "mongoose": "^5.13.2",
     "mongoose-simple-random": "^0.4.1",
     "morgan": "^1.10.0",
     "multer": "^1.4.2",
@@ -77,6 +77,6 @@
     ]
   },
   "engines": {
-    "node": "14.13.1"
+    "node": "v16.4.0"
   }
 }
