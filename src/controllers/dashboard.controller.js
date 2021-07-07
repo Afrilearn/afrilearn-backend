@@ -616,7 +616,7 @@ class DashboardController {
         .limit(10)
         .populate({
           path: 'lessonId',
-          select: "title videoUrls thumbnailUrl"
+          select: "title videoUrls thumbnailUrl termId"
         })
         .populate({
           path: 'courseId',
