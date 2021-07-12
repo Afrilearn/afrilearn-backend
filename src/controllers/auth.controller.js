@@ -17,6 +17,7 @@ import Userz from "../../users.json";
 import Students from "../../students.json";
 import NewUsers from "../../NewUsers.json";
 import OldUsers from "../../old.json";
+import _7_8_2021 from "../../_7_8_2021.json";
 import axios from "axios";
 import CourseCategory from "../db/models/courseCategories.model";
 import Class from "../db/models/classes.model";
@@ -130,9 +131,11 @@ class AuthController {
       const user = await AuthServices.emailExist(email, res);
       const token = await Helper.generateToken(result._id, role, fullName);
 
-      const message = `Hi, ${fullName} just created a new ${customerRole}'s account`;
+      const message = `Hi, ${fullName}, welcome to Afrilearn. <br/> click the link to activate your account https://myafrilearn.com?uuid=${token}`;
+      const adminMessage = `Hi, ${fullName} just created a new ${customerRole}'s account`;
 
-      sendEmail("africustomers@gmail.com", "New Customer", message);
+      sendEmail(email, "Welcome to Afrilearn", message);
+      sendEmail("africustomers@gmail.com", "New Customer", adminMessage);
 
       return res.status(201).json({
         status: "success",
@@ -637,6 +640,7 @@ class AuthController {
 
       // console.log("First", users[0]);
       const enrlist = [];
+      let count = 0;
       // for (let index = 0; index < NewUsers.data.users.length; index++) {
       // const newuser = NewUsers.data.users[index];
 
@@ -657,39 +661,47 @@ class AuthController {
       // };
       // const createdUser = await Auth.create({ ...newUser });
       // }
-      for (let index = 0; index < Students.data.users.length; index++) {
-        const student = Students.data.users[index];
-        const existingUser = await Auth.findOneAndUpdate(
-          {
-            email: student.email,
-          },
-          {
-            referralLink: "classnote",
-          },
-          {
-            new: true,
-          }
-        );
+      // for (let index = 0; index < _7_8_2021.length; index++) {
+      //   const user = _7_8_2021[index];
+      //   const existingUser = await Auth.findOne({
+      //     email: user.email,
+      //   });
+      //   if (!existingUser) {
+      //     count++;
 
-        // const enrolledCourse = await EnrolledCourse.findOneAndUpdate(
-        //   {
-        //     userId: existingUser._id,
-        //     courseId: "5fff72b3de0bdb47f826feaf",
-        //   },
-        //   { endDate: "2021-05-23T10:22:56.825+00:00" },
-        //   { now: true }
-        // );
+      //     //create user
+      //     //add referralLink=classnote
+      //     const encryptpassword = await Helper.encrptPassword(user.last_name);
+      //     const newUser = {
+      //       fullName: user.name,
+      //       password: encryptpassword,
+      //       email: user.email,
+      //       role: "5fd08fba50964811309722d5",
+      //       referralLink: "classnote",
+      //     };
+      //     const createdUser = await Auth.create({ ...newUser });
+      //     //enroll in sss1 and add enddate = current date + 1 month
 
-        // console.log(student);
-        enrlist.push(existingUser);
-      }
+      //     await EnrolledCourse.create({
+      //       userId: createdUser._id,
+      //       courseId: "5fff72b3de0bdb47f826feaf",
+      //       endDate: "2021-08-08T10:22:56.825+00:00",
+      //     });
+
+      //     enrlist.push(createdUser);
+      //   }
+
+      //   // console.log(student);
+      //   // enrlist.push(existingUser);
+      // }
 
       // const count = NewUsers.data.users.length;
 
       return res.status(200).json({
         status: "success",
         data: {
-          old: enrlist,
+          old: count,
+          enrlist,
         },
       });
     } catch (err) {
