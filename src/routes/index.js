@@ -17,6 +17,8 @@ import thirdPartyRoute from "./thirdParty.route";
 import commentRoute from "./comment.route";
 import parentRoute from "./parent.route";
 import feedRoute from "./feed.route";
+import challengeRoute from "./challenge.route";
+import coinRoute from "./coin.route";
 
 const router = Router();
 
@@ -36,6 +38,8 @@ router.use("/terms", termRouter);
 router.use("/payments", paymentRouter);
 router.use("/thirdParty", thirdPartyRoute);
 router.use("/comments", commentRoute);
+router.use("/coins", coinRoute);
+router.use("/challenges", challengeRoute);
 router.use("/feeds", feedRoute);
 router.use("/parents", parentRoute);
 
