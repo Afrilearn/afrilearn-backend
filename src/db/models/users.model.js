@@ -75,6 +75,10 @@ const UserSchema = new mongoose.Schema(
     followers: {
       type: Array,
     },
+    afriCoins: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     toJSON: { virtuals: true },

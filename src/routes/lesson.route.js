@@ -1,6 +1,4 @@
-import {
-  Router
-} from "express";
+import { Router } from "express";
 import LessonController from "../controllers/lesson.controller";
 import verifyToken from "../middlewares/auth.middleware";
 import SaveQuizResults from "../validations/results/quizResults.validator";
@@ -29,6 +27,22 @@ router.post("/search/:keywords", LessonController.searchLessons);
 router.post(
   "/:courseId/:subjectId/subject-lessons",
   LessonController.getSubjectLessonsAndProgress
+);
+router.post(
+  "/:courseId/:subjectId/subject-basic-details",
+  LessonController.getSubjectBasicDetails
+);
+router.post(
+  "/:courseId/:subjectId/lessons",
+  LessonController.getSubjectLessons
+);
+router.post(
+  "/:courseId/:subjectId/subject-progress",
+  LessonController.getSubjectProgress
+);
+router.post(
+  "/:courseId/:subjectId/subject-users",
+  LessonController.getUsersSubscribedToACourse
 );
 router.patch("/:lessonId/update", LessonController.updateLesson);
 router.get("/:lessonId/", LessonController.getSingleLesson);
