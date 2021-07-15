@@ -532,7 +532,7 @@ class DashboardController {
         .limit(10)
         .populate({
           path: 'lessonId',
-          select: "title videoUrls thumbnailUrl",          
+          select: "title videoUrls thumbnailUrl views",          
         })
         .populate({
           path: 'courseId',
@@ -572,7 +572,7 @@ class DashboardController {
       })     
       const lessons = await Lesson.find({
           courseId: enrolledCourse.courseId
-        }).select('title courseId views subjectId termId videoUrls thumbnailUrl').limit(10).sort({
+        }).select('title courseId views subjectId termId videoUrls thumbnailUrl views').limit(10).sort({
           views: -1
         }).populate({
           path: 'courseId',
@@ -616,7 +616,7 @@ class DashboardController {
         .limit(10)
         .populate({
           path: 'lessonId',
-          select: "title videoUrls thumbnailUrl termId"
+          select: "title videoUrls thumbnailUrl termId views"
         })
         .populate({
           path: 'courseId',
