@@ -22,6 +22,7 @@ import axios from "axios";
 import CourseCategory from "../db/models/courseCategories.model";
 import Class from "../db/models/classes.model";
 import AdminRole from "../db/models/adminRole.model";
+import AfriCoinTransaction from "../db/models/afriCoinTransaction.model";
 
 /**
  *Contains Auth Controller
@@ -57,6 +58,18 @@ class AuthController {
         mongoose.isValidObjectId(req.body.referralCode)
       ) {
         newUser.referee = req.body.referralCode;
+        //add afriCoins for referee
+        const referee = await Auth.findById(req.body.referralCode);
+        if (referee) {
+          referee.afriCoins += 100;
+          await referee.save();
+          await AfriCoinTransaction.create({
+            description: "Referrals",
+            type: "add",
+            amount: 100,
+            userId: req.body.referralCode,
+          });
+        }
       }
 
       if (req.body.referralLink) {
