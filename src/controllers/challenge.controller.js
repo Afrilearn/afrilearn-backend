@@ -20,24 +20,17 @@ class ChallengeController {
    */
   static async addChallenge(req, res) {
     try {
-      const result = await Challenge.create({
+      const challenge = await Challenge.create({
         ...req.body,
-        userId: req.data.id,
-      });
-      const challenge = await Challenge.findOne({
-        _id: result._id,
-      }).populate({
-        path: "examCategoryId classId schoolId userId",
-        select: "name fullName profilePhotoUrl",
-      });
+        creatorId: req.data.id,
+      });    
       return res.status(200).json({
         status: "success",
         data: {
-          challenge,
+          challenge
         },
       });
-    } catch (error) {
-      console.log("error", error);
+    } catch (error) {     
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Adding challenge",
@@ -53,12 +46,9 @@ class ChallengeController {
    * @returns {JSON} - A JSON success response.
    *
    */
-  static async getChallenges(req, res) {
-    try {
-      const options = {};
-      if (req.query.examCategoryId) {
-        options.examCategoryId = req.query.examCategoryId;
-      }
+  static async getChallengeForACourse(req, res) {
+    try {      
+      const options = {};      
       if (req.query.courseId) {
         options.courseId = req.query.courseId;
       }
@@ -67,13 +57,9 @@ class ChallengeController {
       }
       if (req.query.schoolId) {
         options.schoolId = req.query.schoolId;
-      }
-      console.log("options", options);
+      }   
 
-      const challenges = await Challenge.find({ ...options }).populate({
-        path: "examCategoryId classId schoolId userId",
-        select: "name fullName profilePhotoUrl",
-      });
+      const challenges = await Challenge.find({ ...options })
       if (!challenges) {
         return res.status(404).json({
           status: "404 Not found",
@@ -223,21 +209,11 @@ class ChallengeController {
    */
   static async storeAChallengeResult(req, res) {
     try {
-      await ChallengeResult.create({
-        ...req.body,
-        userId: req.data.id,
-        challengeId: req.params.challengeId,
-      });
-      const results = await ChallengeResult.find({
-        challengeId: req.params.challengeId,
-      }).populate({
-        path: "userId",
-        select: "fullName profilePhotoUrl",
-      });
+      const challengeResult = await ChallengeResult.create(req.body);     
       return res.status(200).json({
         status: "success",
         data: {
-          results,
+          challengeResult
         },
       });
     } catch (error) {

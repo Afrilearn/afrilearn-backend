@@ -1,6 +1,7 @@
 import { Router } from "express";
 import ChallengeController from "../controllers/challenge.controller";
 import validateToken from "../middlewares/auth.middleware";
+import ChallengeValidator from "../validations/challenge/challenge.validator";
 
 const router = Router();
 
@@ -11,15 +12,17 @@ router.delete(
   ChallengeController.deleteChallenge
 );
 router.get("/:challengeId", ChallengeController.getChallenge);
-router.get("/", ChallengeController.getChallenges);
+router.get("/", ChallengeController.getChallengeForACourse);
 router.post(
   "/register/:challengeId",
   validateToken,
   ChallengeController.registerForAChallenge
 );
 router.post(
-  "/add-result/:challengeId",
-  validateToken,
+  "/store-result",
+  validateToken, 
+  ChallengeValidator.validateAddChallengeResult(),
+  ChallengeValidator.myValidationResult,
   ChallengeController.storeAChallengeResult
 );
 router.get(

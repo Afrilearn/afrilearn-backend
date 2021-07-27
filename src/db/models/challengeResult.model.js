@@ -2,30 +2,23 @@ import mongoose from "mongoose";
 
 const ChallengeResultSchema = new mongoose.Schema(
   {
-    level_speed: [
-      {
-        level: {
-          type: String,
-        },
-        time: {
-          type: Number,
-        },
-      },
-    ],
-    overall_speed: {
-      type: Number,
-    },
-    score: {
-      type: Number,
-    },
     challengeId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Challenge",
+      ref: "challenge",
     },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
     },
+    totalQuestionsAnswered: {
+      type: Number,
+    },
+    numOfCorrectAnswers: {
+      type: Number,
+    },
+    winRatio: {
+      type: Number,
+    }   
   },
   {
     toJSON: { virtuals: true },
@@ -35,7 +28,7 @@ const ChallengeResultSchema = new mongoose.Schema(
 );
 
 const ChallengeResult = mongoose.model(
-  "ChallengeResult",
+  "challengeResult",
   ChallengeResultSchema
 );
 

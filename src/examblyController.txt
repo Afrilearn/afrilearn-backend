@@ -1,0 +1,2108 @@
+<?php
+
+namespace Mini\Controller;
+
+use GuzzleHttp\Psr7\Response;
+use function Http\Response\send;
+use Mini\Model\FPQ;
+use Mini\Libs\Utility;
+use Google_Client;
+use Google_Service_Oauth2;
+
+class V2Controller {
+    
+    //User
+    public function login() {
+        $response = array();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            $headers = getallheaders();
+            $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+            if (isset($auth_token) && $auth_token == API_KEY) {
+                $postdata = file_get_contents("php://input");
+                $request = json_decode($postdata);
+                if (isset($request)) {
+                    $email = $request->email;
+                    $password = $request->password;
+                    
+                    $fpq = new FPQ();
+                    $user = $fpq->studentLogin($email, $password);
+
+                    if ($user) {
+                        $response = array(
+                            "error" => false,
+                            "user" => array(
+                                "active" => $user->active,
+                                "ec_id" => $user->ec_id,
+                                "email" => $user->email,
+                                "firstname" => $user->firstname,
+                                "last_login_date" => $user->last_login_date,
+                                "lastname" => $user->lastname,
+                                "mobile" => $user->mobile,
+                                "auth_token" => AUTH_TOKEN,
+                                "state_id" => $user->state_id,
+                                "user_id" => $user->user_id,
+                                "user_type" => $user->user_type,
+                                "valid_till" => $user->valid_till,
+                                "valid" => (strtotime($user->valid_till) >= date("Y-m-d")) ? true : false
+                            )
+                        );
+                    } else {
+                        $response = array(
+                            "error" => true,
+                            "message" => "Invalid username or password"
+                        );
+                    }
+                } else {
+                    $response = array(
+                        "error" => true,
+                        "message" => "Kindly provide your username and/or password."
+                    );
+                }
+            } else {
+                $response = array(
+                    "error" => true,
+                    "message" => "No Authorization Found."
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "Invalid Request."
+            );
+        }
+        // echo json_encode($response);
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+
+    public function googleLogin() {
+        $response = array();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            $headers = getallheaders();
+            $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+            if (isset($auth_token) && $auth_token == API_KEY) {
+                $postdata = file_get_contents("php://input");
+                $request = json_decode($postdata);
+                if (isset($request)) {
+                    $token = $request->token;
+                    $valid_till = date('Y-m-d', strtotime("7 Days"));
+                    $client_id = '317940776433-k6e7hhdqtoq87js1f76oa5on6njm7909.apps.googleusercontent.com';
+                    $client_secret = 'eEFT5-cVXXSjoYVnK37npqL5';
+                    $redirect_url = 'https://exambly.com';
+
+                    $client = new Google_Client();
+                    $client->setClientId($client_id);
+                    $client->setClientSecret($client_secret);
+                    $client->setRedirectUri($redirect_url);
+                    $client->setAccessType('offline');
+                    $client->addScope("email");
+                    $client->addScope("profile");
+
+                    $client->setAccessToken($token);
+
+                    // Get profile Info
+                    $google_oauth = new Google_Service_Oauth2($client);
+
+                    $google_account_info = $google_oauth->userinfo->get();
+
+                    $email = $google_account_info->email;
+                    $name = $google_account_info->name;
+                    $id = $google_account_info->id;
+                    $last_name = $google_account_info->family_name;
+                    $gender = $google_account_info->gender;
+                    $first_name = $google_account_info->given_name;
+                    $picture = $google_account_info->picture;
+
+                    $fpq = new FPQ();
+
+                    $userExists = $fpq->studentExist($email);
+
+                    if (!$userExists) {
+                        $user_id = $fpq->registerStudentGoogle($email, 'Password10@', $first_name, $last_name, '080', 0, 0, $valid_till, $id, $token);
+
+                        if ($user_id) {
+                            $user = $fpq->getStudent($user_id);
+                            $response = array(
+                                "error" => false,
+                                "user" => array(
+                                    "active" => $user->active,
+                                    "ec_id" => $user->ec_id,
+                                    "email" => $user->email,
+                                    "firstname" => $user->firstname,
+                                    "last_login_date" => $user->last_login_date,
+                                    "lastname" => $user->lastname,
+                                    "mobile" => $user->mobile,
+                                    "auth_token" => AUTH_TOKEN,
+                                    "state_id" => $user->state_id,
+                                    "user_id" => $user->user_id,
+                                    "user_type" => $user->user_type
+                                )
+                            );
+                        } else {
+                            $response = array(
+                                "error" => true,
+                                "message" => "Error occured, please try again."
+                            );
+                        }
+                    } else {
+                        $user_id = $fpq->getStudentbyEmail($email)->user_id;
+                        $user = $fpq->getStudent($user_id);
+                        $response = array(
+                            "error" => false,
+                            "user" => array(
+                                "active" => $user->active,
+                                "ec_id" => $user->ec_id,
+                                "email" => $user->email,
+                                "firstname" => $user->firstname,
+                                "last_login_date" => $user->last_login_date,
+                                "lastname" => $user->lastname,
+                                "mobile" => $user->mobile,
+                                "auth_token" => AUTH_TOKEN,
+                                "state_id" => $user->state_id,
+                                "user_id" => $user->user_id,
+                                "user_type" => $user->user_type
+                            )
+                        );
+                    }
+                } else {
+                    $response = array(
+                        "error" => true,
+                        "message" => "Kindly provide your username and/or password."
+                    );
+                }
+            } else {
+                $response = array(
+                    "error" => true,
+                    "message" => "No Authorization Found."
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "Invalid Request."
+            );
+        }
+        // echo json_encode($response);
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+
+    public function facebookLogin() {
+        $response = array();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            $headers = getallheaders();
+            $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+            if (isset($auth_token) && $auth_token == API_KEY) {
+                $postdata = file_get_contents("php://input");
+                $request = json_decode($postdata);
+                if (isset($request)) {
+                    $token = $request->token;
+                    $valid_till = date('Y-m-d', strtotime("7 Days"));
+
+                    $fpq = new FPQ();
+
+                    $app_id = '264373944539555';
+                    $client_secret = '782e61860627ef77afab4d6f46c2c72c';
+                    $redirect_url = 'http://localhost:8080/fpq/test';
+
+                    $fb = new \Facebook\Facebook([
+                        'app_id' => $app_id,
+                        'app_secret' => $client_secret,
+                        'default_graph_version' => 'v2.10',
+                    ]);
+
+
+                    try {
+                        $response = $fb->get('/me', $token);
+                        $me = $response->getGraphUser();
+
+                        $id = $me->getId();
+                        $tmp_email = $me->getEmail();
+                        $email = isset($tmp_email) ? $tmp_email : $id . '@exambly.com';
+                        $name = $me->getName();
+                        $name2 = explode(" ", $name);
+                        $temln = $me->getLastName();
+                        $temfn = $me->getFirstName();
+                        $last_name = isset($temln) ? $temln : $name2[1];
+                        $first_name = isset($temfn) ? $temfn : $name2[0];
+
+                        $userExists = $fpq->studentExist($email);
+
+                        if (!$userExists) {
+                            $user_id = $fpq->registerStudentFacebook($email, 'Password10@', $first_name, $last_name, '080', 0, 0, $valid_till, $id, $token);
+
+                            if ($user_id) {
+                                $user = $fpq->getStudent($user_id);
+                                $response = array(
+                                    "error" => false,
+                                    "user" => array(
+                                        "active" => $user->active,
+                                        "ec_id" => $user->ec_id,
+                                        "email" => $user->email,
+                                        "firstname" => $user->firstname,
+                                        "last_login_date" => $user->last_login_date,
+                                        "lastname" => $user->lastname,
+                                        "mobile" => $user->mobile,
+                                        "auth_token" => AUTH_TOKEN,
+                                        "state_id" => $user->state_id,
+                                        "user_id" => $user->user_id,
+                                        "user_type" => $user->user_type
+                                    )
+                                );
+                            } else {
+                                $response = array(
+                                    "error" => true,
+                                    "message" => "Error occured, please try again."
+                                );
+                            }
+                        } else {
+                            $user_id = $fpq->getStudentbyEmail($email)->user_id;
+                            $user = $fpq->getStudent($user_id);
+                            $response = array(
+                                "error" => false,
+                                "user" => array(
+                                    "active" => $user->active,
+                                    "ec_id" => $user->ec_id,
+                                    "email" => $user->email,
+                                    "firstname" => $user->firstname,
+                                    "last_login_date" => $user->last_login_date,
+                                    "lastname" => $user->lastname,
+                                    "mobile" => $user->mobile,
+                                    "auth_token" => AUTH_TOKEN,
+                                    "state_id" => $user->state_id,
+                                    "user_id" => $user->user_id,
+                                    "user_type" => $user->user_type,
+                                    "temp_email" => $tmp_email
+                                )
+                            );
+                        }
+                    } catch (\Facebook\Exceptions\FacebookResponseException $e) {
+                        // When Graph returns an error
+                        // echo 'Graph returned an error: ' . $e->getMessage();
+                        // exit;
+                        $response = array(
+                            "error" => true,
+                            "message" => $e->getMessage()
+                        );
+                    } catch (Facebook\Exceptions\FacebookSDKException $e) {
+                        // When validation fails or other local issues
+                       // echo 'Facebook SDK returned an error: ' . $e->getMessage();
+                       // exit;
+                        $response = array(
+                            "error" => true,
+                            "message" => $e->getMessage()
+                        );
+                    }
+                } else {
+                    $response = array(
+                        "error" => true,
+                        "message" => "Kindly provide your username and/or password."
+                    );
+                }
+            } else {
+                $response = array(
+                    "error" => true,
+                    "message" => "No Authorization Found."
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "Invalid Request."
+            );
+        }
+        // echo json_encode($response);
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+
+    public function register() {
+        $response = array();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $headers = getallheaders();
+            $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+            if (isset($auth_token) && $auth_token == API_KEY) {
+                $postdata = file_get_contents("php://input");
+                $request = json_decode($postdata);
+
+                if (isset($request)) {
+                    $email = $request->email;
+                    $password = $request->password;
+                    $firstname = $request->firstname;
+                    $lastname = $request->lastname;
+                    $mobile = $request->mobile;
+//                    $ec_id = $request->ec_id;
+//                    $state_id = $request->state_id;
+                    $ec_id = 0;
+                    $state_id = 0;
+
+
+                    $valid_till = date('Y-m-d', strtotime("7 Days"));
+
+                    $fpq = new FPQ();
+
+                    $userExists = $fpq->studentExist($email);
+
+                    if (!$userExists) {
+                        $user_id = $fpq->registerStudent($email, $password, $firstname, $lastname, $mobile, $ec_id, $state_id, $valid_till);
+
+                        if ($user_id) {
+                            $user = $fpq->getStudent($user_id);
+                            $response = array(
+                                "error" => false,
+                                "user" => array(
+                                    "active" => $user->active,
+                                    "ec_id" => $user->ec_id,
+                                    "email" => $user->email,
+                                    "firstname" => $user->firstname,
+                                    "last_login_date" => $user->last_login_date,
+                                    "lastname" => $user->lastname,
+                                    "mobile" => $user->mobile,
+                                    "auth_token" => AUTH_TOKEN,
+                                    "state_id" => $user->state_id,
+                                    "user_id" => $user->user_id,
+                                    "user_type" => $user->user_type
+                                )
+                            );
+                        } else {
+                            $response = array(
+                                "error" => true,
+                                "message" => "Error occured, please try again."
+                            );
+                        }
+                    } else {
+                        $response = array(
+                            "error" => true,
+                            "message" => "Email already exist."
+                        );
+                    }
+                } else {
+                    $response = array(
+                        "error" => true,
+                        "message" => "Kindly provide all required information"
+                    );
+                }
+            } else {
+                $response = array(
+                    "error" => true,
+                    "message" => "No Authorization Found."
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "Invalid Request."
+            );
+        }
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+
+    public function resetPassword() {
+        $response = array();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            $headers = getallheaders();
+            $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+            if (isset($auth_token) && $auth_token == API_KEY) {
+                $postdata = file_get_contents("php://input");
+                $request = json_decode($postdata);
+                if (isset($request)) {
+                    $email = $request->email;
+
+                    $fpq = new FPQ();
+                    $util = new Utility();
+
+                    $userExists = $fpq->studentExist($email);
+
+                    if ($userExists) {
+                        // $user_id = $fpq->getStudentbyEmail($email)->user_id;
+                        $new_password = $util->generate_random_string(12);
+                        $password_link = $util->encrypt($new_password);
+                        $user = $fpq->resetStudentPassword($email, $password_link);
+
+                        if ($user) {
+                            $message = "You have requested for a password reset, kindly click on this link <a href=\"" . FRONTEND_URL . "change-password?token=" . $password_link . "&uid=" . $email . "\">Reset Password</a> to reset your password.<br /> This link will expire in 24hours.";
+                            //Send new password to $email
+                            $util->sendMail($email, $message);
+                            $response = array(
+                                "error" => false,
+                                "message" => "A new password link has been sent to your email. This link will expire in 24 hours."
+                            );
+                        } else {
+                            $response = array(
+                                "error" => true,
+                                "message" => "An error occured unable to reset password, please try again."
+                            );
+                        }
+                    } else {
+                        $response = array(
+                            "error" => true,
+                            "message" => "Email does not exist."
+                        );
+                    }
+                } else {
+                    $response = array(
+                        "error" => true,
+                        "message" => "Kindly provide all required information"
+                    );
+                }
+            } else {
+                $response = array(
+                    "error" => true,
+                    "message" => "No Authorization Found."
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "Invalid Request."
+            );
+        }
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+
+    public function verifyResetPasswordToken() {
+        $response = array();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $headers = getallheaders();
+            $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+            if (isset($auth_token) && $auth_token == API_KEY) {
+                $postdata = file_get_contents("php://input");
+                $request = json_decode($postdata);
+                if (isset($request)) {
+                    $token = $request->token;
+                    $email = $request->email;
+
+                    $fpq = new FPQ();
+                    $result = $fpq->getPasswordResetToken($email, $token);
+
+                    if ($result) {
+
+                        $reset_password_time = $result->reset_password_time;
+
+                        $today = new \DateTime("now");
+                        $token_date = new \DateTime($result->reset_password_time);
+
+                        $interval = $token_date->diff($today);
+
+                        if ($interval->d > 1) {
+                            $response = array(
+                                "error" => true,
+                                "message" => "Token expired"
+                            );
+                        } else {
+                            $response = array(
+                                "error" => false,
+                                "message" => "Token valid"
+                            );
+                        }
+                    } else {
+                        $response = array(
+                            "error" => false,
+                            "message" => "No record found."
+                        );
+                    }
+                } else {
+                    $response = array(
+                        "error" => true,
+                        "message" => "Kindly provide all required information"
+                    );
+                }
+            } else {
+                $response = array(
+                    "error" => true,
+                    "message" => "No Authorization Found."
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "Invalid Request."
+            );
+        }
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+
+    public function changePassword() {
+        $response = array();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            $headers = getallheaders();
+            $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+            if (isset($auth_token) && $auth_token == API_KEY) {
+                $postdata = file_get_contents("php://input");
+                $request = json_decode($postdata);
+                if (isset($request)) {
+                    $email = $request->email;
+                    $password = $request->password;
+
+                    $fpq = new FPQ();
+
+                    $user = $fpq->changeStudentPassword($email, $password);
+
+                    if ($user) {
+                        $response = array(
+                            "error" => false,
+                            "message" => "Password changed successfully."
+                        );
+                    } else {
+                        $response = array(
+                            "error" => true,
+                            "message" => "An error occured unable to reset password, please try again."
+                        );
+                    }
+                } else {
+                    $response = array(
+                        "error" => true,
+                        "message" => "Kindly provide all required information"
+                    );
+                }
+            } else {
+                $response = array(
+                    "error" => true,
+                    "message" => "No Authorization Found."
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "Invalid Request."
+            );
+        }
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+
+    public function search($search = '') {
+        $headers = getallheaders();
+        $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+        if (isset($auth_token) && $auth_token == API_KEY) {
+            $response = array();
+
+            $main_search = explode(":", $search);
+
+            $search1 = !empty($main_search[0]) ? $main_search[0] : '';
+            $search2 = !empty($main_search[1]) ? $main_search[1] : '';
+            $search3 = !empty($main_search[2]) ? $main_search[2] : '';
+
+            if ($search1 != '') {
+                $fpq = new FPQ();
+                $subjects = $fpq->searchSubjects($search1, $search2, $search3);
+
+                $no_of_records = count($subjects);
+                if ($no_of_records > 0) {
+                    foreach ($subjects as $subject) {
+                        $response[] = array(
+                            'subject_id' => $subject->subject_id,
+                            'subject' => $subject->subject,
+                            'subject_image' => isset($subject->subject_image) ? URL . 'subject_images/' . $subject->subject_image : URL . 'exam_images/' . $subject->exam_image,
+                            'exam_year' => $subject->exam_year,
+                            'exam_name' => $subject->exam_name,
+                            'exam_image' => isset($subject->subject_image) ? URL . 'exam_images/' . $subject->exam_image : ''
+                        );
+                    }
+
+                    $response = array(
+                        "error" => false,
+                        "subjects" => $response
+                    );
+                } else {
+                    $response = array(
+                        "error" => false,
+                        "message" => "No record found." . $search
+                    );
+                }
+            } else {
+                $response = array(
+                    "error" => true,
+                    "message" => "No search data provided."
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "No Authorization Found."
+            );
+        }
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+
+    public function submitResult() {
+        $response = array();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            $headers = getallheaders();
+            $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+            if (isset($auth_token) && $auth_token == API_KEY) {
+                $postdata = file_get_contents("php://input");
+                $request = json_decode($postdata);
+                if (isset($request)) {
+                    $fpq = new FPQ();
+
+                    $results = $request->results;
+
+                    $subject_id = $request->subject_id;
+                    $no_correct_questions = $request->no_correct_questions;
+                    $time_spent = $request->time_spent;
+                    $no_wrong_questions = $request->no_wrong_questions;
+                    $no_skipped_questions = $request->no_skipped_questions;
+                    $login_id = $request->user_id;
+                    $score = $request->score;
+                    $remark = $request->remark;
+
+                    $result_summary_id = $fpq->addResultSummarry($subject_id, $time_spent, $no_correct_questions, $no_wrong_questions, $no_skipped_questions, $login_id, $score, $remark);
+
+                    foreach ($results as $result) {
+                        $fpq->addResultDetails($result_summary_id, $result->question_id, $result->option_selected, $result->correct_option, $result->status);
+                    }
+
+                    if ($result_summary_id) {
+                        $response = array(
+                            "error" => false,
+                            "message" => "Result submitted successfully.",
+                            "result_id" => $result_summary_id
+                        );
+                    } else {
+                        $response = array(
+                            "error" => true,
+                            "message" => "An error occured unable to reset password, please try again."
+                        );
+                    }
+                } else {
+                    $response = array(
+                        "error" => true,
+                        "message" => "Kindly provide all required information"
+                    );
+                }
+            } else {
+                $response = array(
+                    "error" => true,
+                    "message" => "No Authorization Found."
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "Invalid Request."
+            );
+        }
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+
+    public function getResultHistory($user_id) {
+        $headers = getallheaders();
+        $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+        if (isset($auth_token) && $auth_token == API_KEY) {
+            $response = array();
+            $fpq = new FPQ();
+            $results = $fpq->getResultHistory($user_id);
+
+            $no_of_records = count($results);
+            if ($no_of_records > 0) {
+                foreach ($results as $result) {
+                    $response[] = array(
+                        'result_summary_id' => $result->result_summary_id,
+                        'time_spent' => $result->time_spent,
+                        'no_correct_questions' => $result->no_correct_questions,
+                        'no_wrong_questions' => $result->no_wrong_questions,
+                        'no_skipped_questions' => $result->no_skipped_questions,
+                        'score' => $result->score,
+                        'remark' => $result->remark,
+                        'date' => $result->created_at,
+                        'exam_name' => $result->exam_name,
+                        'subject' => $result->subject
+                    );
+                }
+
+                $response = array(
+                    "error" => false,
+                    "results" => $response
+                );
+            } else {
+                $response = array(
+                    "error" => false,
+                    "message" => "No record found in subjects"
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "No Authorization Found."
+            );
+        }
+
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+    
+    public function getResult($id) {
+     
+            $response = array();
+            $fpq = new FPQ();
+            $results = $fpq->getResult($id);
+
+            // $no_of_records = count($results);
+            // if ($no_of_records > 0) {
+            //     foreach ($results as $result) {
+            //         $response[] = array(
+            //             'result_summary_id' => $result->result_summary_id,
+            //             'time_spent' => $result->time_spent,
+            //             'no_correct_questions' => $result->no_correct_questions,
+            //             'no_wrong_questions' => $result->no_wrong_questions,
+            //             'no_skipped_questions' => $result->no_skipped_questions,
+            //             'score' => $result->score,
+            //             'remark' => $result->remark,
+            //             'date' => $result->created_at,
+            //             'exam_name' => $result->exam_name,
+            //             'subject' => $result->subject
+            //         );
+            //     }
+
+            //     $response = array(
+            //         "error" => false,
+            //         "results" => $response
+            //     );
+            // } else {
+            //     $response = array(
+            //         "error" => false,
+            //         "message" => "No record found in subjects"
+            //     );
+            // }
+       
+            $response = array(
+                "error" => false,
+                "result" => $results
+            );
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+
+    public function getStatistics() {
+
+        $headers = getallheaders();
+        $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+        if (isset($auth_token) && $auth_token == API_KEY) {
+            $response = array();
+            $fpq = new FPQ();
+            $completed_tests = $fpq->getNoOfTestsCompleted();
+            $no_of_students = $fpq->getNoOfStudents();
+            $avg_pass_rate = $fpq->getAverageTestScore();
+
+            $response = array(
+                "error" => false,
+                "completed_tests" => 437039 + $completed_tests,
+                "no_of_students" => 9140 + $no_of_students,
+                "avg_pass_rate" => 87
+                // "completed_tests" => $completed_tests,
+                // "no_of_students" => $no_of_students,
+                // "avg_pass_rate" => floor($avg_pass_rate)
+            );
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "No Authorization Found."
+            );
+        }
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+
+    public function getStates() {
+
+        $headers = getallheaders();
+        $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+        if (isset($auth_token) && $auth_token == API_KEY) {
+            $response = array();
+            $fpq = new FPQ();
+            $states = $fpq->getStates();
+
+            $no_of_records = count($states);
+            if ($no_of_records > 0) {
+                foreach ($states as $state) {
+                    $response[] = array(
+                        'state_id' => $state->state_id,
+                        'state_name' => $state->state_name
+                    );
+                }
+
+                $response = array(
+                    "error" => false,
+                    "states" => $response
+                );
+            } else {
+                $response = array(
+                    "error" => false,
+                    "message" => "No record found in state"
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "No Authorization Found."
+            );
+        }
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+
+    public function getEducationalCategory() {
+        $headers = getallheaders();
+        $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+        if (isset($auth_token) && $auth_token == API_KEY) {
+            $response = array();
+            $fpq = new FPQ();
+            $ecs = $fpq->getEducationalCategories();
+
+            $no_of_records = count($ecs);
+            if ($no_of_records > 0) {
+                foreach ($ecs as $ec) {
+                    $response[] = array(
+                        'ec_id' => $ec->ec_id,
+                        'education_category' => $ec->education_category
+                    );
+                }
+
+                $response = array(
+                    "error" => false,
+                    "ecs" => $response
+                );
+            } else {
+                $response = array(
+                    "error" => true,
+                    "message" => "No record found in Educational Category"
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "No Authorization Found."
+            );
+        }
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+   
+    public function getExams() {
+        $headers = getallheaders();
+        $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+       
+        if (isset($auth_token) && $auth_token == API_KEY) {
+            $response = array();
+
+            $olevel = array();
+            $univeristy = array();
+            $professional = array();
+            $cuses = array();
+
+            $fpq = new FPQ();
+            $exams = $fpq->getExamsForFront();
+            $courses = $fpq->getCourseCategories();
+            $schools = $fpq->getSchools();
+
+            $no_of_records = count($exams);
+            $no_of_records2 = count($courses);
+
+            if ($no_of_records > 0 || $no_of_records2 > 0) {
+                foreach ($exams as $exam) {
+
+                    if ($exam->ec_id == PRIMARYIDS || $exam->ec_id == OLEVELIDS) {
+                        $olevel[] = array(
+                            'exam_id' => $exam->exam_id,
+                            'exam_name' => $exam->exam_name,
+                            'exam_image' => (!empty($exam->exam_image)) ? URL . 'exam_images/' . $exam->exam_image : '',
+                            'category_id' => $exam->ec_id
+                        );
+                    } elseif ($exam->ec_id == PROFESSIONALIDS) {
+                        $professional[] = array(
+                            'exam_id' => $exam->exam_id,
+                            'exam_name' => $exam->exam_name,
+                            'exam_image' => (!empty($exam->exam_image)) ? URL . 'exam_images/' . $exam->exam_image : '',
+                            'category_id' => $exam->ec_id
+                        );
+                    }
+                }
+
+                foreach ($schools as $school) {
+                    $univeristy[] = array(
+                        'exam_id' => $school->school_id,
+                        'exam_name' => $school->school_name,
+                        'exam_image' => '',
+                        'category_id' => UNIVERSITYID
+                    );
+                }
+
+                foreach ($courses as $course) {
+                    $cuses[] = array(
+                        'courses_category_id' => $course->courses_category_id,
+                        'courses_category_name' => $course->courses_category_name,
+                    );
+                }
+
+                $response = array(
+                    "error" => false,
+                    "payload" => array(
+                        "olevels" => $olevel,
+                        "univeristies" => $univeristy,
+                        "professionals" => $professional,
+                        "courses" => $cuses
+                    )
+                );
+            } else {
+                $response = array(
+                    "error" => false,
+                    "message" => "No record found in exams"
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "No Authorization Found."
+            );
+        }
+
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+    
+    public function getMyExams() {
+        $headers = getallheaders();
+        $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+       
+        if (isset($auth_token) && $auth_token == API_KEY) {
+            $response = array();
+            
+            $fpq = new FPQ();
+            $exams = $fpq->getExamsForFront();
+            $array = array();
+          
+            $no_of_records = count($exams);
+
+            if ($no_of_records > 0) {
+                 foreach ($exams as $exam) {
+                    $array[] = array(
+                        'exam_id' => $exam->exam_id,
+                        'exam_name' => $exam->exam_name,
+                        'exam_image' => (!empty($exam->exam_image)) ? URL . 'exam_images/' . $exam->exam_image : '',
+                        'category_id' => $exam->ec_id
+                    );
+                    
+                }
+               $response = array(
+                    "error" => false,
+                    "exams" => $array
+                );
+            } else {
+                $response = array(
+                    "error" => false,
+                    "message" => "No record found in exams"
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "No Authorization Found."
+            );
+        }
+
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+    
+    public function getMySubjects($examId) {
+
+        $headers = getallheaders();
+        $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+        if (isset($auth_token) && $auth_token == API_KEY) {
+           
+            $response = array();
+            $subjects = array();
+            $fpq = new FPQ();
+            $resultSubjects = $fpq->getMainSubjectsByExam($examId);
+          
+            if(count($resultSubjects) > 0){
+                foreach ($resultSubjects as $resultS) {
+                    $years = array();
+                    $resultYears = $fpq->getMainSubjectsYears($examId, $resultS->main_subject_id);
+                    foreach ($resultYears as $resultY) {
+                        $years[] = array(
+                            'subject_id' => $resultY->subject_id,
+                            'exam_year' => $resultY->exam_year
+                        );
+                    }
+    
+                    $subjects[] = array(
+                        'id' => $resultS->main_subject_id,
+                        'subject_image' => isset($resultS->subject_image) ? URL . 'subject_images/' . $resultS->subject_image : URL . 'exam_images/' .'dummy.png',
+                        'classification' => $resultS->classification,
+                        'subject' => ucwords($resultS->subject),
+                        'years' => $years
+                    );
+                }
+                $response = array(
+                    "error" => false,
+                    "subjects" => $subjects
+                );
+             
+            }else {
+                $response = array(
+                    "error" => false,
+                    "message" => "No record found..."
+                );
+            }
+         
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "No Authorization Found."
+            );
+        }
+
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+    
+    public function getMySchools() {
+        $headers = getallheaders();
+        $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+       
+        if (isset($auth_token) && $auth_token == API_KEY) {
+            $response = array();
+            $subjects = array();
+            
+            $fpq = new FPQ();
+            $schools = $fpq-> getSchools();
+            
+            if(count($schools) > 0){
+                foreach ($schools as $school) {
+                    $years = array();
+                    $resultYears = $fpq->getExamYearsBySchoolId($school->school_id);
+                    foreach ($resultYears as $resultY) {
+                        $years[] = array(
+                            'subject_id' => $resultY->subject_id,
+                            'exam_year' => $resultY->exam_year
+                        );
+                    }
+                    $subjects[] = array(
+                        'id' => $school->school_id,
+                        'subject_image' => isset($school->school_image) ? URL . 'school_images/' . $school->school_image : URL . 'school_images/' .'dummy.png',
+                        'subject' => ucwords($school->school_name),
+                        'years' => $years
+                    );
+                }
+                $response = array(
+                    "error" => false,
+                    "subjects" => $subjects
+                );
+             
+            }else {
+                $response = array(
+                    "error" => false,
+                    "message" => "No record found..."
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "No Authorization Found."
+            );
+        }
+
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+    public function reportQuestion() {
+        $response = array();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            $headers = getallheaders();
+            $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+            if (isset($auth_token) && $auth_token == API_KEY) {
+                $postdata = file_get_contents("php://input");
+                $request = json_decode($postdata);
+                if (isset($request->message)) {
+                    $email = 'examblyapp@gmail.com';
+                    $message = $request->message;
+                   
+                    $util = new Utility();
+                    $util->sendMail($email, $message, 'Flagged Question');
+                    $response = array(
+                        "error" => false,
+                        "message" => "Report submitted successfully"
+                    );
+                } else {
+                    $response = array(
+                        "error" => true,
+                        "message" => "Kindly provide all required information"
+                    );
+                }
+            } else {
+                $response = array(
+                    "error" => true,
+                    "message" => "No Authorization Found."
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "Invalid Request."
+            );
+        }
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+    public function getMyChallengeQuestions($examId) {
+        $headers = getallheaders();
+        $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+       
+        if (isset($auth_token) && $auth_token == API_KEY) {
+            $response = array();
+            $subjects = array();
+            
+           
+            $response = array(
+                "error" => false,
+                "message" => $examId
+            );
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "No Authorization Found."
+            );
+        }
+
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+    public function inviteFriend() {
+        $response = array();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            $headers = getallheaders();
+            $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+            if (isset($auth_token) && $auth_token == API_KEY) {
+                $postdata = file_get_contents("php://input");
+                $request = json_decode($postdata);
+                if (isset($request->email) && isset($request->fullName)) {
+                    $email = $request->email;
+                    $fullName = $request->fullName;
+                    $message = 'Your Friend, '.$fullName.", is inviting you to practice for your Exams for free on Exambly. Simply download the fun App on https://play.google.com/store/apps/details?id=com.exambly or visit https://www.exambly.com/ to register now.\n\nCheers to flying-colours!";
+                   
+                    $util = new Utility();
+                    $util->sendMail($email, $message, 'Special Invite to Achieve Exam Success on Exambly');
+                    $response = array(
+                        "error" => false,
+                        "message" => "invitation sent successfully"
+                    );
+                } else {
+                    $response = array(
+                        "error" => true,
+                        "message" => "Kindly provide all required information"
+                    );
+                }
+            } else {
+                $response = array(
+                    "error" => true,
+                    "message" => "No Authorization Found."
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "Invalid Request."
+            );
+        }
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+    
+    public function getSubjects($exam_id) {
+        $headers = getallheaders();
+        $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+        if (isset($auth_token) && $auth_token == API_KEY) {
+            $response = array();
+            $fpq = new FPQ();
+            $subjects = $fpq->getSubjectsByExam($exam_id);
+
+            $no_of_records = count($subjects);
+            if ($no_of_records > 0) {
+                foreach ($subjects as $subject) {
+                    $response[] = array(
+                        'subject_id' => $subject->subject_id,
+                        'subject_image' => $subject->subject_image,
+                        'classification' => $subject->classification,
+                        'subject' => $subject->subject,
+                        'exam_year' => $subject->exam_year,
+                        'no_of_questions' => $subject->no_of_questions,
+                        'duration' => $subject->duration
+                    );
+                }
+
+                $response = array(
+                    "error" => false,
+                    "subjects" => $response
+                );
+            } else {
+                $response = array(
+                    "error" => false,
+                    "message" => "No record found in subjects"
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "No Authorization Found."
+            );
+        }
+
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+
+    public function getSubjectDetails($subject_id) {
+        $headers = getallheaders();
+        $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+        if (isset($auth_token) && $auth_token == API_KEY) {
+            $response = array();
+            $fpq = new FPQ();
+            $subject = $fpq->getSubjectDetails($subject_id);
+
+            if ($subject) {
+                $response = array(
+                    "error" => false,
+                    "subject_details" => array(
+                        'subject_id' => $subject->subject_id,
+                        'subject' => $subject->subject,
+                        'subject_image' => $subject->subject_image,
+                        'classification' => $subject->classification,
+                        'exam_year' => $subject->exam_year,
+                        'no_of_questions' => $subject->no_of_questions,
+                        'duration' => $subject->duration,
+                        'exam_name' => $subject->exam_name,
+                        'exam_image' => URL . 'exam_images/' . $subject->exam_image
+                    )
+                );
+            } else {
+                $response = array(
+                    "error" => false,
+                    "message" => "No record found in subject"
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "No Authorization Found."
+            );
+        }
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+
+    public function getQuestions($subject_id) {
+        $headers = getallheaders();
+        $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+        if (isset($auth_token) && $auth_token == API_KEY) {
+            $response = array();
+            $motivation_array = array();
+
+            $image_base_url = URL . 'question_images/';
+
+            $fpq = new FPQ();
+            $subject = $fpq->getSubjectDetails($subject_id);
+            $questions = $fpq->getFrontQuestions($subject_id);
+            $motivation = $fpq->getMotivationalQuotes();
+            
+            if(count($motivation > 0)){
+                foreach ($motivation as $item) {
+                    $motivation_array[] = array(
+                      'id' => $item->id,
+                      'section25Message' => $item->section25Message,
+                      'section25Image' => URL . 'exambly_mobile_images/'.$item->section25Image,
+                      'section50Message' => $item->section50Message,
+                      'section50Image' => URL . 'exambly_mobile_images/'.$item->section50Image,
+                      'section50AccuracyMessage' => $item->section50AccuracyMessage,
+                      'section50AccuracyImage' => URL . 'exambly_mobile_images/'.$item->section50AccuracyImage,
+                      'section75Message' => $item->section75Message,
+                      'section75Image' =>  URL . 'exambly_mobile_images/'.$item->section75Image
+                      );
+                }
+            }
+            
+            $no_of_records = count($questions);
+            if ($no_of_records > 0) {
+                foreach ($questions as $question) {
+                    $response[] = array(
+                        'question_id' => $question->question_id,
+                        'question' => $question->question,
+                        'question_image' => (!is_null($question->question_image) && trim($question->question_image) != '') ? $image_base_url . $question->question_image : $question->question_image,
+                        'question_position' => $question->question_position,
+                        'options' => array(
+                            $question->option_a,
+                            $question->option_b,
+                            $question->option_c,
+                            $question->option_d,
+                            $question->option_e
+                        ),
+                        'images' => array(
+                            (!is_null($question->option_a_image) && trim($question->option_a_image) != '') ? $image_base_url . $question->option_a_image : $question->option_a_image,
+                            (!is_null($question->option_b_image) && trim($question->option_b_image) != '') ? $image_base_url . $question->option_b_image : $question->option_b_image,
+                            (!is_null($question->option_c_image) && trim($question->option_c_image) != '') ? $image_base_url . $question->option_c_image : $question->option_c_image,
+                            (!is_null($question->option_d_image) && trim($question->option_d_image) != '') ? $image_base_url . $question->option_d_image : $question->option_d_image,
+                            (!is_null($question->option_e_image) && trim($question->option_e_image) != '') ? $image_base_url . $question->option_e_image : $question->option_e_image
+                        ),
+                        'grouped' => ($question->grouped == 1) ? true : false,
+                        'from_no' => $question->from_no,
+                        'to_no' => $question->to_no,
+                        'explanation' => $question->explanation,
+                        'correct_option' => $question->correct_option,
+                    );
+                }
+
+                $response = array(
+                    "error" => false,
+                    "subject_details" => array(
+                        'subject_id' => $subject->subject_id,
+                        'subject' => $subject->subject,
+                        'subject_image' => isset($subject->subject_image) ? URL . 'subject_images/' . $subject->subject_image : URL . 'exam_images/' . $subject->exam_image,
+                        'classification' => $subject->classification,
+                        'exam_year' => $subject->exam_year,
+                        'no_of_questions' => $subject->no_of_questions,
+                        'duration' => $subject->duration,
+                        'exam_name' => $subject->exam_name,
+                        'exam_image' => URL . 'exam_images/' . $subject->exam_image
+                    ),
+                    "questions" => $response,
+                    "motivations" =>$motivation_array
+                );
+            } else {
+                $response = array(
+                    "error" => false,
+                    "message" => "No record found in questions"
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "No Authorization Found."
+            );
+        }
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+
+    public function getAnswers($subject_id) {
+        $response = array();
+//        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+//            $postdata = file_get_contents("php://input");
+//            $request = json_decode($postdata);
+//            $subject_id = $request->subject_id;
+
+        $image_base_url = URL . 'question_images/';
+
+        $fpq = new FPQ();
+        $answers = $fpq->getFrontAnswers($subject_id);
+
+        $no_of_records = count($answers);
+        if ($no_of_records > 0) {
+            foreach ($answers as $answer) {
+                $response[] = array(
+                    'question_id' => $answer->question_id,
+                    'correct_option' => $answer->correct_option
+                );
+            }
+
+            $response = array(
+                "error" => false,
+                "answers" => $response
+            );
+        } else {
+            $response = array(
+                "error" => false,
+                "message" => "No record found in answers"
+            );
+        }
+//        } else {
+//            $response = array(
+//                "error" => true,
+//                "message" => "Invalid Request."
+//            );
+//        }
+
+        echo json_encode($response);
+    }
+
+    public function getExamYears($exam_id) {
+        $response = array();
+        $fpq = new FPQ();
+        $years = $fpq->getExamYears($exam_id);
+
+        if (count($years) > 0) {
+            foreach ($years as $year) {
+                $response[] = array(
+                    'exam_year' => $year->exam_year
+                );
+            }
+
+            $response = array(
+                "error" => false,
+                "years" => $response
+            );
+        } else {
+            $response = array(
+                "error" => false,
+                "message" => "No record found..."
+            );
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getOLevels() {
+
+        $headers = getallheaders();
+        $auth_token = isset($headers["Authorization"]) ? $headers["Authorization"] : '';
+
+        if (isset($auth_token) && $auth_token == API_KEY) {
+            $response = array();
+
+            $exams = array();
+
+            $fpq = new FPQ();
+            $results = $fpq->getOLevels();
+
+            if (count($results) > 0) {
+                foreach ($results as $result) {
+                    $subjects = array();
+                    $resultSubjects = $fpq->getMainSubjectsByExam($result->exam_id);
+                    foreach ($resultSubjects as $resultS) {
+                        $years = array();
+
+                        $resultYears = $fpq->getMainSubjectsYears($result->exam_id, $resultS->main_subject_id);
+                        foreach ($resultYears as $resultY) {
+                            $years[] = array(
+                                'subject_id' => $resultY->subject_id,
+                                'exam_year' => $resultY->exam_year
+                            );
+                        }
+
+                        $subjects[] = array(
+                            'id' => $resultS->main_subject_id,
+                            'subject_image' => isset($resultS->subject_image) ? URL . 'subject_images/' . $resultS->subject_image : URL . 'exam_images/' . $result->exam_image,
+                            'classification' => $resultS->classification,
+                            'subject' => ucwords($resultS->subject),
+                            'years' => $years
+                        );
+                    }
+
+                    $exams[] = array(
+                        'exam_id' => $result->exam_id,
+                        'exam_name' => $result->exam_name,
+                        'exam_image' => isset($result->exam_image) ? URL . 'exam_images/' . $result->exam_image : '',
+                        "subjects" => $subjects
+                    );
+                }
+
+                $response = array(
+                    "error" => false,
+                    "exams" => $exams
+                );
+            } else {
+                $response = array(
+                    "error" => false,
+                    "message" => "No record found..."
+                );
+            }
+        } else {
+            $response = array(
+                "error" => true,
+                "message" => "No Authorization Found."
+            );
+        }
+
+
+        $main_response = new Response($status = 200, $headers = [
+            'Content-Type' => 'text/json'
+                ], $body = json_encode($response), $version = '2.0');
+
+        send($main_response);
+    }
+    
+    public function getOLevelSubjects($exam_id, $year) {
+        $response = array();
+
+        $subjects = array();
+
+        $fpq = new FPQ();
+        $results = $fpq->getOLevelSubjects($exam_id, $year);
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+                $subjects[] = array(
+                    'subject_id' => $result->subject_id,
+                    'subject' => $result->subject
+                );
+            }
+
+            $response = array(
+                "error" => false,
+                "subjects" => $subjects
+            );
+        } else {
+            $response = array(
+                "error" => false,
+                "message" => "No record found..."
+            );
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getPostUMESchools($exam_id) {
+        $response = array();
+
+        $schools = array();
+
+        $fpq = new FPQ();
+        $results = $fpq->getPostUMESchools($exam_id);
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+
+                $schools[] = array(
+                    'school_id' => $result->school_id,
+                    'school_name' => $result->school_name
+                );
+            }
+
+            $response = array(
+                "error" => false,
+                "schools" => $schools
+            );
+        } else {
+            $response = array(
+                "error" => false,
+                "message" => "No record found..."
+            );
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getPostUMEFaculties($exam_id, $school_id) {
+        $response = array();
+
+        $faculties = array();
+
+        $fpq = new FPQ();
+        $results = $fpq->getPostUMEFaculties($exam_id, $school_id);
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+
+                $faculties[] = array(
+                    'faculty_id' => $result->faculty_id,
+                    'faculty' => $result->faculty
+                );
+            }
+
+            $response = array(
+                "error" => false,
+                "faculties" => $faculties
+            );
+        } else {
+            $response = array(
+                "error" => false,
+                "message" => "No record found..."
+            );
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getPostUMEYears($exam_id, $school_id, $faculty_id) {
+        $response = array();
+
+        $years = array();
+
+        $fpq = new FPQ();
+        $results = $fpq->getPostUMEYears($exam_id, $school_id, $faculty_id);
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+
+                $years[] = array(
+                    'exam_year' => $result->exam_year
+                );
+            }
+
+            $response = array(
+                "error" => false,
+                "years" => $years
+            );
+        } else {
+            $response = array(
+                "error" => false,
+                "message" => "No record found..."
+            );
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getPostUMESubjects($exam_id, $school_id, $faculty_id, $exam_year) {
+        $response = array();
+
+        $faculties = array();
+
+        $fpq = new FPQ();
+        $results = $fpq->getPostUMESubjects($exam_id, $school_id, $faculty_id, $exam_year);
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+
+                $subjects[] = array(
+                    'subject_id' => $result->subject_id,
+                    'subject' => $result->subject
+                );
+            }
+
+            $response = array(
+                "error" => false,
+                "subjects" => $subjects
+            );
+        } else {
+            $response = array(
+                "error" => false,
+                "message" => "No record found..."
+            );
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getExamLevelsAndSubject($exam_id, $year) {
+        $response = array();
+
+        $levels = array();
+        $subjects = array();
+
+        $fpq = new FPQ();
+        $results = $fpq->getExamLevelsAndSubject($exam_id, $year);
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+                if ($result->level_id > 0) {
+                    $levels[] = array(
+                        'level_id' => $result->level_id,
+                        'level' => $result->level
+                    );
+                }
+            }
+
+            foreach ($results as $result) {
+                $subjects[] = array(
+                    'subject_id' => $result->subject_id,
+                    'subject' => $result->subject
+                );
+            }
+
+            $response = array(
+                "error" => false,
+                "payload" => array(
+                    "levels" => $levels,
+                    "subjects" => $subjects
+                )
+            );
+        } else {
+            $response = array(
+                "error" => false,
+                "message" => "No record found..."
+            );
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getExamSubjectByLevel($exam_id, $level_id) {
+        $response = array();
+        $subjects = array();
+
+        $fpq = new FPQ();
+        $results = $fpq->getExamSubjectByLevel($exam_id, $level_id);
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+                $subjects[] = array(
+                    'subject_id' => $result->subject_id,
+                    'subject' => $result->subject
+                );
+            }
+
+            $response = array(
+                "error" => false,
+                "subjects" => $subjects
+            );
+        } else {
+            $response = array(
+                "error" => false,
+                "message" => "No record found..."
+            );
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getUniversityExamYears($school_id) {
+        $response = array();
+        $fpq = new FPQ();
+        $years = $fpq->getUniversityExamYears($school_id);
+
+        if (count($years) > 0) {
+            foreach ($years as $year) {
+                $response[] = array(
+                    'exam_year' => $year->exam_year
+                );
+            }
+
+            $response = array(
+                "error" => false,
+                "years" => $response
+            );
+        } else {
+            $response = array(
+                "error" => false,
+                "message" => "No record found..."
+            );
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getCategoryCourses($courses_category_id) {
+        $response = array();
+        $fpq = new FPQ();
+        $courses = $fpq->getCategoryCourses($courses_category_id);
+
+        if (count($courses) > 0) {
+            foreach ($courses as $course) {
+                $response[] = array(
+                    'course_id' => $course->course_id,
+                    'course_title' => $course->course_title,
+                    'heading' => $course->heading
+                );
+            }
+
+            $response = array(
+                "error" => false,
+                "courses" => $response
+            );
+        } else {
+            $response = array(
+                "error" => false,
+                "message" => "No record found..."
+            );
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getCourseList($course_id) {
+        $response = array();
+        $fpq = new FPQ();
+        $course_lists = $fpq->getCourseList($course_id);
+
+        if (count($course_lists) > 0) {
+            foreach ($course_lists as $course_list) {
+                $response[] = array(
+                    'course_list_id' => $course_list->course_list_id,
+                    'title' => $course_list->title,
+                    'youtube_link' => $course_list->youtube_link
+                );
+            }
+
+            $response = array(
+                "error" => false,
+                "course_lists" => $response
+            );
+        } else {
+            $response = array(
+                "error" => false,
+                "message" => "No record found..."
+            );
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getExamFacultyInSubject($school_id) {
+        $response = array();
+
+        $faculties = array();
+
+        $fpq = new FPQ();
+        $results = $fpq->getExamFacultyInSubject($school_id);
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+
+                $faculties[] = array(
+                    'faculty_id' => $result->faculty_id,
+                    'faculty' => $result->faculty
+                );
+            }
+
+            $response = array(
+                "error" => false,
+                "faculties" => $faculties
+            );
+        } else {
+            $response = array(
+                "error" => false,
+                "message" => "No record found..."
+            );
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getExamFacultyCoursesInSubject($school_id, $faculty_id) {
+        $response = array();
+
+        $courses = array();
+
+        $fpq = new FPQ();
+        $results = $fpq->getExamFacultyCoursesInSubject($school_id, $faculty_id);
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+
+                $courses[] = array(
+                    'school_course_id' => $result->school_course_id,
+                    'course_title' => $result->course_title
+                );
+            }
+
+            $response = array(
+                "error" => false,
+                "courses" => $courses
+            );
+        } else {
+            $response = array(
+                "error" => false,
+                "message" => "No record found..."
+            );
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getExamFacultyCourseLevelsInSubject($school_id, $faculty_id, $school_course_id) {
+        $response = array();
+
+        $levels = array();
+
+        $fpq = new FPQ();
+        $results = $fpq->getExamFacultyCourseLevelsInSubject($school_id, $faculty_id, $school_course_id);
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+
+                $levels[] = array(
+                    'level_id' => $result->level_id,
+                    'level' => $result->level
+                );
+            }
+
+            $response = array(
+                "error" => false,
+                "levels" => $levels
+            );
+        } else {
+            $response = array(
+                "error" => false,
+                "message" => "No record found..."
+            );
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getExamFacultyCourseLevelYearsInSubject($school_id, $faculty_id, $school_course_id, $level_id) {
+        $response = array();
+
+        $years = array();
+
+        $fpq = new FPQ();
+        $results = $fpq->getExamFacultyCourseLevelYearsInSubject($school_id, $faculty_id, $school_course_id, $level_id);
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+
+                $years[] = array(
+                    'exam_year' => $result->exam_year
+                );
+            }
+
+            $response = array(
+                "error" => false,
+                "years" => $years
+            );
+        } else {
+            $response = array(
+                "error" => false,
+                "message" => "No record found..."
+            );
+        }
+
+        echo json_encode($response);
+    }
+
+    public function getExamFacultyCourseLevelYearSubjectsInSubject($school_id, $faculty_id, $school_course_id, $level_id, $exam_year) {
+        $response = array();
+
+        $subjects = array();
+
+        $fpq = new FPQ();
+        $results = $fpq->getExamFacultyCourseLevelYearSubjectsInSubject($school_id, $faculty_id, $school_course_id, $level_id, $exam_year);
+
+        if (count($results) > 0) {
+            foreach ($results as $result) {
+
+                $subjects[] = array(
+                    'subject_id' => $result->subject_id,
+                    'subject' => $result->subject
+                );
+            }
+
+            $response = array(
+                "error" => false,
+                "subjects" => $subjects
+            );
+        } else {
+            $response = array(
+                "error" => false,
+                "message" => "No record found..."
+            );
+        }
+
+        echo json_encode($response);
+    }
+
+//https://preview.uxpin.com/536eab4422377c59b487c6e4e421cad0500ffac4#/pages/132101696/simulate/sitemap
+}

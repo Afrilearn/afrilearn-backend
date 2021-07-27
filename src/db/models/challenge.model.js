@@ -2,45 +2,46 @@ import mongoose from "mongoose";
 
 const ChallengeSchema = new mongoose.Schema(
   {
-    subjects: [
-      {
-        name: {
-          type: String,
-        },
-        questions: {
-          type: Array,
-        },
-      },
-    ],
-    type: {
-      type: String,
-      enum: ["school", "class", "student", "exam"],
+   
+    name: {
+      type: String      
     },
-    examCategoryId: {
+    creatorId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "pastQuestionType",
+      ref: "user",
     },
     courseId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "course",
     },
-    classId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "class",
+    examblyPastQuestionExamId: {
+      type: Number     
     },
-    schoolId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "school",
+    numberOfQuestions: {
+      type: Number     
     },
-    userId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "user",
+    timeSpan: {
+      type: Number     
     },
-    entry_fee: { type: Number },
-    prize: { type: Number },
-    description: { type: String },
-    winner_instruction: { type: String },
-    deadline: { type: String },
+    entryFee: {
+      type: Number     
+    },
+    prize: { 
+      type: Number
+    },
+    subjects: {
+      type: String      
+    },
+    challengeImageUrl: { type: String },
+    description: { type: String },    
+    startDate: { 
+      type: Date,
+      default: new Date()
+    },
+    endDate: { 
+      type: Date,
+      default: new Date().setHours(168)
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -49,6 +50,6 @@ const ChallengeSchema = new mongoose.Schema(
   }
 );
 
-const Challenge = mongoose.model("Challenge", ChallengeSchema);
+const Challenge = mongoose.model("challenge", ChallengeSchema);
 
 export default Challenge;
