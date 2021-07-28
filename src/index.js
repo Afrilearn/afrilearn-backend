@@ -6,7 +6,7 @@ import logger from "./config";
 import "./db";
 import v1Router from "./routes";
 import Announcement from "./db/models/announcement.model";
-
+ 
 config();
 
 const app = express();

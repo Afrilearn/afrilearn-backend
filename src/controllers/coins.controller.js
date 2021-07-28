@@ -36,6 +36,7 @@ class CoinsController {
         status: "success",
         data: {
           transaction,
+          afriCoins: user.afriCoins,
         },
       });
     } catch (error) {

@@ -1,30 +1,36 @@
-import { Router } from 'express';
-import PaymentController from '../controllers/payment.controller';
-import validateToken from '../middlewares/auth.middleware';
-import AddTransaction from '../validations/payment/addTransaction.validator';
-import VerifyPayment from '../validations/payment/verifyGooglePayment.validator';
+import { Router } from "express";
+import PaymentController from "../controllers/payment.controller";
+import validateToken from "../middlewares/auth.middleware";
+import AddTransaction from "../validations/payment/addTransaction.validator";
+import VerifyPayment from "../validations/payment/verifyGooglePayment.validator";
 
 const router = Router();
 
-router.get('/plans', PaymentController.getPaymentPlans);
+router.get("/plans", PaymentController.getPaymentPlans);
 router.post(
-  '/add-transaction',
-  validateToken, 
+  "/add-transaction",
+  validateToken,
   AddTransaction.validateData(),
   AddTransaction.myValidationResult,
-  PaymentController.addTransaction,
+  PaymentController.addTransaction
 );
 
-router.post('/verify-paystack-payment',
+router.post(
+  "/verify-paystack-payment",
   validateToken,
   PaymentController.verifyPaystackPayment
 );
+router.post(
+  "/pay-with-coins",
+  validateToken,
+  PaymentController.payWithAfriCoins
+);
 
 router.post(
-  '/verify-google-payment',
-  validateToken, 
+  "/verify-google-payment",
+  validateToken,
   VerifyPayment.validateData(),
   VerifyPayment.myValidationResult,
-  PaymentController.verifyGoogleBilingPayment,
+  PaymentController.verifyGoogleBilingPayment
 );
 export default router;
