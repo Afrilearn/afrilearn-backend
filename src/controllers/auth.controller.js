@@ -42,7 +42,7 @@ class AuthController {
   static async signUp(req, res) {
     try {
       let customerRole = "Student";
-      const { fullName, password, email, role } = req.body;
+      const { fullName, password, email, role, phoneNumber } = req.body;
 
       const encryptpassword = await Helper.encrptPassword(password);
 
@@ -51,6 +51,7 @@ class AuthController {
         password: encryptpassword,
         email,
         role,
+        phoneNumber,
       };
 
       if (
@@ -144,10 +145,70 @@ class AuthController {
       const user = await AuthServices.emailExist(email, res);
       const token = await Helper.generateToken(result._id, role, fullName);
 
+      const htmlMessage = `<html>
+      <head>
+        <title></title>
+        <link href="https://svc.webspellchecker.net/spellcheck31/lf/scayt3/ckscayt/css/wsc.css" rel="stylesheet" type="text/css" />
+      </head>
+      <body>
+      <div>Hello ${fullName},</div>
+      
+      <div>&nbsp;</div>
+      
+      <div>&nbsp;</div>
+      
+      <div>We are glad to have you register on Afrilearn but it&#39;s not done yet. We will need to send you important information about us and it is important that we have an accurate email address.</div>
+      
+      <div>&nbsp;</div>
+      
+      <div>&nbsp;</div>
+      
+      <div>Please, simply verify your email address below to continue unfettered access to all that the Afrilearn platform offers.</div>
+      
+      <div>&nbsp;</div>
+      
+      <div><a href="https://myafrilearn.com?uuid=${token}">Click Here to Confirm Your Email Address</a></div>
+      
+      <div>&nbsp;</div>
+      
+      <div>If this does not work, copy this link and paste it in your browser - https://myafrilearn.com?uuid=${token}</div>
+      
+      <div>&nbsp;</div>
+      
+      <div>&nbsp;</div>
+      
+      <div>Do this now and start your fun learning experience.</div>
+      
+      <div>&nbsp;</div>
+      
+      <div>Sincerely,</div>
+      
+      <div>The Afrilearn Team.</div>
+      
+      <div>&nbsp;</div>
+      
+      <div>-- --- -- -- - - - - - - - - - - - -&nbsp;</div>
+      
+      <br/>
+      <br/>
+      <br/>
+      
+      <div><a href="https://play.google.com/store/apps/details?id=com.afrilearn">Download Afrilearn on Android</a></div>
+      
+      <div>Download Afrilearn on iOS</div>
+      
+      <div><a href="https://myafrilearn.com/">Visit Afrilearn on Web</a></div>
+      
+      <div>For customer support - care@myafrilearn.com</div>
+      
+      <div>--- - - - - --- ---- --- --- -- -- -- -</div>
+      </body>
+      </html>
+      `;
       const message = `Hi, ${fullName}, welcome to Afrilearn. <br/> click the link to activate your account https://myafrilearn.com?uuid=${token}`;
       const adminMessage = `Hi, ${fullName} just created a new ${customerRole}'s account`;
 
-      sendEmail(email, "Welcome to Afrilearn", message);
+      sendEmail(email, "Confirm Your Email Address Now!", htmlMessage);
       sendEmail("africustomers@gmail.com", "New Customer", adminMessage);
 
       return res.status(201).json({
@@ -180,10 +241,99 @@ class AuthController {
         isActivated: true,
       };
 
-      await Auth.findByIdAndUpdate(id, {
+      const user = await Auth.findByIdAndUpdate(id, {
         ...newData,
       });
 
+      const emailMessage = `<html>
+      <head>
+        <title></title>
+        <link href="https://svc.webspellchecker.net/spellcheck31/lf/scayt3/ckscayt/css/wsc.css" rel="stylesheet" type="text/css" />
+      </head>
+      <body>
+      <div>Hello ${user.fullName},</div>
+      
+      <div>&nbsp;</div>
+      
+      <div>Welcome to Afrilearn; Africa&rsquo;s best-loved eLearning brand designed to enable you or your ward to learn with fun - we provide world-class and affordable education leveraging technology.</div>
+      
+      <div>Your experience on the Afrilearn platform is limited until you subscribe to gain access to all our content and features.<br />
+      Some of the content and features you will enjoy upon subscribing are:</div>
+      
+      <ul>
+        <li>Unlimited Class Notes</li>
+        <li>Unlimited video lessons</li>
+        <li>Live assessment and instant result</li>
+        <li>Over 5000 past questions across WAEC, JAMB, BECE, Common Entrance, and more</li>
+        <li>Interact and Learn from other users live</li>
+        <li>Ask a Tutor for help on assignments</li>
+        <li>Win N5000 ($15) or more weekly competing on Afri-Challenge</li>
+        <li>Daily, Weekly and Lifetime Performance Summary across all subjects</li>
+        <li>Join your favourite teacher&#39;s classroom to learn</li>
+        <li>Personalized learning experience</li>
+      </ul>
+      
+      <div>We can go on and on but why talk so much when you can simply subscribe now to enjoy all these and more. With just N9999 ($25), you can have unlimited access for ONE WHOLE YEAR.</div>
+      
+      <div>&nbsp;</div>
+      
+      <div>Subscribe Now!</div>
+      
+      <div>&nbsp;</div>
+      
+      <div>Monthly, Quarterly and Bi-Annual subscriptions are also available. <a href="https://myafrilearn.com/select-pay">Subscribe Here Now!</a></div>
+      
+      <div>&nbsp;</div>
+      
+      <div>If you are a Teacher, here&#39;s how you can get the best experience on Afrilearn</div>
+      
+      <div>As a Parent, these are some of the ways Afrilearn can serve you and your kids</div>
+      
+      <div>As a school, you can serve all your students from the Afrilearn platform</div>
+      
+      <div>&nbsp;</div>
+      
+      <div>Feel free to reply to this email if you are having any challenges on Afrilearn and a member of our team will be in touch to help you out.</div>
+      
+      <div>&nbsp;</div>
+      
+      <div>Welcome to the land of fun learning!</div>
+      
+      <div>&nbsp;</div>
+      
+      <div><a href="https://myafrilearn.com/select-pay">Subscribe Here Now!</a></div>
+      
+      <div>&nbsp;</div>
+      
+      <div>Sincerely,</div>
+      
+      <div>The Afrilearn Team.</div>
+      
+      <div>&nbsp;</div>
+      
+      <div><br />
+      &nbsp;</div>
+      
+      <div>-- --- -- -- - - - - - - - - - - - -&nbsp;</div>
+      
+      <div><a href="https://play.google.com/store/apps/details?id=com.afrilearn">Download Afrilearn on Android</a></div>
+      
+      <div>Download Afrilearn on iOS</div>
+      
+      <div><a href="https://myafrilearn.com/">Visit Afrilearn on Web</a></div>
+      
+      <div>For customer support - care@myafrilearn.com</div>
+      
+      <div>--- - - - - --- ---- --- --- -- -- -- -</div>
+      </body>
+      </html>
+      `;
+
+      sendEmail(
+        user.email,
+        "Welcome to Afrilearn - Land of Fun Learning",
+        emailMessage
+      );
       return res.status(200).json({
         status: "success",
         data: {
