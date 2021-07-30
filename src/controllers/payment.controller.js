@@ -472,12 +472,17 @@ class PaymentController {
                 await Transaction.create(condition);
               })();
             }
+
+            const dataToSend = {
+              verified: true,
+              purchaseState: response.receipt.purchaseState,
+            };
+            if (req.body.coinAmount) {
+              dataToSend.coinAmount = req.body.coinAmount;
+            }
             return res.status(200).json({
               status: "success",
-              data: {
-                verified: true,
-                purchaseState: response.receipt.purchaseState,
-              },
+              data: dataToSend,
             });
           } else {
             return res.status(200).json({
