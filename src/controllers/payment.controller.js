@@ -422,6 +422,31 @@ class PaymentController {
                 await Transaction.create(condition);
               })();
             }
+
+            const dataToSend = {
+              verified: true,
+              purchaseState: response.receipt.purchaseState,
+            };
+            if (req.body.coinAmount) {
+              dataToSend.coinAmount = req.body.coinAmount;
+            }
+            if (req.body.coinAmount) {
+              async () => {
+                await AfriCoinTransaction.create({
+                  description: "Coins Purchase",
+                  type: "add",
+                  amount: req.body.coinAmount,
+                  userId: clientUserId,
+                });
+                await User.findByIdAndUpdate(
+                  clientUserId,
+                  {
+                    $inc: { afriCoins: req.body.coinAmount },
+                  },
+                  { new: true }
+                );
+              };
+            }
             return res.status(200).json({
               status: "success",
               data: {
