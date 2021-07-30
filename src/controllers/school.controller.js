@@ -760,7 +760,7 @@ class SchoolController {
         userId,
         schoolId,
       });
-      console.log("classes", classes.length);
+      //console.log("classes", classes.length);
 
       if (classes.length > 0) {
         for (let index = 0; index < classes.length; index++) {
@@ -772,13 +772,13 @@ class SchoolController {
           await clazz.save();
         }
       }
-      console.log("1");
+      //console.log("1");
       //update related admins
       await AdminRole.findOneAndDelete({
         userId,
         schoolId,
       });
-      console.log("2");
+      //console.log("2");
 
       const message = `Hi ${existingSchoolTeacher.fullName}, ${existingSchool.name} unlinked your account.`;
       const adminMessage = ` ${existingSchool.name} just unlink ${existingSchoolTeacher.fullName}'s account.`;
@@ -799,7 +799,7 @@ class SchoolController {
         "Your Child account has been unlinked",
         parentMessage
       );
-      console.log("3");
+      //console.log("3");
 
       return res.status(200).json({
         status: "success",

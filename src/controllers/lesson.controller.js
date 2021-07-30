@@ -558,7 +558,7 @@ class LessonController {
         },
       });
     } catch (error) {
-      console.log(error);
+      //console.log(error);
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error saving favourite",
@@ -625,7 +625,7 @@ class LessonController {
         },
       });
     } catch (error) {
-      console.log(error);
+      //console.log(error);
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error saving like",
@@ -655,7 +655,7 @@ class LessonController {
         data: { selectedLesson },
       });
     } catch (error) {
-      console.log(error);
+      //console.log(error);
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error removing liked video",
@@ -681,7 +681,7 @@ class LessonController {
         },
       });
     } catch (error) {
-      console.log(error);
+      //console.log(error);
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error reporting lesson",

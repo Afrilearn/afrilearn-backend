@@ -78,7 +78,7 @@ class CommentController {
                 }
             });
         } catch (error) {
-            console.log(error)
+            //console.log(error)
             return res.status(500).json({
                 status: "500 Internal server error",
                 error: "Error saving lesson comment like",
@@ -113,7 +113,7 @@ class CommentController {
                 }
             });
         } catch (error) {
-            console.log(error)
+            //console.log(error)
             return res.status(500).json({
                 status: "500 Internal server error",
                 error: "Error removing lesson comment like",

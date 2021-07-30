@@ -801,7 +801,7 @@ class AuthController {
 
       // const users = JSON.parse(Users);
 
-      // console.log("First", users[0]);
+      // //console.log("First", users[0]);
       const enrlist = [];
       let count = 0;
       // for (let index = 0; index < NewUsers.data.users.length; index++) {
@@ -854,7 +854,7 @@ class AuthController {
       //     enrlist.push(createdUser);
       //   }
 
-      //   // console.log(student);
+      //   // //console.log(student);
       //   // enrlist.push(existingUser);
       // }
 
