@@ -18,6 +18,9 @@ const ChallengeResultSchema = new mongoose.Schema(
     },
     winRatio: {
       type: Number,
+    },   
+    averageSpeed: {
+      type: Number,
     }   
   },
   {
