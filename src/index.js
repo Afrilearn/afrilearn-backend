@@ -39,7 +39,7 @@ app.use((err, req, res) => {
   });
 });
 
-
+//server
 app.listen(port, () => {
   logger.info(`Server running at port ${port} on ${process.env.NODE_ENV}`);
 });
