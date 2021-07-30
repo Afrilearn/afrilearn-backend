@@ -8,6 +8,7 @@ import ClassModel from "../db/models/classes.model";
 import axios from "axios";
 import { config } from "dotenv";
 import User from "../db/models/users.model";
+import AfriCoinPaymentPlan from "../db/models/afriCoinPaymentPlans.model";
 config();
 /**
  *Contains Payment Controller
@@ -156,6 +157,54 @@ class PaymentController {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Loading class",
+      });
+    }
+  }
+
+  /**
+   * Get afriCoins payment plans
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof PaymentController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getAfriCoinPaymentPlans(req, res) {
+    try {
+      const paymentPlans = await AfriCoinPaymentPlan.find({});
+
+      return res.status(200).json({
+        status: "success",
+        paymentPlans,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error getting Payment Plans",
+      });
+    }
+  }
+
+  /**
+   * Add afriCoins payment plan
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof PaymentController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async addAfriCoinPaymentPlan(req, res) {
+    try {
+      const plan = await AfriCoinPaymentPlan.create({ ...req.body });
+
+      return res.status(200).json({
+        status: "success",
+        plan,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error adding Payment Plan",
       });
     }
   }
