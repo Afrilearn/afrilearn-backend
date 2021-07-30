@@ -9,6 +9,7 @@ import axios from "axios";
 import { config } from "dotenv";
 import User from "../db/models/users.model";
 import AfriCoinPaymentPlan from "../db/models/afriCoinPaymentPlans.model";
+import AfriCoinTransaction from "../db/models/afriCoinTransaction.model";
 config();
 /**
  *Contains Payment Controller
@@ -472,12 +473,32 @@ class PaymentController {
                 await Transaction.create(condition);
               })();
             }
+
+            const dataToSend = {
+              verified: true,
+              purchaseState: response.receipt.purchaseState,
+            };
+            if (req.body.coinAmount) {
+              dataToSend.coinAmount = req.body.coinAmount;
+            }
+            if (req.body.coinAmount) {
+              await AfriCoinTransaction.create({
+                description: "Coins Purchase",
+                type: "add",
+                amount: req.body.coinAmount,
+                userId: clientUserId,
+              });
+              await User.findByIdAndUpdate(
+                clientUserId,
+                {
+                  $inc: { afriCoins: req.body.coinAmount },
+                },
+                { new: true }
+              );
+            }
             return res.status(200).json({
               status: "success",
-              data: {
-                verified: true,
-                purchaseState: response.receipt.purchaseState,
-              },
+              data: dataToSend,
             });
           } else {
             return res.status(200).json({
