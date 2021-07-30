@@ -7,6 +7,7 @@ import Helper from "../utils/user.utils";
 import ClassModel from "../db/models/classes.model";
 import axios from "axios";
 import { config } from "dotenv";
+import User from "../db/models/users.model";
 config();
 /**
  *Contains Payment Controller
@@ -592,6 +593,9 @@ class PaymentController {
           await Transaction.create(condition);
         })();
       }
+      const me = await User.findById(clientUserId);
+      me.afriCoins -= afriCoins;
+      await me.save();
       return res.status(200).json({
         status: "success",
         data: {
