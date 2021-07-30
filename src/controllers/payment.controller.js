@@ -2,6 +2,8 @@ import moment from "moment";
 import iap from "iap";
 import EnrolledCourse from "../db/models/enrolledCourses.model";
 import PaymentPlan from "../db/models/paymentPlans.model";
+import AfriCoinPaymentPlan from "../db/models/afriCoinPaymentPlans.model";
+
 import Transaction from "../db/models/transaction.model";
 import Helper from "../utils/user.utils";
 import ClassModel from "../db/models/classes.model";
@@ -155,6 +157,54 @@ class PaymentController {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Loading class",
+      });
+    }
+  }
+
+  /**
+   * Get afriCoins payment plans
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof PaymentController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getAfriCoinPaymentPlans(req, res) {
+    try {
+      const paymentPlans = await AfriCoinPaymentPlan.find({});
+
+      return res.status(200).json({
+        status: "success",
+        paymentPlans,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error getting Payment Plans",
+      });
+    }
+  }
+
+  /**
+   * Add afriCoins payment plan
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof PaymentController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async addAfriCoinPaymentPlan(req, res) {
+    try {
+      const plan = await AfriCoinPaymentPlan.create({ ...req.body });
+
+      return res.status(200).json({
+        status: "success",
+        plan,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error adding Payment Plan",
       });
     }
   }
