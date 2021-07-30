@@ -308,7 +308,7 @@ class FeedController {
         },
       });
     } catch (error) {
-      console.log(error);
+      //console.log(error);
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error saving like",
@@ -342,7 +342,7 @@ class FeedController {
         data: { selectedPost },
       });
     } catch (error) {
-      console.log(error);
+      //console.log(error);
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error removing like",
@@ -377,7 +377,7 @@ class FeedController {
         },
       });
     } catch (error) {
-      console.log(error);
+      //console.log(error);
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error saving like",
@@ -411,7 +411,7 @@ class FeedController {
         data: { selectedComment },
       });
     } catch (error) {
-      console.log(error);
+      //console.log(error);
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error removing like",

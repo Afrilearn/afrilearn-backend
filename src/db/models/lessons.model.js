@@ -60,16 +60,16 @@ LessonSchema.virtual("questions", {
 });
 
 // LessonSchema.virtual("recommended").get(async function () {
-//   console.log("lesson", this);
+//   //console.log("lesson", this);
 //   const lessons = await Lesson.find({
 //     courseId: this.courseId,
 //     subjectId: this.subjectId,
 //   });
-//   console.log("lessons", lessons);
+//   //console.log("lessons", lessons);
 //   const otherLessons = lessons.filter((item) => item._id !== this._id);
-//   console.log("otherLessons", otherLessons);
+//   //console.log("otherLessons", otherLessons);
 //   const randomLesson = otherLessons[0];
-//   console.log("randomLesson", randomLesson);
+//   //console.log("randomLesson", randomLesson);
 
 //   return randomLesson._id;
 // });
@@ -77,16 +77,16 @@ LessonSchema.virtual("questions", {
 // LessonSchema.method.toJSON = async function () {
 //   const lesson = this;
 //   const lessonObject = lesson.toObject();
-//   console.log("lesson", lessonObject);
+//   //console.log("lesson", lessonObject);
 //   const lessons = await Lesson.find({
 //     courseId: lessonObject.courseId,
 //     subjectId: lessonObject.subjectId,
 //   });
-//   console.log("lessons", lessons);
+//   //console.log("lessons", lessons);
 //   const otherLessons = lessons.filter((item) => item._id !== lessonObject._id);
-//   console.log("otherLessons", otherLessons);
+//   //console.log("otherLessons", otherLessons);
 //   const randomLesson = otherLessons[0];
-//   console.log("randomLesson", randomLesson);
+//   //console.log("randomLesson", randomLesson);
 //   lessonObject.recommended = randomLesson._id;
 //   return lessonObject;
 // };

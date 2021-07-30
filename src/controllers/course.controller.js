@@ -138,7 +138,7 @@ class CourseController {
   static async getCourseProgressAndPerformance(req, res) {
     try {
       const userID = req.body.userId || req.data.id;
-      console.log("userID", userID);
+      //console.log("userID", userID);
       const userWithThisPerformance = "Usman";
       if (req.body.classId) {
         // if req.body.classId

@@ -408,7 +408,7 @@ class ParentController {
           error: "Parent is not registered",
         });
       }
-      console.log(existingParent);
+      //console.log(existingParent);
 
       if (!existingParentChild) {
         return res.status(400).json({
@@ -517,7 +517,7 @@ class ParentController {
         children.push(existingParentChild);
       }
 
-      // console.log(existingParent);
+      // //console.log(existingParent);
 
       return res.status(200).json({
         status: "success",

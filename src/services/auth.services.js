@@ -81,7 +81,7 @@ export default {
     }
   },
   async createClassesForSchool(courseCategoryId, school, res) {
-    // console.log('am in')
+    // //console.log('am in')
     try {
       // 605b21868636bc00158b4ad6 primary
       // 605b218f8636bc00158b4ad7 secondary
@@ -123,7 +123,7 @@ export default {
 
       // const user = await Auth.findOne(condition);
     } catch (err) {
-      console.log("error occured");
+      //console.log("error occured");
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error creating classes",

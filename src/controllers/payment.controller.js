@@ -267,13 +267,13 @@ class PaymentController {
 
       iap.verifyPayment(platform, payment, function (error, response) {
         if (error) {
-          console.log(error);
+          //console.log(error);
           return res.status(400).json({
             status: "error",
             error,
           });
         } else {
-          // console.log(response)
+          // //console.log(response)
           if (response.receipt.purchaseState === 0) {
             verified = true;
             if (role === "602f3ce39b146b3201c2dc1d") {
@@ -296,7 +296,7 @@ class PaymentController {
                   };
 
                   newClass = await ClassModel.create(condition);
-                  console.log(newClass);
+                  //console.log(newClass);
                 }
 
                 // check whether the user is already enrolled for this course
@@ -313,8 +313,8 @@ class PaymentController {
 
                 if (!existingEnrolledCourse) {
                   // if (role === '602f3ce39b146b3201c2dc1d' && req.body.newClassName) {
-                  //   console.log('attash class id')
-                  //   console.log(newClass)
+                  //   //console.log('attash class id')
+                  //   //console.log(newClass)
                   //   condition['classId'] = newClass.id;
                   // }
                   existingEnrolledCourse = await EnrolledCourse.create(
@@ -376,8 +376,8 @@ class PaymentController {
                     role === "602f3ce39b146b3201c2dc1d" &&
                     req.body.newClassName
                   ) {
-                    console.log("attash class id");
-                    console.log(newClass);
+                    //console.log("attash class id");
+                    //console.log(newClass);
                     condition["classId"] = newClass.id;
                   }
                   existingEnrolledCourse = await EnrolledCourse.create(
@@ -510,8 +510,8 @@ class PaymentController {
 
           if (!existingEnrolledCourse) {
             // if (role === '602f3ce39b146b3201c2dc1d' && req.body.newClassName) {
-            //   console.log('attash class id')
-            //   console.log(newClass)
+            //   //console.log('attash class id')
+            //   //console.log(newClass)
             //   condition['classId'] = newClass.id;
             // }
             existingEnrolledCourse = await EnrolledCourse.create(condition);
@@ -557,8 +557,8 @@ class PaymentController {
 
           if (!existingEnrolledCourse) {
             if (role === "602f3ce39b146b3201c2dc1d" && req.body.newClassName) {
-              console.log("attash class id");
-              console.log(newClass);
+              //console.log("attash class id");
+              //console.log(newClass);
               condition["classId"] = newClass.id;
             }
             existingEnrolledCourse = await EnrolledCourse.create(condition);
@@ -654,7 +654,7 @@ class PaymentController {
                 };
 
                 newClass = await ClassModel.create(condition);
-                console.log(newClass);
+                //console.log(newClass);
               }
 
               // check whether the user is already enrolled for this course
@@ -789,7 +789,7 @@ class PaymentController {
         status: "success1",
       });
     } catch (error) {
-      console.log(error.response.data);
+      //console.log(error.response.data);
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Verifying paystack payment",

@@ -75,7 +75,7 @@ class ChallengeController {
         },
       });
     } catch (error) {
-      console.log("error", error);
+      // //console.log("error", error);
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Getting challenges",
@@ -112,7 +112,7 @@ class ChallengeController {
         },
       });
     } catch (error) {
-      console.log("error", error);
+      // //console.log("error", error);
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Getting challenge",
@@ -146,7 +146,7 @@ class ChallengeController {
         },
       });
     } catch (error) {
-      console.log("error", error);
+      //console.log("error", error);
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Deleting challenge",
@@ -193,7 +193,7 @@ class ChallengeController {
         },
       });
     } catch (error) {
-      console.log("error", error);
+      //console.log("error", error);
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Registering for challenge",
@@ -219,7 +219,7 @@ class ChallengeController {
         },
       });
     } catch (error) {
-      console.log("error", error);
+      //console.log("error", error);
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error storing results",
@@ -250,7 +250,7 @@ class ChallengeController {
         },
       });
     } catch (error) {
-      console.log("error", error);
+      //console.log("error", error);
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error getting results",
