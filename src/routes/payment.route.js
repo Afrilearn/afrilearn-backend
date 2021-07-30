@@ -7,8 +7,8 @@ import VerifyPayment from "../validations/payment/verifyGooglePayment.validator"
 const router = Router();
 
 router.get("/plans", PaymentController.getPaymentPlans);
-router.get("/coin-plans", PaymentController.getAfriCoinPaymentPlans);
-router.post("/add-coin-plan", PaymentController.addAfriCoinPaymentPlan);
+// router.get("/coin-plans", PaymentController.getAfriCoinPaymentPlans);
+// router.post("/add-coin-plan", PaymentController.addAfriCoinPaymentPlan);
 router.post(
   "/add-transaction",
   validateToken,
