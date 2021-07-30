@@ -6,7 +6,7 @@
   "scripts": {
     "heroku-prebuild": "node src/gcpSetup.js",
     "preinstall": "node src/gcpSetup.js",
-    "start": "node --max_old_space_size=8192 --optimize_for_size --stack_size=4096 -r esm src/",
+    "start": "node -r esm src/",
     "dev": "nodemon -r esm src/",
     "test": "env-cmd ./test.env nyc --reporter=html --reporter=text mocha src/**/*.test.js -r esm  --timeout 90000  --recursive --exit",
     "coverage": "nyc report --reporter=text-lcov | coveralls",
