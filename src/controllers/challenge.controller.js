@@ -59,7 +59,9 @@ class ChallengeController {
         options.schoolId = req.query.schoolId;
       }   
 
-      const challenges = await Challenge.find({ ...options })
+      const challenges = await Challenge.find({ ...options }).limit(10).sort({
+        createdAt: -1
+      })
       if (!challenges) {
         return res.status(404).json({
           status: "404 Not found",
