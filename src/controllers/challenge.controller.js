@@ -98,7 +98,7 @@ class ChallengeController {
       }).populate({
         path: "examCategoryId classId schoolId userId",
         select: "name fullName profilePhotoUrl",
-      });
+      })
       if (!challenge) {
         return res.status(404).json({
           status: "404 Not found",
@@ -239,6 +239,8 @@ class ChallengeController {
     try {
       const results = await ChallengeResult.find({
         challengeId: req.params.challengeId,
+      }).sort({
+        winRatio: -1
       }).populate({
         path: "userId",
         select: "fullName profilePhotoUrl",
