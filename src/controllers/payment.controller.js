@@ -488,6 +488,13 @@ class PaymentController {
                 amount: req.body.coinAmount,
                 userId: clientUserId,
               });
+              await User.findByIdAndUpdate(
+                clientUserId,
+                {
+                  $inc: { afriCoins: req.body.coinAmount },
+                },
+                { new: true }
+              );
             }
             return res.status(200).json({
               status: "success",
