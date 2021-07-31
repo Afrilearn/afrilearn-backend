@@ -521,6 +521,7 @@ class PaymentController {
 
       const { purchaseToken, productId, courseId, clientUserId } = req.body;
 
+      const paymentPlan = await AfriCoinPaymentPlan.findById(productId);
       const { role } = req.data;
 
       const platform = "google";
@@ -545,21 +546,21 @@ class PaymentController {
               verified: true,
               purchaseState: response.receipt.purchaseState,
             };
-            if (req.body.coinAmount) {
-              dataToSend.coinAmount = req.body.coinAmount;
+            if (paymentPlan.amount) {
+              dataToSend.coinAmount = paymentPlan.amount;
             }
-            if (req.body.coinAmount) {
+            if (paymentPlan.amount) {
               (async () => {
                 await AfriCoinTransaction.create({
                   description: "Coins Purchase",
                   type: "add",
-                  amount: req.body.coinAmount,
+                  amount: paymentPlan.amount,
                   userId: clientUserId,
                 });
                 await User.findByIdAndUpdate(
                   clientUserId,
                   {
-                    $inc: { afriCoins: req.body.coinAmount },
+                    $inc: { afriCoins: paymentPlan.amount },
                   },
                   { new: true }
                 );
