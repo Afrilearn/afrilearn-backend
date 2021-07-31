@@ -315,7 +315,7 @@ class PaymentController {
         receipt: purchaseToken,
         productId,
         packageName: "com.afrilearn",
-        keyObject: require("../gcpSetup.js"),
+        keyObject: require("./../../gcpconfig.json"),
       };
 
       iap.verifyPayment(platform, payment, function (error, response) {
@@ -528,7 +528,7 @@ class PaymentController {
         receipt: purchaseToken,
         productId,
         packageName: "com.afrilearn",
-        keyObject: require("../gcpSetup.js"),
+        keyObject: require("./../../gcpconfig.json"),
       };
 
       iap.verifyPayment(platform, payment, function (error, response) {
