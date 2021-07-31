@@ -35,4 +35,11 @@ router.post(
   VerifyPayment.myValidationResult,
   PaymentController.verifyGoogleBilingPayment
 );
+router.post(
+  "/verify-google-payment-for-coin-purchase",
+  validateToken,
+  VerifyPayment.validateData(),
+  VerifyPayment.myValidationResult,
+  PaymentController.verifyGoogleBilingPaymentForCoinPurchase
+);
 export default router;
