@@ -46,3 +46,4 @@ coverage/
 .env
 googleplay-keystore.json,
 gcpconfig.json
+src/googlekey.json

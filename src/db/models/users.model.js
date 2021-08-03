@@ -22,6 +22,15 @@ const UserSchema = new mongoose.Schema(
     dateOfBirth: {
       type: String,
     },
+    bank: {
+      type: String,
+    },
+    accountNumber: {
+      type: String,
+    },
+    accountName: {
+      type: String,
+    },
     country: {
       type: String,
       trim: true,
