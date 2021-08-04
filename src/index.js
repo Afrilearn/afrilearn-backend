@@ -5,7 +5,13 @@ import morgan from "morgan";
 import logger from "./config";
 import "./db";
 import v1Router from "./routes";
-import Announcement from "./db/models/announcement.model";
+import {CronJob} from 'cron';
+import ChallengeUtility from './services/challenge.services';
+
+// scheduled creation of challenges on sunday
+const job = new CronJob('* 59 23 * * 0', ChallengeUtility.createNewChallenges);
+job.start();
+
  
 config();
 

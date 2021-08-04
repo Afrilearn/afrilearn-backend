@@ -210,7 +210,11 @@ class ChallengeController {
    *
    */
   static async storeAChallengeResult(req, res) {
-    try {
+    try {      
+      await ChallengeResult.findOneAndDelete({
+        challengeId: req.body.challengeId,
+        userId: req.body.userId,
+      });
       const challengeResult = await ChallengeResult.create(req.body);     
       return res.status(200).json({
         status: "success",
@@ -218,8 +222,7 @@ class ChallengeController {
           challengeResult
         },
       });
-    } catch (error) {
-      //console.log("error", error);
+    } catch (error) {     
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error storing results",

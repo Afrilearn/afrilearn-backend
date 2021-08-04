@@ -27,7 +27,7 @@ const ChallengeSchema = new mongoose.Schema(
       type: Number     
     },
     prize: { 
-      type: Number
+      type: String
     },
     subjects: {
       type: String      
