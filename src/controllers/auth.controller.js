@@ -522,6 +522,21 @@ class AuthController {
         user["country"] = req.body.country;
       }
 
+      if (req.body.bankId) {
+        user["bankId"] = req.body.bankId;
+      }
+      if (req.body.bank) {
+        user["bank"] = req.body.bank;
+      }
+
+      if (req.body.accountNumber) {
+        user["accountNumber"] = req.body.accountNumber;
+      }
+
+      if (req.body.accountName) {
+        user["accountName"] = req.body.accountName;
+      } 
+
       if (req.body.state) {
         user["state"] = req.body.state;
       }
@@ -532,7 +547,7 @@ class AuthController {
 
       if (req.body.role) {
         user["role"] = req.body.role;
-      }
+      } 
 
       if (req.body.referralLink) {
         user["referralLink"] = req.body.referralLink;

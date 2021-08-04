@@ -9,6 +9,9 @@ import Helper from "../utils/user.utils";
 import ClassModel from "../db/models/classes.model";
 import axios from "axios";
 import { config } from "dotenv";
+import AfriCoinTransaction from "../db/models/afriCoinTransaction.model";
+import User from "../db/models/users.model";
+
 config();
 /**
  *Contains Payment Controller
@@ -317,13 +320,13 @@ class PaymentController {
 
       iap.verifyPayment(platform, payment, function (error, response) {
         if (error) {
-          //console.log(error);
+          console.log("error", error);
           return res.status(400).json({
             status: "error",
             error,
           });
         } else {
-          // //console.log(response)
+          console.log("response", response);
           if (response.receipt.purchaseState === 0) {
             verified = true;
             if (role === "602f3ce39b146b3201c2dc1d") {
@@ -477,32 +480,95 @@ class PaymentController {
               verified: true,
               purchaseState: response.receipt.purchaseState,
             };
-            if (req.body.coinAmount) {
-              dataToSend.coinAmount = req.body.coinAmount;
+
+            return res.status(200).json({
+              status: "success",
+              data: dataToSend,
+            });
+          } else {
+            return res.status(200).json({
+              status: "success",
+              data: {
+                verified: false,
+                purchaseState: response,
+                // purchaseState:response.receipt.purchaseState
+              },
+            });
+          }
+        }
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Verifying payment",
+      });
+    }
+  }
+
+  /**
+   * Verify payment for coin purcahse
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof PaymentController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async verifyGoogleBilingPaymentForCoinPurchase(req, res) {
+    try {
+      let verified = null;
+      let condition = null;
+      let newClass = null;
+
+      const { purchaseToken, productId, courseId, clientUserId } = req.body;
+
+      const paymentPlan = await AfriCoinPaymentPlan.findById(productId);
+      const { role } = req.data;
+
+      const platform = "google";
+      const payment = {
+        receipt: purchaseToken,
+        productId,
+        packageName: "com.afrilearn",
+        keyObject: require("./../../gcpconfig.json"),
+      };
+
+      iap.verifyPayment(platform, payment, function (error, response) {
+        if (error) {
+          return res.status(400).json({
+            status: "error",
+            error,
+          });
+        } else {
+          if (response.receipt.purchaseState === 0) {
+            verified = true;
+
+            const dataToSend = {
+              verified: true,
+              purchaseState: response.receipt.purchaseState,
+            };
+            if (paymentPlan.amount) {
+              dataToSend.coinAmount = paymentPlan.amount;
             }
-            if (req.body.coinAmount) {
-              async () => {
+            if (paymentPlan.amount) {
+              (async () => {
                 await AfriCoinTransaction.create({
                   description: "Coins Purchase",
                   type: "add",
-                  amount: req.body.coinAmount,
+                  amount: paymentPlan.amount,
                   userId: clientUserId,
                 });
                 await User.findByIdAndUpdate(
                   clientUserId,
                   {
-                    $inc: { afriCoins: req.body.coinAmount },
+                    $inc: { afriCoins: paymentPlan.amount },
                   },
                   { new: true }
                 );
-              };
+              })();
             }
             return res.status(200).json({
               status: "success",
-              data: {
-                verified: true,
-                purchaseState: response.receipt.purchaseState,
-              },
+              data: dataToSend,
             });
           } else {
             return res.status(200).json({
