@@ -25,6 +25,9 @@ const UserSchema = new mongoose.Schema(
     bank: {
       type: String,
     },
+    bankId: {
+      type: String,
+    },
     accountNumber: {
       type: String,
     },
