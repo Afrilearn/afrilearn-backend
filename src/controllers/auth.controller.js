@@ -522,6 +522,9 @@ class AuthController {
         user["country"] = req.body.country;
       }
 
+      if (req.body.bankId) {
+        user["bankId"] = req.body.bankId;
+      }
       if (req.body.bank) {
         user["bank"] = req.body.bank;
       }
