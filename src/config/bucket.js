@@ -3,12 +3,18 @@ const aws = require("aws-sdk");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
 
-const s3 = new aws.S3();
+// const path = require("path");
+// const dirPath = path.join(__dirname, "./config.json");
+// // const dirPath = path.join(__dirname, "./../../config.json");
+
+// aws.config.loadFromPath(dirPath);
 aws.config.update({
   secretAccessKey: process.env.S3_ACCESS_SECRET,
   accessKeyId: process.env.S3_ACCESS_KEY,
   region: "eu-west-3",
+  AWS_SDK_LOAD_CONFIG: 1,
 });
+const s3 = new aws.S3();
 
 const storage = multerS3({
   acl: "public-read",
