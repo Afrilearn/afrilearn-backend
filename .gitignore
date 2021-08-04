@@ -47,3 +47,4 @@ coverage/
 googleplay-keystore.json,
 gcpconfig.json
 src/googlekey.json
+src/config/config.json
