@@ -9,7 +9,7 @@ import {CronJob} from 'cron';
 import ChallengeUtility from './services/challenge.services';
 
 // scheduled creation of challenges on sunday
-const job = new CronJob('* 59 23 * * 0', ChallengeUtility.createNewChallenges);
+const job = new CronJob('0 59 23 * * 0', ChallengeUtility.createNewChallenges);
 job.start();
 
  
