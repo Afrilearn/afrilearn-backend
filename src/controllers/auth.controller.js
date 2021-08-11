@@ -43,7 +43,7 @@ class AuthController {
     try {
       let customerRole = "Student";
       const { fullName, password, email, role, phoneNumber } = req.body;
-
+     
       const encryptpassword = await Helper.encrptPassword(password);
 
       const newUser = {
@@ -59,9 +59,9 @@ class AuthController {
         mongoose.isValidObjectId(req.body.referralCode)
       ) {
         newUser.referee = req.body.referralCode;
-        //add afriCoins for referee
+        //add afriCoins for referee       
         const referee = await Auth.findById(req.body.referralCode);
-        if (referee) {
+        if (referee) {        
           referee.afriCoins += 100;
           await referee.save();
           await AfriCoinTransaction.create({
