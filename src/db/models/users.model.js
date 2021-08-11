@@ -89,7 +89,7 @@ const UserSchema = new mongoose.Schema(
     },
     afriCoins: {
       type: Number,
-      default: 0,
+      default: 100,
     },
   },
   {

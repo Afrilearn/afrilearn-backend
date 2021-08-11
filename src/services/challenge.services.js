@@ -12,7 +12,7 @@ export default {
         numberOfQuestions:0,
         timeSpan:5,
         entryFee:100,
-        prize:'N5000',
+        prize:'₦5000',
         challengeImageUrl:'https://afrilearn-media.s3.eu-west-3.amazonaws.com/challenge/Backgroundjss1.png',
         description:'Brace Yourself for Battle!',
         subjects:'Mathematics, English and Basic Science'  
@@ -26,7 +26,7 @@ export default {
         numberOfQuestions:0,
         timeSpan:5,
         entryFee:100,
-        prize:'N5000',
+        prize:'₦5000',
         challengeImageUrl:'https://afrilearn-media.s3.eu-west-3.amazonaws.com/challenge/Backgroundjss2.png',
         description:'Brace Yourself for Battle!',
         subjects:'Mathematics, English and Basic Science'  
@@ -40,7 +40,7 @@ export default {
         numberOfQuestions:0,
         timeSpan:5,
         entryFee:100,
-        prize:'N5000',
+        prize:'₦5000',
         challengeImageUrl:'https://afrilearn-media.s3.eu-west-3.amazonaws.com/challenge/Backgroundjss3.png',
         description:'Brace Yourself for Battle!',
         subjects:'Mathematics, English and Basic Science'  
@@ -54,7 +54,7 @@ export default {
         numberOfQuestions:0,
         timeSpan:5,
         entryFee:100,
-        prize:'N5000',
+        prize:'₦5000',
         challengeImageUrl:'https://afrilearn-media.s3.eu-west-3.amazonaws.com/challenge/Backgroundss1.png',
         description:'Brace Yourself for Battle!',
         subjects:'Mathematics, English and Biology'  
@@ -68,7 +68,7 @@ export default {
         numberOfQuestions:0,
         timeSpan:5,
         entryFee:100,
-        prize:'N5000',
+        prize:'₦5000',
         challengeImageUrl:'https://afrilearn-media.s3.eu-west-3.amazonaws.com/challenge/Backgroundss2.png',
         description:'Brace Yourself for Battle!',
         subjects:'Mathematics, English and Biology'  
@@ -82,7 +82,7 @@ export default {
         numberOfQuestions:0,
         timeSpan:5,
         entryFee:100,
-        prize:'N5000',
+        prize:'₦5000',
         challengeImageUrl:'https://afrilearn-media.s3.eu-west-3.amazonaws.com/challenge/Backgroundss3.png',
         description:'Brace Yourself for Battle!',
         subjects:'Mathematics, English and Biology'  
