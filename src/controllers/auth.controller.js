@@ -52,27 +52,35 @@ class AuthController {
         email,
         role,
         phoneNumber,
-      };
+      };     
+      if (req.body.referralCode) {
+        let referee;
+        if(mongoose.isValidObjectId(req.body.referralCode)){         
+          newUser.referee = req.body.referralCode;
+          referee = await Auth.findById(req.body.referralCode);         
+        }else{ 
+          referee = await Auth.findOne({alternateReferralCode:req.body.referralCode});               
+          newUser.referee = referee.id;         
+        }  
 
-      if (
-        req.body.referralCode &&
-        mongoose.isValidObjectId(req.body.referralCode)
-      ) {
-        newUser.referee = req.body.referralCode;
-        //add afriCoins for referee       
-        const referee = await Auth.findById(req.body.referralCode);
+        //add afriCoins for referee
         if (referee) {        
           referee.afriCoins += 100;
           await referee.save();
-          await AfriCoinTransaction.create({
+          const data1 = {
             description: "Referrals",
             type: "add",
-            amount: 100,
-            userId: req.body.referralCode,
-          });
+            amount: 100            
+          }
+          if(mongoose.isValidObjectId(req.body.referralCode)){   
+            data1['userId'] = req.body.referralCode;
+          }else{
+            data1['userId'] = referee.id;
+          }
+          await AfriCoinTransaction.create(data1);
         }
-      }
-
+      } 
+     
       if (req.body.referralLink) {
         newUser.referralLink = req.body.referralLink;
       }
@@ -80,6 +88,7 @@ class AuthController {
       const result = await Auth.create({
         ...newUser,
       });
+
       let enrolledCourse;
       if (
         role !== "606ed82e70f40e18e029165e" &&
@@ -218,7 +227,7 @@ class AuthController {
           user,
         },
       });
-    } catch (err) {
+    } catch (err) {     
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error creating new user",
@@ -510,6 +519,11 @@ class AuthController {
         user["fullName"] = req.body.fullName;
       }
 
+      if (req.body.alternateReferralCode) {
+        await AuthServices.referralExist(req.body.alternateReferralCode, res);
+        user["alternateReferralCode"] = req.body.alternateReferralCode;        
+      }
+      
       if (req.body.phoneNumber) {
         user["phoneNumber"] = req.body.phoneNumber;
       }

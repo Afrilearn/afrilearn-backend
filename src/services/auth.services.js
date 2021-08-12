@@ -80,6 +80,27 @@ export default {
       });
     }
   },
+  
+  async referralExist(referral, res) {
+    try {
+      const condition = {
+        alternateReferralCode: referral,
+      };
+      const user = await Auth.findOne(condition);
+      if (user) {
+        return res.status(409).json({
+          status: '409 Conflict',
+          error: 'Referral already exists',
+        });
+      }
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error checking",
+      });
+    }
+  },
+ 
   async createClassesForSchool(courseCategoryId, school, res) {
     // //console.log('am in')
     try {
