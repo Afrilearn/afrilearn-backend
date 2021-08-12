@@ -65,10 +65,13 @@ const UserSchema = new mongoose.Schema(
     referralLink: {
       type: String,
       trim: true,
-    },
+    },   
     referee: {
       type: mongoose.Schema.ObjectId,
       ref: "user",
+    },
+    alternateReferralCode: {
+      type: String     
     },
     isActivated: {
       type: Boolean,
