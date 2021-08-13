@@ -71,14 +71,24 @@ class AuthController {
    * @memberof AuthController
    * @returns {JSON} - A JSON success response.
    */
-   static async socialLoginGoogleMobile(req, res) {
+  static async socialLoginGoogleMobile(req, res) {
     try {
       const { token } = req.body;
-      const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID2);
-      const ticket = await client.verifyIdToken({
-        idToken: token,
-        audience: process.env.GOOGLE_CLIENT_ID2,
-      });
+      let ticket;
+      let client;
+      if(req.body.ios){        
+        client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID_IOS);
+        ticket = await client.verifyIdToken({
+          idToken: token,
+          audience: process.env.GOOGLE_CLIENT_ID_IOS,
+        });
+      }else{
+        client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID2);
+        ticket = await client.verifyIdToken({
+          idToken: token,
+          audience: process.env.GOOGLE_CLIENT_ID2,
+        });
+      }     
       if (ticket) {
         const payload = ticket.getPayload();
         const response = {
