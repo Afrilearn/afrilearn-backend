@@ -5,6 +5,8 @@ import ChallengeValidator from "../validations/challenge/challenge.validator";
 
 const router = Router();
 
+router.post("/users", ChallengeController.searchForUsers);
+router.post("/add-type", ChallengeController.addChallengeType);
 router.post("/add", validateToken, ChallengeController.addChallenge);
 router.delete(
   "/delete/:challengeId",
@@ -20,7 +22,7 @@ router.post(
 );
 router.post(
   "/store-result",
-  validateToken, 
+  validateToken,
   ChallengeValidator.validateAddChallengeResult(),
   ChallengeValidator.myValidationResult,
   ChallengeController.storeAChallengeResult
@@ -29,6 +31,11 @@ router.get(
   "/results/:challengeId",
   validateToken,
   ChallengeController.getChallengeResults
+);
+router.get(
+  "/friends/:courseId",
+  validateToken,
+  ChallengeController.getFriendsForChallenge
 );
 
 export default router;
