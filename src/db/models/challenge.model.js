@@ -2,45 +2,66 @@ import mongoose from "mongoose";
 
 const ChallengeSchema = new mongoose.Schema(
   {
-   
     name: {
-      type: String      
+      type: String,
+    },
+    challengeTypeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "challengeType",
+      default: "611a6e1343ceb054480c5538",
     },
     creatorId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
+    },
+    stakedAfricoins: {
+      type: Number,
+      default: 0,
+    },
+    subjectId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "subject",
+    },
+    opponentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+    },
+    status: {
+      type: String,
+      enum: ["finished", "pending", "rejected", "accepted"],
+      default: "pending",
     },
     courseId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "course",
     },
     examblyPastQuestionExamId: {
-      type: Number     
+      type: Number,
     },
     numberOfQuestions: {
-      type: Number     
+      type: Number,
     },
     timeSpan: {
-      type: Number     
+      type: Number,
     },
     entryFee: {
-      type: Number     
+      type: Number,
     },
-    prize: { 
-      type: String
+    prize: {
+      type: String,
     },
     subjects: {
-      type: String      
+      type: String,
     },
     challengeImageUrl: { type: String },
-    description: { type: String },    
-    startDate: { 
+    description: { type: String },
+    startDate: {
       type: Date,
-      default: new Date()
+      default: new Date(),
     },
-    endDate: { 
+    endDate: {
       type: Date,
-      default: new Date().setHours(168)
+      default: new Date().setHours(168),
     },
   },
   {

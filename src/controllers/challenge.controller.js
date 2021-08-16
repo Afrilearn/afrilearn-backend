@@ -1,6 +1,9 @@
 import Challenge from "../db/models/challenge.model";
 import ChallengeResult from "../db/models/challengeResult.model";
 import Participant from "../db/models/participant.model";
+import User from "../db/models/users.model";
+import EnrolledCourse from "../db/models/enrolledCourses.model";
+import ChallengeType from "../db/models/challengeTypes.model";
 
 /**
  *Contains Challenge Controller
@@ -23,17 +26,44 @@ class ChallengeController {
       const challenge = await Challenge.create({
         ...req.body,
         creatorId: req.data.id,
-      });    
+      });
       return res.status(200).json({
         status: "success",
         data: {
-          challenge
+          challenge,
         },
       });
-    } catch (error) {     
+    } catch (error) {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Adding challenge",
+      });
+    }
+  }
+
+  /**
+   * Add a Challenge Type
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ChallengeController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async addChallengeType(req, res) {
+    try {
+      const challengeType = await ChallengeType.create({
+        name: req.body.name,
+      });
+      return res.status(200).json({
+        status: "success",
+        data: {
+          challengeType,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Adding challenge Type",
       });
     }
   }
@@ -47,8 +77,8 @@ class ChallengeController {
    *
    */
   static async getChallengeForACourse(req, res) {
-    try {      
-      const options = {};      
+    try {
+      const options = {};
       if (req.query.courseId) {
         options.courseId = req.query.courseId;
       }
@@ -57,11 +87,17 @@ class ChallengeController {
       }
       if (req.query.schoolId) {
         options.schoolId = req.query.schoolId;
-      }   
+      }
+      if (req.query.status) {
+        options.status = req.query.status;
+      }
+      console.log("options", options);
 
-      const challenges = await Challenge.find({ ...options }).limit(10).sort({
-        createdAt: -1
-      })
+      const challenges = await Challenge.find({ ...options })
+        .limit(10)
+        .sort({
+          createdAt: -1,
+        });
       if (!challenges) {
         return res.status(404).json({
           status: "404 Not found",
@@ -98,7 +134,7 @@ class ChallengeController {
       }).populate({
         path: "examCategoryId classId schoolId userId",
         select: "name fullName profilePhotoUrl",
-      })
+      });
       if (!challenge) {
         return res.status(404).json({
           status: "404 Not found",
@@ -210,19 +246,19 @@ class ChallengeController {
    *
    */
   static async storeAChallengeResult(req, res) {
-    try {      
+    try {
       await ChallengeResult.findOneAndDelete({
         challengeId: req.body.challengeId,
         userId: req.body.userId,
       });
-      const challengeResult = await ChallengeResult.create(req.body);     
+      const challengeResult = await ChallengeResult.create(req.body);
       return res.status(200).json({
         status: "success",
         data: {
-          challengeResult
+          challengeResult,
         },
       });
-    } catch (error) {     
+    } catch (error) {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error storing results",
@@ -242,12 +278,14 @@ class ChallengeController {
     try {
       const results = await ChallengeResult.find({
         challengeId: req.params.challengeId,
-      }).sort({
-        winRatio: -1
-      }).populate({
-        path: "userId",
-        select: "fullName profilePhotoUrl",
-      });
+      })
+        .sort({
+          winRatio: -1,
+        })
+        .populate({
+          path: "userId",
+          select: "fullName profilePhotoUrl",
+        });
       return res.status(200).json({
         status: "success",
         data: {
@@ -259,6 +297,74 @@ class ChallengeController {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error getting results",
+      });
+    }
+  }
+
+  /**
+   * get friends for challenge
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ChallengeController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getFriendsForChallenge(req, res) {
+    try {
+      const enrollments = await EnrolledCourse.find({
+        courseId: req.params.courseId,
+      }).populate({ path: "userId", select: "fullName profilePhotoUrl" });
+
+      const users = [];
+      for (let index = 0; index < enrollments.length; index++) {
+        const enrollment = enrollments[index];
+        const notExists = users.indexOf(enrollment) === -1;
+        if (enrollment.userId && notExists) {
+          users.push(enrollment.userId);
+        }
+      }
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          users,
+        },
+      });
+    } catch (error) {
+      //console.log("error", error);
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error getting users",
+      });
+    }
+  }
+
+  /**
+   * Search for users
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ChallengeController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async searchForUsers(req, res) {
+    try {
+      const searchData = new RegExp(req.query.searchQuery, "i");
+      const users = await User.find({
+        $or: [{ fullName: searchData }],
+      })
+        .sort({ fullName: 1 })
+        .select("fullName profilePhotoUrl")
+        .limit(20);
+
+      return res.status(200).json({
+        status: "success",
+        data: { users },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Searching",
       });
     }
   }
