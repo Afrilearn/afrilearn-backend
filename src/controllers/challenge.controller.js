@@ -48,7 +48,9 @@ class ChallengeController {
    */
   static async getChallengeForACourse(req, res) {
     try {      
-      const options = {};      
+      const options = {
+        challengeTypeId:'611a6e1343ceb054480c5538'
+      };      
       if (req.query.courseId) {
         options.courseId = req.query.courseId;
       }
@@ -62,6 +64,12 @@ class ChallengeController {
       const challenges = await Challenge.find({ ...options }).limit(10).sort({
         createdAt: -1
       })
+      const options1 = {
+        description:'Battle-with-friends',
+        challengeTypeId:'611a6f14af35ab4d3415c012'
+      }
+      const challengeAFriendGeneralInfor = await Challenge.find(options1)
+
       if (!challenges) {
         return res.status(404).json({
           status: "404 Not found",
@@ -72,6 +80,7 @@ class ChallengeController {
         status: "success",
         data: {
           challenges,
+          challengeAFriendGeneralInfor
         },
       });
     } catch (error) {

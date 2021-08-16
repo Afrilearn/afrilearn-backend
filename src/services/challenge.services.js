@@ -18,7 +18,7 @@ export default {
         subjects:'Mathematics, English and Basic Science'  
       }); 
       //Jss2
-      await ChallengeModel.create({ 
+      await ChallengeModel.create({         
         name:'J2 Clash',
         creatorId:'603fdf31a36c060015655272',
         courseId:'5fff7329de0bdb47f826feb0',
@@ -29,7 +29,8 @@ export default {
         prize:'₦5000',
         challengeImageUrl:'https://afrilearn-media.s3.eu-west-3.amazonaws.com/challenge/Backgroundjss2.png',
         description:'Brace Yourself for Battle!',
-        subjects:'Mathematics, English and Basic Science'  
+        subjects:'Mathematics, English and Basic Science',
+        challengeTypeId:'611a6e1343ceb054480c5538'  
       }); 
       //Jss3
       await ChallengeModel.create({ 
@@ -43,7 +44,8 @@ export default {
         prize:'₦5000',
         challengeImageUrl:'https://afrilearn-media.s3.eu-west-3.amazonaws.com/challenge/Backgroundjss3.png',
         description:'Brace Yourself for Battle!',
-        subjects:'Mathematics, English and Basic Science'  
+        subjects:'Mathematics, English and Basic Science',
+        challengeTypeId:'611a6e1343ceb054480c5538'    
       }); 
       //ss1
        await ChallengeModel.create({ 
@@ -57,7 +59,8 @@ export default {
         prize:'₦5000',
         challengeImageUrl:'https://afrilearn-media.s3.eu-west-3.amazonaws.com/challenge/Backgroundss1.png',
         description:'Brace Yourself for Battle!',
-        subjects:'Mathematics, English and Biology'  
+        subjects:'Mathematics, English and Biology',
+        challengeTypeId:'611a6e1343ceb054480c5538'    
       }); 
        //ss2
        await ChallengeModel.create({ 
@@ -71,7 +74,8 @@ export default {
         prize:'₦5000',
         challengeImageUrl:'https://afrilearn-media.s3.eu-west-3.amazonaws.com/challenge/Backgroundss2.png',
         description:'Brace Yourself for Battle!',
-        subjects:'Mathematics, English and Biology'  
+        subjects:'Mathematics, English and Biology',
+        challengeTypeId:'611a6e1343ceb054480c5538'    
       }); 
       //ss3
        await ChallengeModel.create({ 
@@ -85,7 +89,8 @@ export default {
         prize:'₦5000',
         challengeImageUrl:'https://afrilearn-media.s3.eu-west-3.amazonaws.com/challenge/Backgroundss3.png',
         description:'Brace Yourself for Battle!',
-        subjects:'Mathematics, English and Biology'  
+        subjects:'Mathematics, English and Biology',
+        challengeTypeId:'611a6e1343ceb054480c5538'    
       }); 
       console.log('Done creating challenge')
     } catch (err) {
