@@ -13,7 +13,7 @@ import socketio  from 'socket.io';
 // scheduled creation of challenges on sunday
 const job = new CronJob('0 59 23 * * 0', ChallengeUtility.createNewChallenges);
 job.start();
- 
+
 config();
 
 const app = express();
