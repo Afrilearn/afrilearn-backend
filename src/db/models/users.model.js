@@ -94,6 +94,10 @@ const UserSchema = new mongoose.Schema(
       type: Number,
       default: 100,
     },
+    channel: {
+      type: String,
+      default: 'web',
+    },
   },
   {
     toJSON: { virtuals: true },
