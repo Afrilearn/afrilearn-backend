@@ -53,7 +53,10 @@ class AuthController {
         role,
         phoneNumber,
       };     
-      
+      if (req.body.channel) {
+        newUser['channel'] = req.body.channel
+      }
+
       if (req.body.referralCode) {
         let referee;
         if(mongoose.isValidObjectId(req.body.referralCode)){         
@@ -523,6 +526,38 @@ class AuthController {
       if (req.body.alternateReferralCode) {
         await AuthServices.referralExist(req.body.alternateReferralCode, res);
         user["alternateReferralCode"] = req.body.alternateReferralCode;        
+      }
+      
+      //add afriCoins for referee via social login
+      if (req.body.referralCode) {
+        let referee;
+        if(mongoose.isValidObjectId(req.body.referralCode)){         
+          newUser.referee = req.body.referralCode;
+          referee = await Auth.findById(req.body.referralCode);         
+        }else{ 
+          referee = await Auth.findOne({alternateReferralCode:req.body.referralCode});               
+          newUser.referee = referee.id;         
+        }  
+
+        if (referee) {        
+          referee.afriCoins += 100;
+          await referee.save();
+          const data1 = {
+            description: "Referrals",
+            type: "add",
+            amount: 100            
+          }
+          if(mongoose.isValidObjectId(req.body.referralCode)){   
+            data1['userId'] = req.body.referralCode;
+          }else{
+            data1['userId'] = referee.id;
+          }
+          await AfriCoinTransaction.create(data1);
+        }
+      }
+
+      if (req.body.channel) {
+        user['channel'] = req.body.channel
       }
       
       if (req.body.phoneNumber) {
