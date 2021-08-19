@@ -313,21 +313,25 @@ class ChallengeController {
     try {
       const enrollments = await EnrolledCourse.find({
         courseId: req.params.courseId,
-      }).populate({ path: "userId", select: "fullName profilePhotoUrl" });
+      })
+        .populate({ path: "userId", select: "fullName profilePhotoUrl" })
+        .limit(20)
+        .select("userId");
 
       const users = [];
-      for (let index = 0; index < enrollments.length; index++) {
-        const enrollment = enrollments[index];
-        const notExists = users.indexOf(enrollment) === -1;
-        if (enrollment.userId && notExists) {
-          users.push(enrollment.userId);
-        }
-      }
+      // for (let index = 0; index < enrollments.length; index++) {
+      //   const enrollment = enrollments[index];
+
+      //   const notExists = users.indexOf(enrollment) === -1;
+      //   if (enrollment.userId && notExists) {
+      //     users.push(enrollment.userId);
+      //   }
+      // }
 
       return res.status(200).json({
         status: "success",
         data: {
-          users,
+          users: enrollments,
         },
       });
     } catch (error) {

@@ -6,60 +6,27 @@ import morgan from "morgan";
 import logger from "./config";
 import "./db";
 import v1Router from "./routes";
-import {CronJob} from 'cron';
-import ChallengeUtility from './services/challenge.services';
-import socketio  from 'socket.io';
+import { CronJob } from "cron";
+import ChallengeUtility from "./services/challenge.services";
+import socketio from "socket.io";
+import User from "./db/models/users.model";
+import "../src/controllers/studentRequest.controller";
 
 // scheduled creation of challenges on sunday
-const job = new CronJob('0 59 23 * * 0', ChallengeUtility.createNewChallenges);
+const job = new CronJob("0 59 23 * * 0", ChallengeUtility.createNewChallenges);
 job.start();
- 
+
 config();
 
 const app = express();
 
 const server = http.createServer(app);
 
-const corsOptions={
-  cors: true,
-  origins:["http://localhost:5000/api/v1/"],
-}
-const io = socketio(server);
-
-//socket
-io.on('connection', (socket) => {
-  console.log('connected to socket')
-  // socket.on('join', ({ name, room }, callback) => {
-  //   const { error, user } = addUser({ id: socket.id, name, room });
-
-  //   if(error) return callback(error);
-
-  //   socket.join(user.room);
-
-  //   socket.emit('message', { user: 'admin', text: `${user.name}, welcome to room ${user.room}.`});
-  //   socket.broadcast.to(user.room).emit('message', { user: 'admin', text: `${user.name} has joined!` });
-
-  //   io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room) });
-
-  //   callback();
-  // });
-
-  // socket.on('sendMessage', (message, callback) => {
-  //   const user = getUser(socket.id);
-
-  //   io.to(user.room).emit('message', { user: user.name, text: message });
-
-  //   callback();
-  // });
-
-  // socket.on('disconnect', () => {
-  //   const user = removeUser(socket.id);
-
-  //   if(user) {
-  //     io.to(user.room).emit('message', { user: 'Admin', text: `${user.name} has left.` });
-  //     io.to(user.room).emit('roomData', { room: user.room, users: getUsersInRoom(user.room)});
-  //   }
-  // })
+const io = socketio(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+  },
 });
 
 const port = process.env.PORT || 5000;
@@ -95,5 +62,41 @@ app.use((err, req, res) => {
 server.listen(port, () => {
   logger.info(`Server running at port ${port} on ${process.env.NODE_ENV}`);
 });
+
+const users = {};
+
+io.of("/").on("connection", (socket) => {
+  //register login
+  socket.on("login", function (data) {
+    console.log("a user " + data.userId + " connected");
+    users[socket.id] = data;
+    console.log("users", users);
+    io.emit("get_users_online", users);
+  });
+
+  console.log("new client connected");
+  console.log("users", users);
+
+  socket.on("disconnect", (reason) => {
+    if (reason === "io server disconnect") {
+      // the disconnection was initiated by the server, you need to reconnect manually
+      socket.connect();
+    }
+    console.log("user disconnected");
+    delete users[socket.id];
+    console.log("users", users);
+    io.emit("get_users_online", users);
+  });
+});
+io.of("/challenge").on("connection", (socket) => {
+  /* socket object may be used to send specific messages to the new connected client */
+  //set user status as online
+  console.log("new client connected for challenge");
+  socket.on("disconnect", () => {
+    console.log("user disconnected for challenge");
+    //set user status as offline
+  });
+});
+console.log("users", users);
 
 export default app;
