@@ -47,7 +47,7 @@ class StudentRequestController {
       const body = `Hello Afrilearn, I am ${user.fullName} \nPlease help me with this Question. \nQuestion: ${req.body.question} \nSubject: ${subject.mainSubjectId.name} \nClass: ${course.name}  \nEmail: ${req.body.email}  \nPhone: ${req.body.phone} `;
       sendWhatsappMessge(body, "");
       if (attachment) {
-        sendWhatsappMessge("", attachment);
+        sendWhatsappMessge(body, attachment);
       }
 
       // Send an email to admin (a request was received)
