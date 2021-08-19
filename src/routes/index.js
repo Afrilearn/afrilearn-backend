@@ -19,6 +19,7 @@ import parentRoute from "./parent.route";
 import feedRoute from "./feed.route";
 import challengeRoute from "./challenge.route";
 import coinRoute from "./coin.route";
+import requestRoute from "./request.route";
 
 const router = Router();
 
@@ -42,5 +43,6 @@ router.use("/coins", coinRoute);
 router.use("/challenges", challengeRoute);
 router.use("/feeds", feedRoute);
 router.use("/parents", parentRoute);
+router.use("/student-requests", requestRoute);
 
 export default router;

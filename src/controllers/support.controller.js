@@ -1,5 +1,5 @@
-import SupportRequest from '../db/models/supportRequest.model';
-import sendEmail from '../utils/email.utils';
+import SupportRequest from "../db/models/supportRequest.model";
+import sendEmail from "../utils/email.utils";
 
 /**
  *Contains SupportRequest Controller
@@ -24,24 +24,24 @@ class SupportRequestController {
       sendEmail(
         req.body.email,
         req.body.subject,
-        'Your Support request was recieved, a team member will contact you.',
+        "Your Support request was recieved, a team member will contact you."
       );
       sendEmail(
-        'afrilearners@gmail.com',
+        "afrilearners@gmail.com",
         req.body.subject,
-        `A Support request was sent by ${req.body.email}.`,
+        `${req.body.content}. `
       );
 
       return res.status(200).json({
-        status: 'success',
+        status: "success",
         data: {
           supportRequest,
         },
       });
     } catch (error) {
       return res.status(500).json({
-        status: '500 Internal server error',
-        error: 'Error Saving Support Request',
+        status: "500 Internal server error",
+        error: "Error Saving Support Request",
       });
     }
   }
