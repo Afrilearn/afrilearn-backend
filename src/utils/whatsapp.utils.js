@@ -6,7 +6,7 @@ const sendWhatsappMessge = (body, mediaUrl) => {
   const data = {
     from: "whatsapp:+14155238886",
     body,
-    to: "whatsapp:+2348051544949",
+    to: "whatsapp:+2348180172978",
   };
   if (mediaUrl) {
     data.mediaUrl = mediaUrl;
