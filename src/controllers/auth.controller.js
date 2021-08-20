@@ -532,11 +532,11 @@ class AuthController {
       if (req.body.referralCode) {
         let referee;
         if(mongoose.isValidObjectId(req.body.referralCode)){         
-          newUser.referee = req.body.referralCode;
+          user.referee = req.body.referralCode;
           referee = await Auth.findById(req.body.referralCode);         
         }else{ 
           referee = await Auth.findOne({alternateReferralCode:req.body.referralCode});               
-          newUser.referee = referee.id;         
+          user.referee = referee.id;         
         }  
 
         if (referee) {        
