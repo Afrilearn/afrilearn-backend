@@ -4,6 +4,7 @@ import Participant from "../db/models/participant.model";
 import User from "../db/models/users.model";
 import EnrolledCourse from "../db/models/enrolledCourses.model";
 import ChallengeType from "../db/models/challengeTypes.model";
+import DuelResult from "../db/models/duelResult.model";
 
 /**
  *Contains Challenge Controller
@@ -37,6 +38,51 @@ class ChallengeController {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Adding challenge",
+      });
+    }
+  }
+
+  /**
+   * Update a Challenge
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ChallengeController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async updateChallenge(req, res) {
+    const updates = Object.keys(req.body);
+    const allowedUpdates = [
+      "stakedAfricoins",
+      "subjectId",
+      "opponentId",
+      "status",
+      "entryFee",
+    ];
+    const isValidOperation = updates.every((update) =>
+      allowedUpdates.includes(update)
+    );
+    if (!isValidOperation) {
+      return res.status(400).json({
+        status: "400 Invalid Updates",
+        error: "Error updating profile",
+      });
+    }
+    try {
+      const challenge = await Challenge.findById(req.params.challengeId);
+      updates.forEach((update) => {
+        challenge[update] = req.body[update];
+      });
+      return res.status(200).json({
+        status: "success",
+        data: {
+          challenge,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Updating challenge",
       });
     }
   }
@@ -259,6 +305,31 @@ class ChallengeController {
         status: "success",
         data: {
           challengeResult,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error storing results",
+      });
+    }
+  }
+
+  /**
+   * store a duel result
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof ChallengeController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async storeADuelResult(req, res) {
+    try {
+      const duelResult = await DuelResult.create(req.body);
+      return res.status(200).json({
+        status: "success",
+        data: {
+          duelResult,
         },
       });
     } catch (error) {
