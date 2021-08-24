@@ -371,8 +371,7 @@ class AuthController {
   static async login(req, res) {
     try {
       const { email, password } = req.body;
-      const lowerCaseEmail = email.toLowerCase();
-      const user = await AuthServices.emailExist(lowerCaseEmail, res);
+      const user = await AuthServices.emailExist(email, res);
 
       if (!user) {
         return res.status(401).json({
