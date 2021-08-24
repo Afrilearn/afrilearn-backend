@@ -28,7 +28,14 @@ const ChallengeSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["finished", "pending", "rejected", "accepted"],
+      enum: [
+        "finished",
+        "pending",
+        "rejected",
+        "accepted",
+        "cancelled",
+        "timedout",
+      ],
       default: "pending",
     },
     courseId: {

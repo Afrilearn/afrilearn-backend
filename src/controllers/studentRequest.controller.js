@@ -75,11 +75,34 @@ class StudentRequestController {
       </body>
       </html>
       `;
+      const userHtmlMessage = `
+      <html>
+      <head>
+        <title></title>
+        <link href="https://svc.webspellchecker.net/spellcheck31/lf/scayt3/ckscayt/css/wsc.css" rel="stylesheet" type="text/css" />
+      </head>
+      <body>
+        <div>Dear ${user.fullName},</div>
+        <br/ >
+        <div>
+        Thank you for posting your Assignment for help on Afrilearn. Our experienced Tutors are glad to receive your entry, excited to help and will get on it shortly.
+        </div>
+        <br/ >
+        <div>
+        Please expect to receive the Solution and Explanation to your assignment within the next 24 Hours. Should you have further questions, feel free to reach out to us as we are always at your service.
+        </div>
+       <br/ >
+        <div>To your Success, </div>
+       <br/ >
+       <div>Team Afrilearn </div>             
+      </body>
+      </html>
+      `;
 
       sendEmail(
         req.body.email,
-        "We received your request.",
-        `Hello ${user.fullName}, we received your request '${req.body.question}'. A team member will contact you soon to help you out.`
+        "Assignment Help Request Received!",
+        userHtmlMessage
       );
       sendEmail("care@myafrilearn.com", " HOMEWORK ASSISTANCE", htmlMessage);
       // care@myafrilearn.com
@@ -108,23 +131,53 @@ class StudentRequestController {
       const users = await User.find({}).populate("enrolledCourses");
       const counts = [];
       const nulls = [];
+      const parents = [];
+      const schools = [];
+      const googleSignIns = [];
+      const students = [];
       for (let index = 0; index < users.length; index++) {
         const user = users[index];
-        const enrolledCoursesCount = await EnrolledCOurse.countDocuments({
-          userId: user._id,
-        });
+        // const enrolledCoursesCount = await EnrolledCOurse.countDocuments({
+        //   userId: user._id,
+        // });
         if (user.enrolledCourses.length < 1) {
-          nulls.push(user);
-          counts.push(enrolledCoursesCount);
+          if (user.role == "606ed82e70f40e18e029165e") {
+            parents.push(user);
+          }
+          if (user.role == "607ededa2712163504210684") {
+            schools.push(user);
+          }
+          if (user.role == "5fd08fba50964811309722d5") {
+            students.push(user);
+            // await EnrolledCOurse.create({
+            //   courseId: "5fff72b3de0bdb47f826feaf",
+            //   userId: user._id,
+            // });
+          }
+          if (
+            user.role !== "5fd08fba50964811309722d5" &&
+            user.role !== "607ededa2712163504210684" &&
+            user.role !== "606ed82e70f40e18e029165e"
+          ) {
+            if (user.googleUserId) {
+              googleSignIns.push(user);
+            } else {
+              nulls.push(user);
+            }
+          }
+          // counts.push(enrolledCoursesCount);
           // await enrolledCOurse.remove();
         }
       }
       console.log("nulls", nulls.length);
-      console.log("counts", counts);
+      console.log("parents", parents.length);
+      console.log("schools", schools.length);
+      console.log("students", students.length);
+      console.log("googleSignIns", googleSignIns.length);
 
       return res.status(200).json({
         status: "success",
-        data: { nulls },
+        data: { nulls, parents, schools, students, googleSignIns },
       });
     } catch (error) {
       return res.status(500).json({

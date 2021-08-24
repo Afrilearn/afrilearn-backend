@@ -13,6 +13,7 @@ router.delete(
   validateToken,
   ChallengeController.deleteChallenge
 );
+router.patch("/:challengeId", ChallengeController.updateChallenge);
 router.get("/:challengeId", ChallengeController.getChallenge);
 router.get("/", ChallengeController.getChallengeForACourse);
 router.post(
@@ -27,6 +28,7 @@ router.post(
   ChallengeValidator.myValidationResult,
   ChallengeController.storeAChallengeResult
 );
+router.post("/store-duel-result", ChallengeController.storeADuelResult);
 router.get(
   "/results/:challengeId",
   validateToken,
