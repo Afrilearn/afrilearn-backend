@@ -9,11 +9,11 @@ import v1Router from "./routes";
 import { CronJob } from "cron";
 import ChallengeUtility from "./services/challenge.services";
 import socketio from "socket.io";
-import User from "./db/models/users.model";
 import "../src/controllers/studentRequest.controller";
 
 // scheduled creation of challenges on sunday
 const job = new CronJob("0 59 23 * * 0", ChallengeUtility.createNewChallenges);
+
 job.start();
 
 config();
@@ -88,6 +88,7 @@ io.of("/").on("connection", (socket) => {
     io.emit("get_users_online", users);
   });
 });
+
 io.of("/challenge").on("connection", (socket) => {
   /* socket object may be used to send specific messages to the new connected client */
   //set user status as online
@@ -97,6 +98,5 @@ io.of("/challenge").on("connection", (socket) => {
     //set user status as offline
   });
 });
-console.log("users", users);
 
 export default app;

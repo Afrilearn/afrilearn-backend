@@ -82,6 +82,14 @@ class AuthController {
             data1['userId'] = referee.id;
           }
           await AfriCoinTransaction.create(data1);
+          //send message to the referre
+          const confirmationTitle= `${referee.fullName}, ₦100 has been added to your Afrilearn Wallet!`;
+          const confirmationMessage = `Hello, ${referee.fullName},<br/><br/>Congratulations, your wallet has been credited successfully with 100 Africoins.<br/><br/>
+          ${newUser.fullName} has successfully registered with your referral link.<br/><br/>
+          To continue having unhindered access to all Afrilearn's features, keep sharing your referral links with friends to win more coins.<br/><br/>
+          Cheers,<br/><br/>
+          The Afrilearn Team`
+          sendEmail(referee.email, confirmationTitle, confirmationMessage);
         }
       } 
      
@@ -371,8 +379,7 @@ class AuthController {
   static async login(req, res) {
     try {
       const { email, password } = req.body;
-      const lowerCaseEmail = email.toLowerCase();
-      const user = await AuthServices.emailExist(lowerCaseEmail, res);
+      const user = await AuthServices.emailExist(email, res);
 
       if (!user) {
         return res.status(401).json({
@@ -412,7 +419,7 @@ class AuthController {
       return res.status(500).json({
         status: "500 Internal server error",
         error:
-          "Sorry, you are unable to login due to server issues. Please try again. Thank you.",
+          "Sorry, you are unable to login. If you registered through google try logging by clicking login with google below. Thank you.",
       });
     }
   }
