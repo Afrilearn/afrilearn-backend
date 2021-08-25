@@ -1,5 +1,7 @@
 import User from "../db/models/users.model";
 import AfriCoinTransaction from "../db/models/afriCoinTransaction.model";
+import ChallengeUtility from "../services/challenge.services";
+
 
 /**
  *Contains Afri Coins Controller
@@ -18,7 +20,7 @@ class CoinsController {
    *
    */
   static async addOrRemoveCoins(req, res) {
-    try {
+    try {     
       const transaction = await AfriCoinTransaction.create({
         ...req.body,
         userId: req.data.id,
