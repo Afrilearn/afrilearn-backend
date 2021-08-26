@@ -1,7 +1,5 @@
 import User from "../db/models/users.model";
 import AfriCoinTransaction from "../db/models/afriCoinTransaction.model";
-import ChallengeUtility from "../services/challenge.services";
-
 
 /**
  *Contains Afri Coins Controller
