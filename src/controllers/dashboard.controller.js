@@ -179,7 +179,7 @@ class DashboardController {
               path: "relatedPastQuestions relatedSubjects",
               populate: {
                 path: "pastQuestionTypes mainSubjectId relatedLessons",
-                select: "name imageUrl title videoUrls categoryId",
+                select: "name imageUrl title videoUrls categoryId description",
               },
             },
           });
