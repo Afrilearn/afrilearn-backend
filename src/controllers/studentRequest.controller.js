@@ -8,6 +8,7 @@ import sendWhatsappMessge from "../utils/whatsapp.utils";
 import Subject from "../db/models/subjects.model";
 import Course from "../db/models/courses.model";
 import EnrolledCOurse from "../db/models/enrolledCourses.model";
+import mongoose from "mongoose";
 
 /**
  *Contains StudentRequest Controller
@@ -31,20 +32,32 @@ class StudentRequestController {
       attachment = req.file.location;
     }
     try {
-      const request = await StudentRequest.create({
+      const data = {
         ...req.body,
         userId: req.data.id,
         attachment,
-      });
+      };
+      //if subjectId and courseId are objectIds
+      if (mongoose.isValidObjectId(req.body.subjectId)) {
+        const subject = await Subject.findById(req.body.subjectId).populate(
+          "mainSubjectId"
+        );
+        data.subjectId = subject.mainSubjectId.name;
+      } else {
+        data.subjectId = req.body.subjectId;
+      }
+      if (mongoose.isValidObjectId(req.body.courseId)) {
+        const course = await Course.findById(req.body.courseId);
+        data.courseId = course.name;
+      } else {
+        data.courseId = req.body.courseId;
+      }
+      const request = await StudentRequest.create({ ...data });
       const user = await User.findById(req.data.id);
-      const subject = await Subject.findById(req.body.subjectId).populate(
-        "mainSubjectId"
-      );
-      const course = await Course.findById(req.body.courseId);
 
       // Send Whatsapp message to admin (a request was received)
       // Send Whatsapp message to user (we received your request)
-      const body = `Hello Afrilearn, I am ${user.fullName} \nPlease help me with this Question. \nQuestion: ${req.body.question} \nSubject: ${subject.mainSubjectId.name} \nClass: ${course.name}  \nEmail: ${req.body.email}  \nPhone: ${req.body.phone} `;
+      const body = `Hello Afrilearn, I am ${user.fullName} \nPlease help me with this Question. \nQuestion: ${req.body.question} \nSubject: ${data.subjectId} \nClass: ${data.courseId}  \nEmail: ${req.body.email}  \nPhone: ${req.body.phone} `;
       sendWhatsappMessge(body);
       if (attachment) {
         sendWhatsappMessge(body, attachment);
@@ -62,8 +75,8 @@ class StudentRequestController {
         <div>Hello Afrilearn, I am ${user.fullName} ,</div>
         <div>Please help me with this Question.</div>
         <div>Question: ${req.body.question}</div>
-        <div>Subject: ${subject.mainSubjectId.name}</div>
-        <div>Class: ${course.name}</div>
+        <div>Subject: ${data.subjectId}</div>
+        <div>Class: ${data.courseId}</div>
         <div>Email: ${req.body.email}</div>
         <div>Phone: ${req.body.phone} </div>
         ${
@@ -74,6 +87,7 @@ class StudentRequestController {
         
       </body>
       </html>
+
       `;
       const userHtmlMessage = `
       <html>
@@ -98,7 +112,6 @@ class StudentRequestController {
       </body>
       </html>
       `;
-
       sendEmail(
         req.body.email,
         "Assignment Help Request Received!",
