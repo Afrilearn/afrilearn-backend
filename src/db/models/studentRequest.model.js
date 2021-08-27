@@ -11,12 +11,10 @@ const StudentRequestSchema = new mongoose.Schema(
       ref: "user",
     },
     courseId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "course",
+      type: String,
     },
     subjectId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "subject",
+      type: String,
     },
   },
   {
