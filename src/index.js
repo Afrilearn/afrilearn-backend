@@ -19,7 +19,7 @@ import {
 import sendEmail from "./utils/email.utils";
 
 // scheduled creation of challenges on sunday
-const job = new CronJob("0 59 23 * * 0", ChallengeUtility.createNewChallenges);
+const job = new CronJob("00 00 00 * * 6", ChallengeUtility.createNewChallenges);
 
 job.start();
 
