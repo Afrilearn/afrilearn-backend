@@ -43,7 +43,7 @@ class AuthController {
     try {
       let customerRole = "Student";
       const { fullName, password, email, role, phoneNumber } = req.body;
-     
+
       const encryptpassword = await Helper.encrptPassword(password);
 
       const newUser = {
@@ -52,47 +52,49 @@ class AuthController {
         email,
         role,
         phoneNumber,
-      };     
+      };
       if (req.body.channel) {
-        newUser['channel'] = req.body.channel
+        newUser["channel"] = req.body.channel;
       }
 
       if (req.body.referralCode) {
         let referee;
-        if(mongoose.isValidObjectId(req.body.referralCode)){         
+        if (mongoose.isValidObjectId(req.body.referralCode)) {
           newUser.referee = req.body.referralCode;
-          referee = await Auth.findById(req.body.referralCode);         
-        }else{ 
-          referee = await Auth.findOne({alternateReferralCode:req.body.referralCode});               
-          newUser.referee = referee.id;         
-        }  
+          referee = await Auth.findById(req.body.referralCode);
+        } else {
+          referee = await Auth.findOne({
+            alternateReferralCode: req.body.referralCode,
+          });
+          newUser.referee = referee.id;
+        }
 
         //add afriCoins for referee
-        if (referee) {        
+        if (referee) {
           referee.afriCoins += 100;
           await referee.save();
           const data1 = {
             description: "Referrals",
             type: "add",
-            amount: 100            
-          }
-          if(mongoose.isValidObjectId(req.body.referralCode)){   
-            data1['userId'] = req.body.referralCode;
-          }else{
-            data1['userId'] = referee.id;
+            amount: 100,
+          };
+          if (mongoose.isValidObjectId(req.body.referralCode)) {
+            data1["userId"] = req.body.referralCode;
+          } else {
+            data1["userId"] = referee.id;
           }
           await AfriCoinTransaction.create(data1);
           //send message to the referre
-          const confirmationTitle= `${referee.fullName}, ₦100 has been added to your Afrilearn Wallet!`;
+          const confirmationTitle = `${referee.fullName}, ₦100 has been added to your Afrilearn Wallet!`;
           const confirmationMessage = `Hello, ${referee.fullName},<br/><br/>Congratulations, your wallet has been credited successfully with 100 Africoins.<br/><br/>
           ${newUser.fullName} has successfully registered with your referral link.<br/><br/>
           To continue having unhindered access to all Afrilearn's features, keep sharing your referral links with friends to win more coins.<br/><br/>
           Cheers,<br/><br/>
-          The Afrilearn Team`
+          The Afrilearn Team`;
           sendEmail(referee.email, confirmationTitle, confirmationMessage);
         }
-      } 
-     
+      }
+
       if (req.body.referralLink) {
         newUser.referralLink = req.body.referralLink;
       }
@@ -239,7 +241,7 @@ class AuthController {
           user,
         },
       });
-    } catch (err) {     
+    } catch (err) {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error creating new user",
@@ -532,41 +534,43 @@ class AuthController {
 
       if (req.body.alternateReferralCode) {
         await AuthServices.referralExist(req.body.alternateReferralCode, res);
-        user["alternateReferralCode"] = req.body.alternateReferralCode;        
+        user["alternateReferralCode"] = req.body.alternateReferralCode;
       }
-      
+
       //add afriCoins for referee via social login
       if (req.body.referralCode) {
         let referee;
-        if(mongoose.isValidObjectId(req.body.referralCode)){         
+        if (mongoose.isValidObjectId(req.body.referralCode)) {
           user.referee = req.body.referralCode;
-          referee = await Auth.findById(req.body.referralCode);         
-        }else{ 
-          referee = await Auth.findOne({alternateReferralCode:req.body.referralCode});               
-          user.referee = referee.id;         
-        }  
+          referee = await Auth.findById(req.body.referralCode);
+        } else {
+          referee = await Auth.findOne({
+            alternateReferralCode: req.body.referralCode,
+          });
+          user.referee = referee.id;
+        }
 
-        if (referee) {        
+        if (referee) {
           referee.afriCoins += 100;
           await referee.save();
           const data1 = {
             description: "Referrals",
             type: "add",
-            amount: 100            
-          }
-          if(mongoose.isValidObjectId(req.body.referralCode)){   
-            data1['userId'] = req.body.referralCode;
-          }else{
-            data1['userId'] = referee.id;
+            amount: 100,
+          };
+          if (mongoose.isValidObjectId(req.body.referralCode)) {
+            data1["userId"] = req.body.referralCode;
+          } else {
+            data1["userId"] = referee.id;
           }
           await AfriCoinTransaction.create(data1);
         }
       }
 
       if (req.body.channel) {
-        user['channel'] = req.body.channel
+        user["channel"] = req.body.channel;
       }
-      
+
       if (req.body.phoneNumber) {
         user["phoneNumber"] = req.body.phoneNumber;
       }
@@ -592,7 +596,7 @@ class AuthController {
 
       if (req.body.accountName) {
         user["accountName"] = req.body.accountName;
-      } 
+      }
 
       if (req.body.state) {
         user["state"] = req.body.state;
@@ -604,7 +608,7 @@ class AuthController {
 
       if (req.body.role) {
         user["role"] = req.body.role;
-      } 
+      }
 
       if (req.body.referralLink) {
         user["referralLink"] = req.body.referralLink;
@@ -988,6 +992,30 @@ class AuthController {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Loading user",
+      });
+    }
+  }
+
+  static async getActiveSubscriptions(req, res) {
+    try {
+      const enrolledCourses = await EnrolledCourse.find({
+        userId: req.params.userId,
+      });
+      const actives = [];
+      enrolledCourses.forEach((course) => {
+        if (course.endDate > Date.now()) {
+          actives.push(course.courseId);
+        }
+      });
+
+      return res.status(200).json({
+        status: "success",
+        data: { actives },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Get Subscriptions",
       });
     }
   }
