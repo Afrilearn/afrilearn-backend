@@ -32,6 +32,7 @@ router.post(
   AuthController.signUp
 );
 
+router.get("/active-subs/:userId", AuthController.getActiveSubscriptions);
 router.get("/activate_account", verifyToken, AuthController.activateAccount);
 
 router.post(
