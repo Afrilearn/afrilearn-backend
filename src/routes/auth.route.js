@@ -31,7 +31,7 @@ router.post(
   SignUpValidator.emailAlreadyExist,
   AuthController.signUp
 );
-
+// router.post('/delete-stuff', AuthController.deleteStuff)
 router.get("/active-subs/:userId", AuthController.getActiveSubscriptions);
 router.get("/activate_account", verifyToken, AuthController.activateAccount);
 

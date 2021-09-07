@@ -9,6 +9,10 @@ const AfriCoinTransactionSchema = new mongoose.Schema(
       type: String,
       enum: ["add", "remove"],
     },
+    free: {
+      type: Boolean,
+      default: false,
+    },
     amount: {
       type: Number,
     },

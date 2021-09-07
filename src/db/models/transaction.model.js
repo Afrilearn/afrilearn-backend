@@ -11,6 +11,10 @@ const TransactionSchema = new mongoose.Schema(
     flutterWaveResponse: {
       type: Object,
     },
+    free: {
+      type: Boolean,
+      default: false,
+    },
     status: {
       type: String,
       enum: ["pending", "successful", "failed", "paid"], //pending- customer has initiated payment, paid - the payment was recieved by payment merchant, successful - merchant sent webhook stating successful transaction
@@ -22,7 +26,7 @@ const TransactionSchema = new mongoose.Schema(
     },
     classId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'class',
+      ref: "class",
     },
     enrolledCourseId: {
       type: mongoose.Schema.ObjectId,
@@ -34,13 +38,13 @@ const TransactionSchema = new mongoose.Schema(
     },
     creatorId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'cmsUser',
+      ref: "cmsUser",
     },
   },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-    timestamps: true
+    timestamps: true,
   }
 );
 
