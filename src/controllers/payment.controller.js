@@ -11,6 +11,7 @@ import axios from "axios";
 import { config } from "dotenv";
 import AfriCoinTransaction from "../db/models/afriCoinTransaction.model";
 import User from "../db/models/users.model";
+import sendEmail from "../utils/email.utils";
 
 config();
 /**
@@ -279,6 +280,41 @@ class PaymentController {
         });
       }
       const transaction = await Transaction.create(req.body);
+
+      //send mail to user
+      const userThatPaid = await User.findById(req.body.userId);
+      const htmlMessage = `<html>
+          <head>
+            <title></title>
+            <link href="https://svc.webspellchecker.net/spellcheck31/lf/scayt3/ckscayt/css/wsc.css" rel="stylesheet" type="text/css" />
+          </head>
+          <body>
+          <div>Dear ${userThatPaid.fullName},</div>
+          
+          <div>&nbsp;</div>
+          
+          <div>&nbsp;</div>
+          
+          <div>Congrats on subscribing to the best-kept secret of Successful Students; we’re super excited to have you as part of the winning Afrilearn family!</div>
+          <div>&nbsp;</div>
+          <div>To get started on your personalized fun learning portal, simply log on to your dashboard. You can access Afrilearn on your Smartphone, Tablet, or PC.</div>
+          <div>&nbsp;</div>
+          <div>Feel free to let us know if you have any questions by replying to this email.</div>
+          <div>&nbsp;</div>  
+          <div>Your dreams are valid and we’re rooting for you!</div>
+          
+          <div>&nbsp;</div>
+          
+          <div>&nbsp;</div>
+          
+          <div>All the best,</div>
+          <div>&nbsp;</div>
+          <div>Team Afrilearn</div>
+          
+          </body>
+          </html>
+      `;
+      sendEmail(userThatPaid.email, "Afrilearn Transaction", htmlMessage);
 
       return res.status(201).json({
         status: "success",
@@ -557,12 +593,48 @@ class PaymentController {
                   amount: paymentPlan.amount,
                   userId: clientUserId,
                 });
-                await User.findByIdAndUpdate(
+                const userThatPaid = await User.findByIdAndUpdate(
                   clientUserId,
                   {
                     $inc: { afriCoins: paymentPlan.amount },
                   },
                   { new: true }
+                );
+                const htmlMessage = `<html>
+                      <head>
+                        <title></title>
+                        <link href="https://svc.webspellchecker.net/spellcheck31/lf/scayt3/ckscayt/css/wsc.css" rel="stylesheet" type="text/css" />
+                      </head>
+                      <body>
+                      <div>Dear ${userThatPaid.fullName},</div>
+                      
+                      <div>&nbsp;</div>
+                      
+                      <div>&nbsp;</div>
+                      
+                      <div>Congrats on subscribing to the best-kept secret of Successful Students; we’re super excited to have you as part of the winning Afrilearn family!</div>
+                      <div>&nbsp;</div>
+                      <div>To get started on your personalized fun learning portal, simply log on to your dashboard. You can access Afrilearn on your Smartphone, Tablet, or PC.</div>
+                      <div>&nbsp;</div>
+                      <div>Feel free to let us know if you have any questions by replying to this email.</div>
+                      <div>&nbsp;</div>  
+                      <div>Your dreams are valid and we’re rooting for you!</div>
+                      
+                      <div>&nbsp;</div>
+                      
+                      <div>&nbsp;</div>
+                      
+                      <div>All the best,</div>
+                      <div>&nbsp;</div>
+                      <div>Team Afrilearn</div>
+                      
+                      </body>
+                      </html>
+      `;
+                sendEmail(
+                  userThatPaid.email,
+                  "Afrilearn Transaction",
+                  htmlMessage
                 );
               })();
             }
@@ -650,11 +722,6 @@ class PaymentController {
           let existingEnrolledCourse = await EnrolledCourse.findOne(condition);
 
           if (!existingEnrolledCourse) {
-            // if (role === '602f3ce39b146b3201c2dc1d' && req.body.newClassName) {
-            //   //console.log('attash class id')
-            //   //console.log(newClass)
-            //   condition['classId'] = newClass.id;
-            // }
             existingEnrolledCourse = await EnrolledCourse.create(condition);
           }
 
@@ -733,6 +800,41 @@ class PaymentController {
           await Transaction.create(condition);
         })();
       }
+
+      const userThatPaid = await User.findById(clientUserId);
+      //send email to user
+      const htmlMessage = `<html>
+          <head>
+            <title></title>
+            <link href="https://svc.webspellchecker.net/spellcheck31/lf/scayt3/ckscayt/css/wsc.css" rel="stylesheet" type="text/css" />
+          </head>
+          <body>
+          <div>Dear ${userThatPaid.fullName},</div>
+          
+          <div>&nbsp;</div>
+          
+          <div>&nbsp;</div>
+          
+          <div>Congrats on subscribing to the best-kept secret of Successful Students; we’re super excited to have you as part of the winning Afrilearn family!</div>
+          <div>&nbsp;</div>
+          <div>To get started on your personalized fun learning portal, simply log on to your dashboard. You can access Afrilearn on your Smartphone, Tablet, or PC.</div>
+          <div>&nbsp;</div>
+          <div>Feel free to let us know if you have any questions by replying to this email.</div>
+          <div>&nbsp;</div>  
+          <div>Your dreams are valid and we’re rooting for you!</div>
+          
+          <div>&nbsp;</div>
+          
+          <div>&nbsp;</div>
+          
+          <div>All the best,</div>
+          <div>&nbsp;</div>
+          <div>Team Afrilearn</div>
+          
+          </body>
+          </html>
+      `;
+      sendEmail(userThatPaid.email, "Afrilearn Transaction", htmlMessage);
       return res.status(200).json({
         status: "success",
         data: {
@@ -773,6 +875,40 @@ class PaymentController {
       });
 
       if (response.data.status === true) {
+        const userThatPaid = await User.findById(clientUserId);
+        const htmlMessage = `<html>
+            <head>
+              <title></title>
+              <link href="https://svc.webspellchecker.net/spellcheck31/lf/scayt3/ckscayt/css/wsc.css" rel="stylesheet" type="text/css" />
+            </head>
+            <body>
+            <div>Dear ${userThatPaid.fullName},</div>
+            
+            <div>&nbsp;</div>
+            
+            <div>&nbsp;</div>
+            
+            <div>Congrats on subscribing to the best-kept secret of Successful Students; we’re super excited to have you as part of the winning Afrilearn family!</div>
+            <div>&nbsp;</div>
+            <div>To get started on your personalized fun learning portal, simply log on to your dashboard. You can access Afrilearn on your Smartphone, Tablet, or PC.</div>
+            <div>&nbsp;</div>
+            <div>Feel free to let us know if you have any questions by replying to this email.</div>
+            <div>&nbsp;</div>  
+            <div>Your dreams are valid and we’re rooting for you!</div>
+            
+            <div>&nbsp;</div>
+            
+            <div>&nbsp;</div>
+            
+            <div>All the best,</div>
+            <div>&nbsp;</div>
+            <div>Team Afrilearn</div>
+            
+            </body>
+            </html>
+        `;
+        sendEmail(userThatPaid.email, "Afrilearn Transaction", htmlMessage);
+
         if (response.data.data.status === "success") {
           verified = true;
           if (role === "602f3ce39b146b3201c2dc1d") {

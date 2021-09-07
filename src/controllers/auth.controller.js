@@ -23,6 +23,7 @@ import CourseCategory from "../db/models/courseCategories.model";
 import Class from "../db/models/classes.model";
 import AdminRole from "../db/models/adminRole.model";
 import AfriCoinTransaction from "../db/models/afriCoinTransaction.model";
+import Transaction from "../db/models/transaction.model";
 
 /**
  *Contains Auth Controller
@@ -77,6 +78,7 @@ class AuthController {
             description: "Referrals",
             type: "add",
             amount: 100,
+            free: true,
           };
           if (mongoose.isValidObjectId(req.body.referralCode)) {
             data1["userId"] = req.body.referralCode;
@@ -557,6 +559,7 @@ class AuthController {
             description: "Referrals",
             type: "add",
             amount: 100,
+            free: true,
           };
           if (mongoose.isValidObjectId(req.body.referralCode)) {
             data1["userId"] = req.body.referralCode;
@@ -1019,5 +1022,23 @@ class AuthController {
       });
     }
   }
+
+  static async deleteStuff(req, res) {
+    try {
+      const deleteWorthies = [];
+      const rrr = await Transaction.find({}).populate("userId");
+      rrr.forEach(async (r) => {
+        if (r.userId === null) {
+          await r.delete();
+          deleteWorthies.push(r);
+        }
+      });
+      console.log("deleteWorthies", deleteWorthies.length);
+      res.send(deleteWorthies);
+    } catch (error) {
+      res.status(500).send(error);
+    }
+  }
 }
+
 export default AuthController;
