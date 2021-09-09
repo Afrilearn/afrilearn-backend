@@ -65,13 +65,13 @@ const UserSchema = new mongoose.Schema(
     referralLink: {
       type: String,
       trim: true,
-    },   
+    },
     referee: {
       type: mongoose.Schema.ObjectId,
       ref: "user",
     },
     alternateReferralCode: {
-      type: String     
+      type: String,
     },
     isActivated: {
       type: Boolean,
@@ -79,6 +79,12 @@ const UserSchema = new mongoose.Schema(
     },
     profilePhotoUrl: {
       type: String,
+    },
+    feedBack: {
+      type: String,
+    },
+    rating: {
+      type: Number,
     },
     isAdmin: {
       type: Boolean,
@@ -96,7 +102,7 @@ const UserSchema = new mongoose.Schema(
     },
     channel: {
       type: String,
-      default: 'web',
+      default: "web",
     },
   },
   {
