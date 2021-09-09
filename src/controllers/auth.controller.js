@@ -582,6 +582,12 @@ class AuthController {
         user["dateOfBirth"] = req.body.dateOfBirth;
       }
 
+      if (req.body.feedBack) {
+        user["feedBack"] = req.body.feedBack;
+      }
+      if (req.body.rating) {
+        user["rating"] = req.body.rating;
+      }
       if (req.body.country) {
         user["country"] = req.body.country;
       }
@@ -620,7 +626,7 @@ class AuthController {
       if (req.body.referee) {
         user["referee"] = req.body.referee;
       }
-
+ 
       await user.save();
       if (req.body.courseId) {
         const enrolledCourse = await EnrolledCourse.create({
