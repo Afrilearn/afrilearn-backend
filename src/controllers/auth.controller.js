@@ -626,7 +626,7 @@ class AuthController {
       if (req.body.referee) {
         user["referee"] = req.body.referee;
       }
- 
+
       await user.save();
       if (req.body.courseId) {
         const enrolledCourse = await EnrolledCourse.create({
@@ -697,7 +697,14 @@ class AuthController {
       );
 
       const user2 = await AuthServices.emailExist(user.email, res);
-
+      if (req.body.feedBack && req.body.rating) {
+        //send email to
+        sendEmail(
+          "care@myafrilearn.com",
+          `Feedback from ${user.fullName}`,
+          `${user.fullName} submitted feedback and rating. \n What could we do to improve your Experience?: ${req.body.feedBack}\n How likely are you to recommend Afrilearn to a friend or colleague?: ${req.body.rating}/10`
+        );
+      }
       return res.status(200).json({
         status: "success",
         data: {
