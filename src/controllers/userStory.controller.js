@@ -24,7 +24,7 @@ class UserStoryController {
 
   static async getUserStory(req, res) {
     try {
-      const customerStories = await UserStory.find().sort({ createdAt: -1 });
+      const customerStories = await UserStory.find({}).sort({ createdAt: -1 });
       return res.status(200).json({
         status: "success",
         data: {
@@ -32,6 +32,7 @@ class UserStoryController {
         },
       });
     } catch (error) {
+      console.lo(error)
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error getting UserStory",
