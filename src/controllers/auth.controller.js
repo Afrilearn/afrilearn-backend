@@ -12,16 +12,7 @@ import Lesson from "../db/models/lessons.model";
 import Question from "../db/models/questions.model";
 import mongoose from "mongoose";
 import School from "../db/models/schoolProfile";
-
-import Userz from "../../users.json";
-import Students from "../../students.json";
-import NewUsers from "../../NewUsers.json";
-import OldUsers from "../../old.json";
-import _7_8_2021 from "../../_7_8_2021.json";
-import axios from "axios";
 import CourseCategory from "../db/models/courseCategories.model";
-import Class from "../db/models/classes.model";
-import AdminRole from "../db/models/adminRole.model";
 import AfriCoinTransaction from "../db/models/afriCoinTransaction.model";
 import Transaction from "../db/models/transaction.model";
 
