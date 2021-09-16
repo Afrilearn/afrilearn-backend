@@ -5,5 +5,5 @@ import upload from "../config/bucket";
 const router = Router();
 
 router.post("/", upload.single("image"), UserStoryController.addUserStory);
-router.get("/", UserStoryController.getUserStory);
+router.get("/stories", UserStoryController.getUserStory);
 export default router;
