@@ -6,21 +6,8 @@ import Auth from "../db/models/users.model";
 
 import Helper from "../utils/user.utils";
 import sendEmail from "../utils/email.utils";
-import AuthServices from "../services/auth.services";
-import ResetPassword from "../db/models/resetPassword.model";
-import Role from "../db/models/roles.model";
 import EnrolledCourse from "../db/models/enrolledCourses.model";
 import ClassMember from "../db/models/classMembers.model";
-import Lesson from "../db/models/lessons.model";
-import Question from "../db/models/questions.model";
-import mongoose from "mongoose";
-
-import Userz from "../../users.json";
-import Students from "../../students.json";
-import NewUsers from "../../NewUsers.json";
-import OldUsers from "../../old.json";
-import axios from "axios";
-import CourseCategory from "../db/models/courseCategories.model";
 
 /**
  *Contains School Controller
