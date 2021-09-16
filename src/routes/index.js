@@ -22,6 +22,7 @@ import coinRoute from "./coin.route";
 import requestRoute from "./request.route";
 import facultyRoute from "./faculty.route";
 import notificationRoute from "./notification.route";
+import userStoryRoute from "./userStory.route";
 
 const router = Router();
 
@@ -48,5 +49,6 @@ router.use("/parents", parentRoute);
 router.use("/student-requests", requestRoute);
 router.use("/faculty", facultyRoute);
 router.use("/notifications", notificationRoute);
+router.use("/user-story", userStoryRoute);
 
 export default router;
