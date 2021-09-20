@@ -41,7 +41,7 @@ async function sendEmail(to, subject = "Afrilearn", message) {
       return re.test(email);
     };
     
-    if(validateEmail(to) && res.valid === true){      
+    if(validateEmail(to)){      
       let mailDetail = {
         from: 'Afrilearn Education <care@myafrilearn.com>',
         to: to,
