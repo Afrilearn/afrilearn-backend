@@ -41,7 +41,7 @@ async function sendEmail(to, subject = "Afrilearn", message) {
       return re.test(email);
     };
     
-    if(validateEmail(to)){      
+    if(validateEmail(to) && res.valid === true){      
       let mailDetail = {
         from: 'Afrilearn Education <care@myafrilearn.com>',
         to: to,
@@ -55,8 +55,7 @@ async function sendEmail(to, subject = "Afrilearn", message) {
           logger.info(`This email ${to} was not sent. Err:${err}`) 
           if(err.status !== 400){
             sendEmail(to, subject, message) 
-          }
-             
+          }             
         }
         else {
           logger.info(`Mail-->${to} was sent successfully`)       
