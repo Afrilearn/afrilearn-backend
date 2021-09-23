@@ -141,10 +141,11 @@ class ChallengeController {
         createdAt: -1
       })
       const options1 = {
-        description:'Battle-with-friends',
-        challengeTypeId:'611a6f14af35ab4d3415c012'
+        subjects:'oneOnOne',
+        challengeTypeId:'611a6f14af35ab4d3415c012',
+        courseId: req.query.courseId
       }
-      const challengeAFriendGeneralInfor = await Challenge.find(options1)
+      const challengeAFriendGeneralInfor = await Challenge.findOne(options1)
 
       if (!challenges) {
         return res.status(404).json({
