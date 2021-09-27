@@ -154,6 +154,7 @@ class AuthController {
           name: req.body.className,
           courseId: req.body.courseId,
           classCode,
+          subjectIds: req.body.subjectIds,
         });
 
         await enrolledCourse.update(
@@ -532,6 +533,9 @@ class AuthController {
 
       if (req.body.fullName) {
         user["fullName"] = req.body.fullName;
+      }
+      if (req.body.pushToken) {
+        user["pushToken"] = req.body.pushToken;
       }
 
       if (req.body.alternateReferralCode) {
