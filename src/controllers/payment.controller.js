@@ -907,7 +907,7 @@ class PaymentController {
             </body>
             </html>
         `;
-        // sendEmail(userThatPaid.email, "Afrilearn Transaction", htmlMessage);
+        sendEmail(userThatPaid.email, "Afrilearn Transaction", htmlMessage);
 
         if (response.data.data.status === "success") {
           verified = true;
