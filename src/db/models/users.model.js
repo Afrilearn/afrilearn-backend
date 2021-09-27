@@ -104,6 +104,9 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: "web",
     },
+    pushToken: {
+      type: String,
+    },
   },
   {
     toJSON: { virtuals: true },

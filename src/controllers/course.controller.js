@@ -11,22 +11,8 @@ import RelatedPastQuestion from "../db/models/relatedPastQuestions.model";
 import PastQuestionType from "../db/models/pastQuestionTypes.model";
 import Recommendation from "../db/models/recommendation.model";
 import Lesson from "../db/models/lessons.model";
-/**
- *Contains Course Controller
- *
- *
- *
- * @class CourseController
- */
+
 class CourseController {
-  /**
-   * Get all Cousres
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof CourseController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
   static async loadCourses(req, res) {
     try {
       const courses = await Course.find({})
@@ -50,14 +36,6 @@ class CourseController {
     }
   }
 
-  /**
-   * User Add a Cousre to list of their EnrolledCourse
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof CourseController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
   static async addCourseToEnrolledCourses(req, res) {
     try {
       const existingEnrollement = await EnrolledCourse.findOne({
@@ -92,14 +70,6 @@ class CourseController {
     }
   }
 
-  /**
-   * Get a Cousre
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof CourseController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
   static async getCourse(req, res) {
     try {
       const course = await Course.findById(req.params.courseId).populate({
@@ -127,14 +97,6 @@ class CourseController {
     }
   }
 
-  /**
-   * Get progress and performance for a Cousre
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof CourseController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
   static async getCourseProgressAndPerformance(req, res) {
     try {
       const userID = req.body.userId || req.data.id;
@@ -479,14 +441,6 @@ class CourseController {
     }
   }
 
-  /**
-   * Get past Question performance for a Cousre
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof CourseController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
   static async getCoursePastQuestionPerformance(req, res) {
     try {
       const userID = req.body.userId || req.data.id;
@@ -602,14 +556,6 @@ class CourseController {
     }
   }
 
-  /**
-   * Get subject performance for a Cousre
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof CourseController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
   static async getCourseSubjectPerformance(req, res) {
     try {
       const userID = req.body.userId || req.data.id;
@@ -702,14 +648,6 @@ class CourseController {
     }
   }
 
-  /**
-   * Get progress for a Cousre
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof CourseController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
   static async getCourseProgress(req, res) {
     try {
       const userID = req.body.userId || req.data.id;
@@ -767,14 +705,6 @@ class CourseController {
     }
   }
 
-  /**
-   * Get all Subjects for a course
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof SubjectController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
   static async getSubjectsForACourse(req, res) {
     try {
       const subjects = await Subject.find({
@@ -805,14 +735,6 @@ class CourseController {
     }
   }
 
-  /**
-   * Submit subject progress
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof SubjectController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
   static async subjectProgress(req, res) {
     const { courseId, subjectId, lessonId } = req.body;
     try {

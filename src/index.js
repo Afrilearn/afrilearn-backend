@@ -10,13 +10,11 @@ import { CronJob } from "cron";
 import ChallengeUtility from "./services/challenge.services";
 import socketio from "socket.io";
 import "../src/controllers/studentRequest.controller";
-import {
-  join_User,
-  get_Current_User,
-  user_Disconnect,
-  get_Current_User_socket_id_with_userId,
-} from "./chat/dummyuser";
-import sendEmail from "./utils/email.utils";
+
+import chat from "./events/chat";
+import login from "./events/login";
+import challenge from "./events/challenge";
+import disconnect from "./events/disconnect";
 
 // scheduled creation of challenges on sunday
 const job = new CronJob("00 00 00 * * 6", ChallengeUtility.createNewChallenges);
@@ -34,6 +32,8 @@ const io = socketio(server, {
     origin: process.env.CLIENT_URL,
     methods: ["GET", "POST"],
   },
+  pingTimeout: 6000000,
+  pingInterval: 30000,
 });
 
 const port = process.env.PORT || 5000;
@@ -71,111 +71,12 @@ server.listen(port, () => {
 });
 
 const users = {};
+const onConnection = (socket) => {
+  chat(io, socket);
+  login(io, socket, users);
+  challenge(io, socket, users);
+  disconnect(io, socket, users);
+};
 
-io.of("/").on("connection", (socket) => {
-  //for a new user joining the room
-
-  socket.on("joinRoom", ({ username, roomname, user }) => {
-    socket.join(roomname);
-    //* create user
-    const { p_user, c_users } = join_User(socket.id, username, roomname, user);
-    //display a welcome message to the user who have joined a room
-    socket.emit("message", {
-      userId: p_user.id,
-      username: p_user.username,
-      text: `Welcome ${p_user.username}`,
-    });
-
-    //Send connected users to everyone
-    io.to(p_user.room).emit("connected_users", c_users);
-    //displays a joined room message to all other room users except that particular user
-    socket.to(p_user.room).emit("message", {
-      userId: p_user.id,
-      username: p_user.username,
-      text: `${p_user.username} has joined the chat`,
-    });
-  });
-
-  //user inviting others
-  socket.on("invite", ({ guest, host }) => {
-    //check if user is connected
-    const socketReturned = get_Current_User_socket_id_with_userId(
-      guest._id,
-      users
-    );
-    //if connected
-    if (socketReturned.socketId) {
-      //emit a prompt to show invite modal to user
-      io.to(socketReturned.socketId).emit("promt_invite", {
-        guest,
-        host,
-      });
-      //send email to user with the user
-      if (guest.email) {
-        sendEmail(
-          guest.email,
-          `${host.fullName} challenged you`,
-          `Your friend, ${host.fullName} has invited you to a challenge on Afrilearn. Log in on your afrilearn App to Accept the challenge.`
-        );
-      }
-      //record challenge request for guest
-    }
-    //else send email to user with the user
-    if (guest.email) {
-      sendEmail(
-        guest.email,
-        `${host.fullName} challenged you`,
-        `Your friend, ${host.fullName} has invited you to a challenge on Afrilearn. Log in on your afrilearn App to Accept the challenge.`
-      );
-    }
-    //record challenge request for guest
-  });
-
-  //user sending message
-  socket.on("record_challenge_result", ({ challengeId, data }) => {
-    io.to(challengeId).emit("updateChallengeResults", data);
-  });
-
-  //user sending message
-  socket.on("chat", (text) => {
-    //gets the room user and the message sent
-    const p_user = get_Current_User(socket.id);
-
-    io.to(p_user.room).emit("message", {
-      userId: p_user.id,
-      username: p_user.username,
-      text: text,
-    });
-  });
-
-  //register login to manage users online and those offline
-  socket.on("login", function (data) {
-    users[socket.id] = data;
-    io.emit("get_users_online", users);
-  });
-
-  socket.on("disconnecting", () => {
-    console.log(socket.rooms); // the Set contains at least the socket ID
-  });
-
-  socket.on("disconnect", (reason) => {
-    //the user is deleted from array of users and a left room message displayed
-    const p_user = user_Disconnect(socket.id);
-
-    if (p_user) {
-      io.to(p_user.room).emit("message", {
-        userId: p_user.id,
-        username: p_user.username,
-        text: `${p_user.username} has left the room`,
-      });
-    }
-    if (reason === "io server disconnect") {
-      // the disconnection was initiated by the server, you need to reconnect manually
-      socket.connect();
-    }
-    delete users[socket.id];
-    io.emit("get_users_online", users);
-  });
-});
-
+io.of("/").on("connection", onConnection);
 export default app;

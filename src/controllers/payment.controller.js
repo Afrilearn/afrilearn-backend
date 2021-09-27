@@ -929,6 +929,9 @@ class PaymentController {
                   courseId,
                   classCode,
                 };
+                if (req.body.subjectId) {
+                  condition.subjectIds = [req.body.subjectId];
+                }
 
                 newClass = await ClassModel.create(condition);
                 //console.log(newClass);

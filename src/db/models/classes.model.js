@@ -11,11 +11,15 @@ const ClassSchema = new mongoose.Schema(
     },
     courseId: {
       type: mongoose.Schema.ObjectId,
-      ref: "course", 
+      ref: "course",
     },
     schoolId: {
       type: mongoose.Schema.ObjectId,
       ref: "school",
+    },
+    subjectIds: {
+      type: Array,
+      default: [],
     },
     classCode: {
       type: String,
@@ -24,8 +28,8 @@ const ClassSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-    timestamps: true
-  },
+    timestamps: true,
+  }
 );
 
 ClassSchema.virtual("classAnnouncements", {
