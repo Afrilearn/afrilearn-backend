@@ -980,11 +980,21 @@ class PaymentController {
               //Assuming that the teacher has just one subject in a class
               if (classId) {
                 const classBeingPaidFor = await ClassModel.findById(classId);
-                classBeingPaidFor.subjectIds[0] = {
-                  ...classBeingPaidFor.subjectIds[0],
-                  startdate,
-                  endDate,
-                };
+                if (classBeingPaidFor.subjectIds.length > 0) {
+                  classBeingPaidFor.subjectIds[0] = {
+                    ...classBeingPaidFor.subjectIds[0],
+                    startdate,
+                    endDate,
+                  };
+                } else {
+                  classBeingPaidFor.subjectIds = [
+                    {
+                      subjectId: req.body.subjectId,
+                      startdate,
+                      endDate,
+                    },
+                  ];
+                }
                 await classBeingPaidFor.save();
               }
 
