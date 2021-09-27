@@ -150,7 +150,7 @@ class AuthController {
           classCode = await Helper.generateCode(8);
         }
         const newClass = await ClassModel.create({
-          userId: result._id,
+          userId: result._id, 
           name: req.body.className,
           courseId: req.body.courseId,
           classCode,
