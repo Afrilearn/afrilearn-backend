@@ -864,7 +864,8 @@ class PaymentController {
       let condition = null;
       let newClass = null;
 
-      const { reference, productId, courseId, clientUserId } = req.body;
+      const { reference, productId, courseId, clientUserId, classId } =
+        req.body;
 
       const { role } = req.data;
 
@@ -873,7 +874,6 @@ class PaymentController {
         url: `https://api.paystack.co/transaction/verify/${reference}`,
         headers: { Authorization: process.env.PAYSTACK_SECRET_KEY },
       });
-
       if (response.data.status === true) {
         const userThatPaid = await User.findById(clientUserId);
         const htmlMessage = `<html>
@@ -930,11 +930,10 @@ class PaymentController {
                   classCode,
                 };
                 if (req.body.subjectId) {
-                  condition.subjectIds = [req.body.subjectId];
+                  condition.subjectIds = [{ subjectId: req.body.subjectId }];
                 }
 
                 newClass = await ClassModel.create(condition);
-                //console.log(newClass);
               }
 
               // check whether the user is already enrolled for this course
@@ -977,6 +976,27 @@ class PaymentController {
               existingEnrolledCourse.endDate = endDate;
               existingEnrolledCourse.status = "paid";
               existingEnrolledCourse.save();
+
+              //Assuming that the teacher has just one subject in a class
+              if (classId) {
+                const classBeingPaidFor = await ClassModel.findById(classId);
+                if (classBeingPaidFor.subjectIds.length > 0) {
+                  classBeingPaidFor.subjectIds[0] = {
+                    ...classBeingPaidFor.subjectIds[0],
+                    startdate,
+                    endDate,
+                  };
+                } else {
+                  classBeingPaidFor.subjectIds = [
+                    {
+                      subjectId: req.body.subjectId,
+                      startdate,
+                      endDate,
+                    },
+                  ];
+                }
+                await classBeingPaidFor.save();
+              }
 
               // // Create the transaction
               condition = {

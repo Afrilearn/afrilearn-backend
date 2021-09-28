@@ -17,10 +17,19 @@ const ClassSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "school",
     },
-    subjectIds: {
-      type: Array,
-      default: [],
-    },
+    subjectIds: [
+      {
+        subjectId: { type: mongoose.Schema.ObjectId, ref: "subject" },
+        startDate: {
+          type: Date,
+          default: new Date(),
+        },
+        endDate: {
+          type: Date,
+          default: new Date(),
+        },
+      },
+    ],
     classCode: {
       type: String,
     },
