@@ -12,6 +12,7 @@ import { config } from "dotenv";
 import AfriCoinTransaction from "../db/models/afriCoinTransaction.model";
 import User from "../db/models/users.model";
 import sendEmail from "../utils/email.utils";
+import TeacherPaymentPlan from "../db/models/teacherPaymentPlan";
 
 config();
 /**
@@ -166,6 +167,32 @@ class PaymentController {
   }
 
   /**
+   * Get Teacher payment plans
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof PaymentController
+   * @returns {JSON} - A JSON success response.
+   *
+   */
+  static async getTeacherPaymentPlans(req, res) {
+    try {
+      const paymentPlans = await TeacherPaymentPlan.find({}).populate(
+        "category"
+      );
+
+      return res.status(200).json({
+        status: "success",
+        paymentPlans,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Loading class",
+      });
+    }
+  }
+
+  /**
    * Get afriCoins payment plans
    * @param {Request} req - Response object.
    * @param {Response} res - The payload.
@@ -200,6 +227,22 @@ class PaymentController {
   static async addAfriCoinPaymentPlan(req, res) {
     try {
       const plan = await AfriCoinPaymentPlan.create({ ...req.body });
+
+      return res.status(200).json({
+        status: "success",
+        plan,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error adding Payment Plan",
+      });
+    }
+  }
+
+  static async addTeacherPaymentPlan(req, res) {
+    try {
+      const plan = await TeacherPaymentPlan.create({ ...req.body });
 
       return res.status(200).json({
         status: "success",
@@ -342,7 +385,8 @@ class PaymentController {
       let condition = null;
       let newClass = null;
 
-      const { purchaseToken, productId, courseId, clientUserId } = req.body;
+      const { purchaseToken, productId, courseId, clientUserId, classId } =
+        req.body;
 
       const { role } = req.data;
 
@@ -383,7 +427,9 @@ class PaymentController {
                     courseId,
                     classCode,
                   };
-
+                  if (req.body.subjectId) {
+                    condition.subjectIds = [{ subjectId: req.body.subjectId }];
+                  }
                   newClass = await ClassModel.create(condition);
                   //console.log(newClass);
                 }
@@ -415,15 +461,14 @@ class PaymentController {
                 condition = {
                   _id: productId,
                 };
-                const paymentPlan = await PaymentPlan.findOne(
-                  {
-                    _id: productId,
-                  },
+                const paymentPlan = await TeacherPaymentPlan.findOne(
+                  { _id: productId },
                   {
                     amount: 1,
                     duration: 1,
                   }
                 );
+                console.log("paymentPlan", paymentPlan);
 
                 //credit the user
                 const startdate = moment().toDate();
@@ -436,6 +481,26 @@ class PaymentController {
                 existingEnrolledCourse.status = "paid";
                 existingEnrolledCourse.save();
 
+                //Assume the user has only one subject in class
+                if (classId) {
+                  const classBeingPaidFor = await ClassModel.findById(classId);
+                  if (classBeingPaidFor.subjectIds.length > 0) {
+                    classBeingPaidFor.subjectIds[0] = {
+                      ...classBeingPaidFor.subjectIds[0],
+                      startdate,
+                      endDate,
+                    };
+                  } else {
+                    classBeingPaidFor.subjectIds = [
+                      {
+                        subjectId: req.body.subjectId,
+                        startdate,
+                        endDate,
+                      },
+                    ];
+                  }
+                  await classBeingPaidFor.save();
+                }
                 // // Create the transaction
                 condition = {
                   tx_ref: purchaseToken,
@@ -956,7 +1021,7 @@ class PaymentController {
               condition = {
                 _id: productId,
               };
-              const paymentPlan = await PaymentPlan.findOne(
+              const paymentPlan = await TeacherPaymentPlan.findOne(
                 {
                   _id: productId,
                 },
@@ -965,6 +1030,7 @@ class PaymentController {
                   duration: 1,
                 }
               );
+              console.log("paymentPlan", paymentPlan);
 
               //credit the user
               const startdate = moment().toDate();

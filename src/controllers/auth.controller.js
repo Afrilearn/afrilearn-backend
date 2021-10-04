@@ -15,6 +15,8 @@ import School from "../db/models/schoolProfile";
 import CourseCategory from "../db/models/courseCategories.model";
 import AfriCoinTransaction from "../db/models/afriCoinTransaction.model";
 import Transaction from "../db/models/transaction.model";
+import Recommendation from "../db/models/recommendation.model";
+import RecentActivity from "../db/models/recentActivities.model";
 
 /**
  *Contains Auth Controller
@@ -141,7 +143,7 @@ class AuthController {
           classCode = await Helper.generateCode(8);
         }
         const newClass = await ClassModel.create({
-          userId: result._id, 
+          userId: result._id,
           name: req.body.className,
           courseId: req.body.courseId,
           classCode,
@@ -1034,10 +1036,10 @@ class AuthController {
   static async deleteStuff(req, res) {
     try {
       const deleteWorthies = [];
-      const rrr = await Transaction.find({}).populate("userId");
+      const rrr = await RecentActivity.find({}).populate("lessonId");
       rrr.forEach(async (r) => {
-        if (r.userId === null) {
-          await r.delete();
+        if (r.lessonId === null) {
+          // await r.delete();
           deleteWorthies.push(r);
         }
       });
