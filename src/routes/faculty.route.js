@@ -4,6 +4,11 @@ import upload from "../config/bucket";
 
 const router = Router();
 
+router.patch(
+  "/:facultyId",
+  upload.single("image"),
+  FacultyController.updateFaculty
+);
 router.post("/", upload.single("image"), FacultyController.addFaculty);
 router.get("/", FacultyController.getFaculty);
 
