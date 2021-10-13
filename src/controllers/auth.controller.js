@@ -697,7 +697,7 @@ class AuthController {
       if (req.body.feedBack && req.body.rating) {
         //send email to
         sendEmail(
-          "care@myafrilearn.com",
+          "myafrilearn@gmail.com",
           `Feedback from ${user.fullName}`,
           `${user.fullName} submitted feedback and rating. \n What could we do to improve your Experience?: ${req.body.feedBack}\n How likely are you to recommend Afrilearn to a friend or colleague?: ${req.body.rating}/10`
         );

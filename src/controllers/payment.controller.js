@@ -15,22 +15,8 @@ import sendEmail from "../utils/email.utils";
 import TeacherPaymentPlan from "../db/models/teacherPaymentPlan";
 
 config();
-/**
- *Contains Payment Controller
- *
- *
- *
- * @class PaymentController
- */
+
 class PaymentController {
-  /**
-   * Verify a Payment
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof PaymentController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
   static async verifyPayment(req, res) {
     try {
       await Transaction.create({
@@ -142,14 +128,6 @@ class PaymentController {
     }
   }
 
-  /**
-   * Get payment plans
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof PaymentController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
   static async getPaymentPlans(req, res) {
     try {
       const paymentPlans = await PaymentPlan.find({}).populate("category");
@@ -166,14 +144,6 @@ class PaymentController {
     }
   }
 
-  /**
-   * Get Teacher payment plans
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof PaymentController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
   static async getTeacherPaymentPlans(req, res) {
     try {
       const paymentPlans = await TeacherPaymentPlan.find({}).populate(
@@ -192,14 +162,6 @@ class PaymentController {
     }
   }
 
-  /**
-   * Get afriCoins payment plans
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof PaymentController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
   static async getAfriCoinPaymentPlans(req, res) {
     try {
       const paymentPlans = await AfriCoinPaymentPlan.find({});
@@ -216,14 +178,6 @@ class PaymentController {
     }
   }
 
-  /**
-   * Add afriCoins payment plan
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof PaymentController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
   static async addAfriCoinPaymentPlan(req, res) {
     try {
       const plan = await AfriCoinPaymentPlan.create({ ...req.body });
@@ -256,14 +210,6 @@ class PaymentController {
     }
   }
 
-  /**
-   * Add transaction
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof PaymentController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
   static async addTransaction(req, res) {
     try {
       if (req.body.courseId) {
@@ -371,14 +317,894 @@ class PaymentController {
     }
   }
 
-  /**
-   * Get payment plans
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof PaymentController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
+  // static async verifyGoogleBilingPayment(req, res) {
+  //   try {
+  //     let verified = null;
+  //     let condition = null;
+  //     let newClass = null;
+
+  //     const {
+  //       purchaseToken,
+  //       productId,
+  //       courseId,
+  //       clientUserId,
+  //       classId,
+  //       subjectIds,
+  //     } = req.body;
+
+  //     const { role } = req.data;
+
+  //     const platform = "google";
+  //     const payment = {
+  //       receipt: purchaseToken,
+  //       productId,
+  //       packageName: "com.afrilearn",
+  //       keyObject: require("./../../gcpconfig.json"),
+  //     };
+
+  //     iap.verifyPayment(platform, payment, function (error, response) {
+  //       if (error) {
+  //         console.log("error", error);
+  //         return res.status(400).json({
+  //           status: "error",
+  //           error,
+  //         });
+  //       } else {
+  //         console.log("response", response);
+  //         if (response.receipt.purchaseState === 0) {
+  //           verified = true;
+  //           if (role === "602f3ce39b146b3201c2dc1d") {
+  //             (async () => {
+  //               if (req.body.newClassName) {
+  //                 let classCode = await Helper.generateCode(8);
+
+  //                 const existingClassCode = await ClassModel.findOne({
+  //                   classCode,
+  //                 });
+  //                 if (existingClassCode) {
+  //                   classCode = await Helper.generateCode(9);
+  //                 }
+
+  //                 condition = {
+  //                   userId: clientUserId,
+  //                   name: req.body.newClassName,
+  //                   courseId,
+  //                   classCode,
+  //                 };
+  //                 if (req.body.subjectId) {
+  //                   condition.subjectIds = subjectIds.map((i) => {
+  //                     return {
+  //                       subjectId: i,
+  //                     };
+  //                   });
+  //                 }
+  //                 newClass = await ClassModel.create(condition);
+  //                 //console.log(newClass);
+  //               }
+
+  //               // check whether the user is already enrolled for this course
+  //               condition = {
+  //                 courseId,
+  //                 userId: clientUserId,
+  //               };
+  //               if (req.body.newClassName) {
+  //                 condition["classId"] = newClass.id;
+  //               }
+  //               let existingEnrolledCourse = await EnrolledCourse.findOne(
+  //                 condition
+  //               );
+
+  //               if (!existingEnrolledCourse) {
+  //                 // if (role === '602f3ce39b146b3201c2dc1d' && req.body.newClassName) {
+  //                 //   //console.log('attash class id')
+  //                 //   //console.log(newClass)
+  //                 //   condition['classId'] = newClass.id;
+  //                 // }
+  //                 existingEnrolledCourse = await EnrolledCourse.create(
+  //                   condition
+  //                 );
+  //               }
+
+  //               // Get payment plan length and amount
+  //               condition = {
+  //                 _id: productId,
+  //               };
+  //               const paymentPlan = await TeacherPaymentPlan.findOne(
+  //                 { _id: productId },
+  //                 {
+  //                   amount: 1,
+  //                   duration: 1,
+  //                 }
+  //               );
+  //               console.log("paymentPlan", paymentPlan);
+
+  //               //credit the user
+  //               const startdate = moment().toDate();
+  //               const endDate = moment(startdate, "DD-MM-YYYY")
+  //                 .add(paymentPlan.duration, "months")
+  //                 .toDate();
+
+  //               existingEnrolledCourse.startDate = startdate;
+  //               existingEnrolledCourse.endDate = endDate;
+  //               existingEnrolledCourse.status = "paid";
+  //               existingEnrolledCourse.save();
+
+  //               if (classId) {
+  //                 const classBeingPaidFor = await ClassModel.findById(classId);
+
+  //                 if (classBeingPaidFor.subjectIds.length > 0) {
+  //                   if (subjectIds) {
+  //                     for (let index = 0; index < subjectIds.length; index++) {
+  //                       const subjectIdItem = subjectIds[index];
+  //                       if (
+  //                         classBeingPaidFor.subjectIds.find(
+  //                           (i) => i.subjectId == subjectIdItem
+  //                         )
+  //                       ) {
+  //                         classBeingPaidFor.subjectIds[index] = {
+  //                           ...classBeingPaidFor.subjectIds[index],
+  //                           startdate,
+  //                           endDate,
+  //                         };
+  //                       } else {
+  //                         classBeingPaidFor.subjectIds.push({
+  //                           subjectId: subjectIdItem,
+  //                           startdate,
+  //                           endDate,
+  //                         });
+  //                       }
+  //                     }
+  //                   } else if (req.body.subjectId) {
+  //                     const alreadyIn = classBeingPaidFor.subjectIds.findIndex(
+  //                       (i) => i.subjectId == req.body.subjectId
+  //                     );
+  //                     if (alreadyIn === -1) {
+  //                       classBeingPaidFor.subjectIds = [
+  //                         ...classBeingPaidFor.subjectIds,
+  //                         {
+  //                           subjectId: req.body.subjectId,
+  //                           startdate,
+  //                           endDate,
+  //                         },
+  //                       ];
+  //                     } else {
+  //                       const cloneSubjects = classBeingPaidFor.subjectIds;
+  //                       cloneSubjects.splice(alreadyIn, 1, {
+  //                         subjectId: req.body.subjectId,
+  //                         startdate,
+  //                         endDate,
+  //                       });
+  //                       classBeingPaidFor.subjectIds = cloneSubjects;
+  //                     }
+  //                   }
+  //                 } else {
+  //                   if (subjectIds) {
+  //                     classBeingPaidFor.subjectIds = subjectIds.map((i) => {
+  //                       return {
+  //                         subjectId: i,
+  //                         startdate,
+  //                         endDate,
+  //                       };
+  //                     });
+  //                   } else if (req.body.subjectId) {
+  //                     classBeingPaidFor.subjectIds = [
+  //                       {
+  //                         subjectId: req.body.subjectId,
+  //                         startdate,
+  //                         endDate,
+  //                       },
+  //                     ];
+  //                   }
+  //                 }
+  //                 await classBeingPaidFor.save();
+  //               }
+  //               // // Create the transaction
+  //               condition = {
+  //                 tx_ref: purchaseToken,
+  //                 amount: paymentPlan.amount,
+  //                 status: "successful",
+  //                 userId: clientUserId,
+  //                 enrolledCourseId: existingEnrolledCourse._id,
+  //                 paymentPlanId: productId,
+  //               };
+  //               await Transaction.create(condition);
+  //             })();
+  //           } else {
+  //             // if is not a teacher do this
+  //             (async () => {
+  //               // check whether the user is already enrolled for this course
+  //               condition = {
+  //                 courseId,
+  //                 userId: clientUserId,
+  //               };
+
+  //               let existingEnrolledCourse = await EnrolledCourse.findOne(
+  //                 condition
+  //               );
+
+  //               if (!existingEnrolledCourse) {
+  //                 if (
+  //                   role === "602f3ce39b146b3201c2dc1d" &&
+  //                   req.body.newClassName
+  //                 ) {
+  //                   //console.log("attash class id");
+  //                   //console.log(newClass);
+  //                   condition["classId"] = newClass.id;
+  //                 }
+  //                 existingEnrolledCourse = await EnrolledCourse.create(
+  //                   condition
+  //                 );
+  //               }
+
+  //               // Get payment plan length and amount
+  //               condition = {
+  //                 _id: productId,
+  //               };
+  //               const paymentPlan = await PaymentPlan.findOne(
+  //                 {
+  //                   _id: productId,
+  //                 },
+  //                 {
+  //                   amount: 1,
+  //                   duration: 1,
+  //                 }
+  //               );
+
+  //               //credit the user
+  //               const startdate = moment().toDate();
+  //               const endDate = moment(startdate, "DD-MM-YYYY")
+  //                 .add(paymentPlan.duration, "months")
+  //                 .toDate();
+
+  //               existingEnrolledCourse.startDate = startdate;
+  //               existingEnrolledCourse.endDate = endDate;
+  //               existingEnrolledCourse.status = "paid";
+  //               existingEnrolledCourse.save();
+
+  //               // // Create the transaction
+  //               condition = {
+  //                 tx_ref: purchaseToken,
+  //                 amount: paymentPlan.amount,
+  //                 status: "successful",
+  //                 userId: clientUserId,
+  //                 enrolledCourseId: existingEnrolledCourse._id,
+  //                 paymentPlanId: productId,
+  //               };
+  //               await Transaction.create(condition);
+  //             })();
+  //           }
+
+  //           const dataToSend = {
+  //             verified: true,
+  //             purchaseState: response.receipt.purchaseState,
+  //           };
+
+  //           return res.status(200).json({
+  //             status: "success",
+  //             data: dataToSend,
+  //           });
+  //         } else {
+  //           return res.status(200).json({
+  //             status: "success",
+  //             data: {
+  //               verified: false,
+  //               purchaseState: response,
+  //               // purchaseState:response.receipt.purchaseState
+  //             },
+  //           });
+  //         }
+  //       }
+  //     });
+  //   } catch (error) {
+  //     return res.status(500).json({
+  //       status: "500 Internal server error",
+  //       error: "Error Verifying payment",
+  //     });
+  //   }
+  // }
+
+  static async verifyGoogleBilingPaymentForCoinPurchase(req, res) {
+    try {
+      let verified = null;
+      let condition = null;
+      let newClass = null;
+
+      const { purchaseToken, productId, courseId, clientUserId } = req.body;
+
+      const paymentPlan = await AfriCoinPaymentPlan.findById(productId);
+      const { role } = req.data;
+
+      const platform = "google";
+      const payment = {
+        receipt: purchaseToken,
+        productId,
+        packageName: "com.afrilearn",
+        keyObject: require("./../../gcpconfig.json"),
+      };
+
+      iap.verifyPayment(platform, payment, function (error, response) {
+        if (error) {
+          return res.status(400).json({
+            status: "error",
+            error,
+          });
+        } else {
+          if (response.receipt.purchaseState === 0) {
+            verified = true;
+
+            const dataToSend = {
+              verified: true,
+              purchaseState: response.receipt.purchaseState,
+            };
+            if (paymentPlan.amount) {
+              dataToSend.coinAmount = paymentPlan.amount;
+            }
+            if (paymentPlan.amount) {
+              (async () => {
+                await AfriCoinTransaction.create({
+                  description: "Coins Purchase",
+                  type: "add",
+                  amount: paymentPlan.amount,
+                  userId: clientUserId,
+                });
+                const userThatPaid = await User.findByIdAndUpdate(
+                  clientUserId,
+                  {
+                    $inc: { afriCoins: paymentPlan.amount },
+                  },
+                  { new: true }
+                );
+                const htmlMessage = `<html>
+                      <head>
+                        <title></title>
+                        <link href="https://svc.webspellchecker.net/spellcheck31/lf/scayt3/ckscayt/css/wsc.css" rel="stylesheet" type="text/css" />
+                      </head>
+                      <body>
+                      <div>Dear ${userThatPaid.fullName},</div>
+                      
+                      <div>&nbsp;</div>
+                      
+                      <div>&nbsp;</div>
+                      
+                      <div>Congrats on subscribing to the best-kept secret of Successful Students; we’re super excited to have you as part of the winning Afrilearn family!</div>
+                      <div>&nbsp;</div>
+                      <div>To get started on your personalized fun learning portal, simply log on to your dashboard. You can access Afrilearn on your Smartphone, Tablet, or PC.</div>
+                      <div>&nbsp;</div>
+                      <div>Feel free to let us know if you have any questions by replying to this email.</div>
+                      <div>&nbsp;</div>  
+                      <div>Your dreams are valid and we’re rooting for you!</div>
+                      
+                      <div>&nbsp;</div>
+                      
+                      <div>&nbsp;</div>
+                      
+                      <div>All the best,</div>
+                      <div>&nbsp;</div>
+                      <div>Team Afrilearn</div>
+                      
+                      </body>
+                      </html>
+      `;
+                sendEmail(
+                  userThatPaid.email,
+                  "Afrilearn Transaction",
+                  htmlMessage
+                );
+              })();
+            }
+            return res.status(200).json({
+              status: "success",
+              data: dataToSend,
+            });
+          } else {
+            return res.status(200).json({
+              status: "success",
+              data: {
+                verified: false,
+                purchaseState: response,
+                // purchaseState:response.receipt.purchaseState
+              },
+            });
+          }
+        }
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Verifying payment",
+      });
+    }
+  }
+
+  static async payWithAfriCoins(req, res) {
+    try {
+      let condition = null;
+      let newClass = null;
+      const { purchaseToken, productId, courseId, clientUserId } = req.body;
+
+      const { role } = req.data;
+
+      const paymentPlan = await PaymentPlan.findOne(
+        {
+          _id: productId,
+        },
+        {
+          amount: 1,
+          duration: 1,
+        }
+      );
+      const afriCoins = paymentPlan.amount;
+
+      if (role === "602f3ce39b146b3201c2dc1d") {
+        (async () => {
+          if (req.body.newClassName) {
+            let classCode = await Helper.generateCode(8);
+
+            const existingClassCode = await ClassModel.findOne({
+              classCode,
+            });
+            if (existingClassCode) {
+              classCode = await Helper.generateCode(9);
+            }
+
+            condition = {
+              userId: clientUserId,
+              name: req.body.newClassName,
+              courseId,
+              classCode,
+            };
+
+            newClass = await ClassModel.create(condition);
+          }
+
+          // check whether the user is already enrolled for this course
+          condition = {
+            courseId,
+            userId: clientUserId,
+          };
+          if (req.body.newClassName) {
+            condition["classId"] = newClass.id;
+          }
+          let existingEnrolledCourse = await EnrolledCourse.findOne(condition);
+
+          if (!existingEnrolledCourse) {
+            existingEnrolledCourse = await EnrolledCourse.create(condition);
+          }
+
+          // Get payment plan length and amount
+          condition = {
+            _id: productId,
+          };
+
+          //credit the user
+          const startdate = moment().toDate();
+          const endDate = moment(startdate, "DD-MM-YYYY")
+            .add(paymentPlan.duration, "months")
+            .toDate();
+
+          existingEnrolledCourse.startDate = startdate;
+          existingEnrolledCourse.endDate = endDate;
+          existingEnrolledCourse.status = "paid";
+          existingEnrolledCourse.save();
+
+          // // Create the transaction
+          condition = {
+            tx_ref: purchaseToken,
+            amount: paymentPlan.amount,
+            status: "successful",
+            userId: clientUserId,
+            enrolledCourseId: existingEnrolledCourse._id,
+            paymentPlanId: productId,
+          };
+          await Transaction.create(condition);
+        })();
+      } else {
+        // if is not a teacher do this
+        (async () => {
+          // check whether the user is already enrolled for this course
+          condition = {
+            courseId,
+            userId: clientUserId,
+          };
+
+          let existingEnrolledCourse = await EnrolledCourse.findOne(condition);
+
+          if (!existingEnrolledCourse) {
+            if (role === "602f3ce39b146b3201c2dc1d" && req.body.newClassName) {
+              //console.log("attash class id");
+              //console.log(newClass);
+              condition["classId"] = newClass.id;
+            }
+            existingEnrolledCourse = await EnrolledCourse.create(condition);
+          }
+
+          // Get payment plan length and amount
+          condition = {
+            _id: productId,
+          };
+
+          //credit the user
+          const startdate = moment().toDate();
+          const endDate = moment(startdate, "DD-MM-YYYY")
+            .add(paymentPlan.duration, "months")
+            .toDate();
+
+          existingEnrolledCourse.startDate = startdate;
+          existingEnrolledCourse.endDate = endDate;
+          existingEnrolledCourse.status = "paid";
+          existingEnrolledCourse.save();
+
+          // // Create the transaction
+          condition = {
+            tx_ref: purchaseToken,
+            amount: paymentPlan.amount,
+            status: "successful",
+            userId: clientUserId,
+            enrolledCourseId: existingEnrolledCourse._id,
+            paymentPlanId: productId,
+          };
+          await Transaction.create(condition);
+        })();
+      }
+
+      const userThatPaid = await User.findById(clientUserId);
+      //send email to user
+      const htmlMessage = `<html>
+          <head>
+            <title></title>
+            <link href="https://svc.webspellchecker.net/spellcheck31/lf/scayt3/ckscayt/css/wsc.css" rel="stylesheet" type="text/css" />
+          </head>
+          <body>
+          <div>Dear ${userThatPaid.fullName},</div>
+          
+          <div>&nbsp;</div>
+          
+          <div>&nbsp;</div>
+          
+          <div>Congrats on subscribing to the best-kept secret of Successful Students; we’re super excited to have you as part of the winning Afrilearn family!</div>
+          <div>&nbsp;</div>
+          <div>To get started on your personalized fun learning portal, simply log on to your dashboard. You can access Afrilearn on your Smartphone, Tablet, or PC.</div>
+          <div>&nbsp;</div>
+          <div>Feel free to let us know if you have any questions by replying to this email.</div>
+          <div>&nbsp;</div>  
+          <div>Your dreams are valid and we’re rooting for you!</div>
+          
+          <div>&nbsp;</div>
+          
+          <div>&nbsp;</div>
+          
+          <div>All the best,</div>
+          <div>&nbsp;</div>
+          <div>Team Afrilearn</div>
+          
+          </body>
+          </html>
+      `;
+      sendEmail(userThatPaid.email, "Afrilearn Transaction", htmlMessage);
+      return res.status(200).json({
+        status: "success",
+        data: {
+          verified: true,
+          afriCoins,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Paying with Coins",
+      });
+    }
+  }
+
+  static async verifyPaystackPayment(req, res) {
+    try {
+      let verified = null;
+      let condition = null;
+      let newClass = null;
+
+      const {
+        reference,
+        productId,
+        courseId,
+        clientUserId,
+        classId,
+        subjectIds,
+      } = req.body;
+
+      const { role } = req.data;
+
+      const response = await axios({
+        method: "get",
+        url: `https://api.paystack.co/transaction/verify/${reference}`,
+        headers: { Authorization: process.env.PAYSTACK_SECRET_KEY },
+      });
+      if (response.data.status === true) {
+        const userThatPaid = await User.findById(clientUserId);
+        const htmlMessage = `<html>
+            <head>
+              <title></title>
+              <link href="https://svc.webspellchecker.net/spellcheck31/lf/scayt3/ckscayt/css/wsc.css" rel="stylesheet" type="text/css" />
+            </head>
+            <body>
+            <div>Dear ${userThatPaid.fullName},</div>
+            
+            <div>&nbsp;</div>
+            
+            <div>&nbsp;</div>
+            
+            <div>Congrats on subscribing to the best-kept secret of Successful Students; we’re super excited to have you as part of the winning Afrilearn family!</div>
+            <div>&nbsp;</div>
+            <div>To get started on your personalized fun learning portal, simply log on to your dashboard. You can access Afrilearn on your Smartphone, Tablet, or PC.</div>
+            <div>&nbsp;</div>
+            <div>Feel free to let us know if you have any questions by replying to this email.</div>
+            <div>&nbsp;</div>  
+            <div>Your dreams are valid and we’re rooting for you!</div>
+            
+            <div>&nbsp;</div>
+            
+            <div>&nbsp;</div>
+            
+            <div>All the best,</div>
+            <div>&nbsp;</div>
+            <div>Team Afrilearn</div>
+            
+            </body>
+            </html>
+        `;
+        sendEmail(userThatPaid.email, "Afrilearn Transaction", htmlMessage);
+
+        if (response.data.data.status === "success") {
+          verified = true;
+          if (role === "602f3ce39b146b3201c2dc1d") {
+            (async () => {
+              if (req.body.newClassName) {
+                let classCode = await Helper.generateCode(8);
+
+                const existingClassCode = await ClassModel.findOne({
+                  classCode,
+                });
+                if (existingClassCode) {
+                  classCode = await Helper.generateCode(9);
+                }
+
+                condition = {
+                  userId: clientUserId,
+                  name: req.body.newClassName,
+                  courseId,
+                  classCode,
+                };
+                if (subjectIds) {
+                  condition.subjectIds = subjectIds.map((i) => {
+                    return {
+                      subjectId: i,
+                    };
+                  });
+                }
+
+                newClass = await ClassModel.create(condition);
+              }
+
+              // check whether the user is already enrolled for this course
+              condition = {
+                courseId,
+                userId: clientUserId,
+              };
+              if (req.body.newClassName) {
+                condition["classId"] = newClass.id;
+              }
+              let existingEnrolledCourse = await EnrolledCourse.findOne(
+                condition
+              );
+
+              if (!existingEnrolledCourse) {
+                existingEnrolledCourse = await EnrolledCourse.create(condition);
+              }
+
+              // Get payment plan length and amount
+              condition = {
+                _id: productId,
+              };
+              const paymentPlan = await TeacherPaymentPlan.findOne(
+                {
+                  _id: productId,
+                },
+                {
+                  amount: 1,
+                  duration: 1,
+                }
+              );
+              // console.log("paymentPlan", paymentPlan);
+
+              //credit the user
+              const startdate = moment().toDate();
+              const endDate = moment(startdate, "DD-MM-YYYY")
+                .add(paymentPlan.duration, "months")
+                .toDate();
+
+              existingEnrolledCourse.startDate = startdate;
+              existingEnrolledCourse.endDate = endDate;
+              existingEnrolledCourse.status = "paid";
+              existingEnrolledCourse.save();
+
+              if (classId) {
+                const classBeingPaidFor = await ClassModel.findById(classId);
+
+                if (classBeingPaidFor.subjectIds.length > 0) {
+                  if (subjectIds) {
+                    for (let index = 0; index < subjectIds.length; index++) {
+                      const subjectIdItem = subjectIds[index];
+                      if (
+                        classBeingPaidFor.subjectIds.find(
+                          (i) => i.subjectId == subjectIdItem
+                        )
+                      ) {
+                        classBeingPaidFor.subjectIds[index] = {
+                          ...classBeingPaidFor.subjectIds[index],
+                          startdate,
+                          endDate,
+                        };
+                      } else {
+                        classBeingPaidFor.subjectIds.push({
+                          subjectId: subjectIdItem,
+                          startdate,
+                          endDate,
+                        });
+                      }
+                    }
+                  } else if (req.body.subjectId) {
+                    const alreadyIn = classBeingPaidFor.subjectIds.findIndex(
+                      (i) => i.subjectId == req.body.subjectId
+                    );
+                    if (alreadyIn === -1) {
+                      classBeingPaidFor.subjectIds = [
+                        ...classBeingPaidFor.subjectIds,
+                        {
+                          subjectId: req.body.subjectId,
+                          startdate,
+                          endDate,
+                        },
+                      ];
+                    } else {
+                      const cloneSubjects = classBeingPaidFor.subjectIds;
+                      cloneSubjects.splice(alreadyIn, 1, {
+                        subjectId: req.body.subjectId,
+                        startdate,
+                        endDate,
+                      });
+                      classBeingPaidFor.subjectIds = cloneSubjects;
+                    }
+                  }
+                } else {
+                  if (subjectIds) {
+                    classBeingPaidFor.subjectIds = subjectIds.map((i) => {
+                      return {
+                        subjectId: i,
+                        startdate,
+                        endDate,
+                      };
+                    });
+                  } else if (req.body.subjectId) {
+                    classBeingPaidFor.subjectIds = [
+                      {
+                        subjectId: req.body.subjectId,
+                        startdate,
+                        endDate,
+                      },
+                    ];
+                  }
+                }
+                await classBeingPaidFor.save();
+              }
+
+              // // Create the transaction
+              condition = {
+                tx_ref: reference,
+                amount: paymentPlan.amount,
+                status: "successful",
+                userId: clientUserId,
+                enrolledCourseId: existingEnrolledCourse._id,
+                paymentPlanId: productId,
+              };
+              await Transaction.create(condition);
+            })();
+          } else {
+            // if is not a teacher do this
+            (async () => {
+              // check whether the user is already enrolled for this course
+              condition = {
+                courseId,
+                userId: clientUserId,
+              };
+
+              let existingEnrolledCourse = await EnrolledCourse.findOne(
+                condition
+              );
+
+              if (!existingEnrolledCourse) {
+                existingEnrolledCourse = await EnrolledCourse.create(condition);
+              }
+
+              // Get payment plan length and amount
+              condition = {
+                _id: productId,
+              };
+              const paymentPlan = await PaymentPlan.findOne(
+                {
+                  _id: productId,
+                },
+                {
+                  amount: 1,
+                  duration: 1,
+                }
+              );
+
+              //credit the user
+              const startdate = moment().toDate();
+              const endDate = moment(startdate, "DD-MM-YYYY")
+                .add(paymentPlan.duration, "months")
+                .toDate();
+
+              existingEnrolledCourse.startDate = startdate;
+              existingEnrolledCourse.endDate = endDate;
+              existingEnrolledCourse.status = "paid";
+              existingEnrolledCourse.save();
+
+              // // Create the transaction
+              condition = {
+                tx_ref: reference,
+                amount: paymentPlan.amount,
+                status: "successful",
+                userId: clientUserId,
+                enrolledCourseId: existingEnrolledCourse._id,
+                paymentPlanId: productId,
+              };
+              await Transaction.create(condition);
+            })();
+          }
+          return res.status(200).json({
+            status: "success",
+            data: {
+              verified: true,
+            },
+          });
+        } else {
+          return res.status(200).json({
+            status: "success",
+            data: {
+              verified: false,
+            },
+          });
+        }
+      } else {
+        return res.status(200).json({
+          status: "success",
+          data: {
+            verified: false,
+          },
+        });
+      }
+      return res.status(200).json({
+        status: "success1",
+      });
+    } catch (error) {
+      //console.log(error.response.data);
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Verifying paystack payment",
+      });
+    }
+  }
+
+  static async studentTransaction(req, res) {
+    try {
+      return true;
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Verifying payment",
+      });
+    }
+  }
   static async verifyGoogleBilingPayment(req, res) {
     try {
       let verified = null;
@@ -598,582 +1424,6 @@ class PaymentController {
           }
         }
       });
-    } catch (error) {
-      return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Verifying payment",
-      });
-    }
-  }
-
-  /**
-   * Verify payment for coin purcahse
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof PaymentController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
-  static async verifyGoogleBilingPaymentForCoinPurchase(req, res) {
-    try {
-      let verified = null;
-      let condition = null;
-      let newClass = null;
-
-      const { purchaseToken, productId, courseId, clientUserId } = req.body;
-
-      const paymentPlan = await AfriCoinPaymentPlan.findById(productId);
-      const { role } = req.data;
-
-      const platform = "google";
-      const payment = {
-        receipt: purchaseToken,
-        productId,
-        packageName: "com.afrilearn",
-        keyObject: require("./../../gcpconfig.json"),
-      };
-
-      iap.verifyPayment(platform, payment, function (error, response) {
-        if (error) {
-          return res.status(400).json({
-            status: "error",
-            error,
-          });
-        } else {
-          if (response.receipt.purchaseState === 0) {
-            verified = true;
-
-            const dataToSend = {
-              verified: true,
-              purchaseState: response.receipt.purchaseState,
-            };
-            if (paymentPlan.amount) {
-              dataToSend.coinAmount = paymentPlan.amount;
-            }
-            if (paymentPlan.amount) {
-              (async () => {
-                await AfriCoinTransaction.create({
-                  description: "Coins Purchase",
-                  type: "add",
-                  amount: paymentPlan.amount,
-                  userId: clientUserId,
-                });
-                const userThatPaid = await User.findByIdAndUpdate(
-                  clientUserId,
-                  {
-                    $inc: { afriCoins: paymentPlan.amount },
-                  },
-                  { new: true }
-                );
-                const htmlMessage = `<html>
-                      <head>
-                        <title></title>
-                        <link href="https://svc.webspellchecker.net/spellcheck31/lf/scayt3/ckscayt/css/wsc.css" rel="stylesheet" type="text/css" />
-                      </head>
-                      <body>
-                      <div>Dear ${userThatPaid.fullName},</div>
-                      
-                      <div>&nbsp;</div>
-                      
-                      <div>&nbsp;</div>
-                      
-                      <div>Congrats on subscribing to the best-kept secret of Successful Students; we’re super excited to have you as part of the winning Afrilearn family!</div>
-                      <div>&nbsp;</div>
-                      <div>To get started on your personalized fun learning portal, simply log on to your dashboard. You can access Afrilearn on your Smartphone, Tablet, or PC.</div>
-                      <div>&nbsp;</div>
-                      <div>Feel free to let us know if you have any questions by replying to this email.</div>
-                      <div>&nbsp;</div>  
-                      <div>Your dreams are valid and we’re rooting for you!</div>
-                      
-                      <div>&nbsp;</div>
-                      
-                      <div>&nbsp;</div>
-                      
-                      <div>All the best,</div>
-                      <div>&nbsp;</div>
-                      <div>Team Afrilearn</div>
-                      
-                      </body>
-                      </html>
-      `;
-                sendEmail(
-                  userThatPaid.email,
-                  "Afrilearn Transaction",
-                  htmlMessage
-                );
-              })();
-            }
-            return res.status(200).json({
-              status: "success",
-              data: dataToSend,
-            });
-          } else {
-            return res.status(200).json({
-              status: "success",
-              data: {
-                verified: false,
-                purchaseState: response,
-                // purchaseState:response.receipt.purchaseState
-              },
-            });
-          }
-        }
-      });
-    } catch (error) {
-      return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Verifying payment",
-      });
-    }
-  }
-
-  /**
-   * Pay with Coins
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof PaymentController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
-  static async payWithAfriCoins(req, res) {
-    try {
-      let condition = null;
-      let newClass = null;
-      const { purchaseToken, productId, courseId, clientUserId } = req.body;
-
-      const { role } = req.data;
-
-      const paymentPlan = await PaymentPlan.findOne(
-        {
-          _id: productId,
-        },
-        {
-          amount: 1,
-          duration: 1,
-        }
-      );
-      const afriCoins = paymentPlan.amount;
-
-      if (role === "602f3ce39b146b3201c2dc1d") {
-        (async () => {
-          if (req.body.newClassName) {
-            let classCode = await Helper.generateCode(8);
-
-            const existingClassCode = await ClassModel.findOne({
-              classCode,
-            });
-            if (existingClassCode) {
-              classCode = await Helper.generateCode(9);
-            }
-
-            condition = {
-              userId: clientUserId,
-              name: req.body.newClassName,
-              courseId,
-              classCode,
-            };
-
-            newClass = await ClassModel.create(condition);
-          }
-
-          // check whether the user is already enrolled for this course
-          condition = {
-            courseId,
-            userId: clientUserId,
-          };
-          if (req.body.newClassName) {
-            condition["classId"] = newClass.id;
-          }
-          let existingEnrolledCourse = await EnrolledCourse.findOne(condition);
-
-          if (!existingEnrolledCourse) {
-            existingEnrolledCourse = await EnrolledCourse.create(condition);
-          }
-
-          // Get payment plan length and amount
-          condition = {
-            _id: productId,
-          };
-
-          //credit the user
-          const startdate = moment().toDate();
-          const endDate = moment(startdate, "DD-MM-YYYY")
-            .add(paymentPlan.duration, "months")
-            .toDate();
-
-          existingEnrolledCourse.startDate = startdate;
-          existingEnrolledCourse.endDate = endDate;
-          existingEnrolledCourse.status = "paid";
-          existingEnrolledCourse.save();
-
-          // // Create the transaction
-          condition = {
-            tx_ref: purchaseToken,
-            amount: paymentPlan.amount,
-            status: "successful",
-            userId: clientUserId,
-            enrolledCourseId: existingEnrolledCourse._id,
-            paymentPlanId: productId,
-          };
-          await Transaction.create(condition);
-        })();
-      } else {
-        // if is not a teacher do this
-        (async () => {
-          // check whether the user is already enrolled for this course
-          condition = {
-            courseId,
-            userId: clientUserId,
-          };
-
-          let existingEnrolledCourse = await EnrolledCourse.findOne(condition);
-
-          if (!existingEnrolledCourse) {
-            if (role === "602f3ce39b146b3201c2dc1d" && req.body.newClassName) {
-              //console.log("attash class id");
-              //console.log(newClass);
-              condition["classId"] = newClass.id;
-            }
-            existingEnrolledCourse = await EnrolledCourse.create(condition);
-          }
-
-          // Get payment plan length and amount
-          condition = {
-            _id: productId,
-          };
-
-          //credit the user
-          const startdate = moment().toDate();
-          const endDate = moment(startdate, "DD-MM-YYYY")
-            .add(paymentPlan.duration, "months")
-            .toDate();
-
-          existingEnrolledCourse.startDate = startdate;
-          existingEnrolledCourse.endDate = endDate;
-          existingEnrolledCourse.status = "paid";
-          existingEnrolledCourse.save();
-
-          // // Create the transaction
-          condition = {
-            tx_ref: purchaseToken,
-            amount: paymentPlan.amount,
-            status: "successful",
-            userId: clientUserId,
-            enrolledCourseId: existingEnrolledCourse._id,
-            paymentPlanId: productId,
-          };
-          await Transaction.create(condition);
-        })();
-      }
-
-      const userThatPaid = await User.findById(clientUserId);
-      //send email to user
-      const htmlMessage = `<html>
-          <head>
-            <title></title>
-            <link href="https://svc.webspellchecker.net/spellcheck31/lf/scayt3/ckscayt/css/wsc.css" rel="stylesheet" type="text/css" />
-          </head>
-          <body>
-          <div>Dear ${userThatPaid.fullName},</div>
-          
-          <div>&nbsp;</div>
-          
-          <div>&nbsp;</div>
-          
-          <div>Congrats on subscribing to the best-kept secret of Successful Students; we’re super excited to have you as part of the winning Afrilearn family!</div>
-          <div>&nbsp;</div>
-          <div>To get started on your personalized fun learning portal, simply log on to your dashboard. You can access Afrilearn on your Smartphone, Tablet, or PC.</div>
-          <div>&nbsp;</div>
-          <div>Feel free to let us know if you have any questions by replying to this email.</div>
-          <div>&nbsp;</div>  
-          <div>Your dreams are valid and we’re rooting for you!</div>
-          
-          <div>&nbsp;</div>
-          
-          <div>&nbsp;</div>
-          
-          <div>All the best,</div>
-          <div>&nbsp;</div>
-          <div>Team Afrilearn</div>
-          
-          </body>
-          </html>
-      `;
-      sendEmail(userThatPaid.email, "Afrilearn Transaction", htmlMessage);
-      return res.status(200).json({
-        status: "success",
-        data: {
-          verified: true,
-          afriCoins,
-        },
-      });
-    } catch (error) {
-      return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Paying with Coins",
-      });
-    }
-  }
-
-  /**
-   * Verify a Paystack Payment
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof PaymentController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
-  static async verifyPaystackPayment(req, res) {
-    try {
-      let verified = null;
-      let condition = null;
-      let newClass = null;
-
-      const { reference, productId, courseId, clientUserId, classId } =
-        req.body;
-
-      const { role } = req.data;
-
-      const response = await axios({
-        method: "get",
-        url: `https://api.paystack.co/transaction/verify/${reference}`,
-        headers: { Authorization: process.env.PAYSTACK_SECRET_KEY },
-      });
-      if (response.data.status === true) {
-        const userThatPaid = await User.findById(clientUserId);
-        const htmlMessage = `<html>
-            <head>
-              <title></title>
-              <link href="https://svc.webspellchecker.net/spellcheck31/lf/scayt3/ckscayt/css/wsc.css" rel="stylesheet" type="text/css" />
-            </head>
-            <body>
-            <div>Dear ${userThatPaid.fullName},</div>
-            
-            <div>&nbsp;</div>
-            
-            <div>&nbsp;</div>
-            
-            <div>Congrats on subscribing to the best-kept secret of Successful Students; we’re super excited to have you as part of the winning Afrilearn family!</div>
-            <div>&nbsp;</div>
-            <div>To get started on your personalized fun learning portal, simply log on to your dashboard. You can access Afrilearn on your Smartphone, Tablet, or PC.</div>
-            <div>&nbsp;</div>
-            <div>Feel free to let us know if you have any questions by replying to this email.</div>
-            <div>&nbsp;</div>  
-            <div>Your dreams are valid and we’re rooting for you!</div>
-            
-            <div>&nbsp;</div>
-            
-            <div>&nbsp;</div>
-            
-            <div>All the best,</div>
-            <div>&nbsp;</div>
-            <div>Team Afrilearn</div>
-            
-            </body>
-            </html>
-        `;
-        sendEmail(userThatPaid.email, "Afrilearn Transaction", htmlMessage);
-
-        if (response.data.data.status === "success") {
-          verified = true;
-          if (role === "602f3ce39b146b3201c2dc1d") {
-            (async () => {
-              if (req.body.newClassName) {
-                let classCode = await Helper.generateCode(8);
-
-                const existingClassCode = await ClassModel.findOne({
-                  classCode,
-                });
-                if (existingClassCode) {
-                  classCode = await Helper.generateCode(9);
-                }
-
-                condition = {
-                  userId: clientUserId,
-                  name: req.body.newClassName,
-                  courseId,
-                  classCode,
-                };
-                if (req.body.subjectId) {
-                  condition.subjectIds = [{ subjectId: req.body.subjectId }];
-                }
-
-                newClass = await ClassModel.create(condition);
-              }
-
-              // check whether the user is already enrolled for this course
-              condition = {
-                courseId,
-                userId: clientUserId,
-              };
-              if (req.body.newClassName) {
-                condition["classId"] = newClass.id;
-              }
-              let existingEnrolledCourse = await EnrolledCourse.findOne(
-                condition
-              );
-
-              if (!existingEnrolledCourse) {
-                existingEnrolledCourse = await EnrolledCourse.create(condition);
-              }
-
-              // Get payment plan length and amount
-              condition = {
-                _id: productId,
-              };
-              const paymentPlan = await TeacherPaymentPlan.findOne(
-                {
-                  _id: productId,
-                },
-                {
-                  amount: 1,
-                  duration: 1,
-                }
-              );
-              console.log("paymentPlan", paymentPlan);
-
-              //credit the user
-              const startdate = moment().toDate();
-              const endDate = moment(startdate, "DD-MM-YYYY")
-                .add(paymentPlan.duration, "months")
-                .toDate();
-
-              existingEnrolledCourse.startDate = startdate;
-              existingEnrolledCourse.endDate = endDate;
-              existingEnrolledCourse.status = "paid";
-              existingEnrolledCourse.save();
-
-              //Assuming that the teacher has just one subject in a class
-              if (classId) {
-                const classBeingPaidFor = await ClassModel.findById(classId);
-                if (classBeingPaidFor.subjectIds.length > 0) {
-                  classBeingPaidFor.subjectIds[0] = {
-                    ...classBeingPaidFor.subjectIds[0],
-                    startdate,
-                    endDate,
-                  };
-                } else {
-                  classBeingPaidFor.subjectIds = [
-                    {
-                      subjectId: req.body.subjectId,
-                      startdate,
-                      endDate,
-                    },
-                  ];
-                }
-                await classBeingPaidFor.save();
-              }
-
-              // // Create the transaction
-              condition = {
-                tx_ref: reference,
-                amount: paymentPlan.amount,
-                status: "successful",
-                userId: clientUserId,
-                enrolledCourseId: existingEnrolledCourse._id,
-                paymentPlanId: productId,
-              };
-              await Transaction.create(condition);
-            })();
-          } else {
-            // if is not a teacher do this
-            (async () => {
-              // check whether the user is already enrolled for this course
-              condition = {
-                courseId,
-                userId: clientUserId,
-              };
-
-              let existingEnrolledCourse = await EnrolledCourse.findOne(
-                condition
-              );
-
-              if (!existingEnrolledCourse) {
-                existingEnrolledCourse = await EnrolledCourse.create(condition);
-              }
-
-              // Get payment plan length and amount
-              condition = {
-                _id: productId,
-              };
-              const paymentPlan = await PaymentPlan.findOne(
-                {
-                  _id: productId,
-                },
-                {
-                  amount: 1,
-                  duration: 1,
-                }
-              );
-
-              //credit the user
-              const startdate = moment().toDate();
-              const endDate = moment(startdate, "DD-MM-YYYY")
-                .add(paymentPlan.duration, "months")
-                .toDate();
-
-              existingEnrolledCourse.startDate = startdate;
-              existingEnrolledCourse.endDate = endDate;
-              existingEnrolledCourse.status = "paid";
-              existingEnrolledCourse.save();
-
-              // // Create the transaction
-              condition = {
-                tx_ref: reference,
-                amount: paymentPlan.amount,
-                status: "successful",
-                userId: clientUserId,
-                enrolledCourseId: existingEnrolledCourse._id,
-                paymentPlanId: productId,
-              };
-              await Transaction.create(condition);
-            })();
-          }
-          return res.status(200).json({
-            status: "success",
-            data: {
-              verified: true,
-            },
-          });
-        } else {
-          return res.status(200).json({
-            status: "success",
-            data: {
-              verified: false,
-            },
-          });
-        }
-      } else {
-        return res.status(200).json({
-          status: "success",
-          data: {
-            verified: false,
-          },
-        });
-      }
-      return res.status(200).json({
-        status: "success1",
-      });
-    } catch (error) {
-      //console.log(error.response.data);
-      return res.status(500).json({
-        status: "500 Internal server error",
-        error: "Error Verifying paystack payment",
-      });
-    }
-  }
-
-  /**
-   * Student transaction
-   * @param {Request} req - Response object.
-   * @param {Response} res - The payload.
-   * @memberof PaymentController
-   * @returns {JSON} - A JSON success response.
-   *
-   */
-  static async studentTransaction(req, res) {
-    try {
-      return true;
     } catch (error) {
       return res.status(500).json({
         status: "500 Internal server error",
