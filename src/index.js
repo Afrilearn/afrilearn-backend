@@ -17,8 +17,7 @@ import challenge from "./events/challenge";
 import disconnect from "./events/disconnect";
 
 // scheduled creation of challenges on sunday
-const job = new CronJob("00 00 00 * * 6", ChallengeUtility.createNewChallenges);
-// ChallengeUtility.createNewChallenges()
+const job = new CronJob("0 1 0 * * 6", ChallengeUtility.createNewChallenges);
 job.start();
 
 config();
