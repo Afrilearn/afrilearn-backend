@@ -1,22 +1,25 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const examQuestionTypeSchema = new mongoose.Schema(
   {
     name: {
-      type: String     
-    },   
+      type: String,
+    },
     creatorId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'user',
-    },    
+      ref: "user",
+    },
   },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-    timestamps: true 
-  }, 
+    timestamps: true,
+  }
 );
 
-const examQuestionType = mongoose.model('examQuestionType', examQuestionTypeSchema);
+const ExamQuestionType = mongoose.model(
+  "examQuestionType",
+  examQuestionTypeSchema
+);
 
-export default examQuestionType;
+export default ExamQuestionType;
