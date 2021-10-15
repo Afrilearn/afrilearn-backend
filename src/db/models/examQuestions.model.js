@@ -1,15 +1,15 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const ExamQuestionSchema = new mongoose.Schema(
   {
     examId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'exam',
+      ref: "exam",
       required: true,
     },
     creatorId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'user',
+      ref: "user",
     },
     question: {
       type: String,
@@ -35,10 +35,10 @@ const ExamQuestionSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-    timestamps: true
-  },
+    timestamps: true,
+  }
 );
 
-const examQuestion = mongoose.model('examQuestion', ExamQuestionSchema);
+const ExamQuestion = mongoose.model("examQuestion", ExamQuestionSchema);
 
-export default examQuestion;
+export default ExamQuestion;

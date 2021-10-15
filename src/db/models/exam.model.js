@@ -1,46 +1,62 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const examSchema = new mongoose.Schema(
   {
     subjectId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'subject',
+      ref: "subject",
     },
     termId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'term',
+      ref: "term",
     },
     title: {
-      type: String     
+      type: String,
     },
     questionTypeId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'examQuestionType',
+      ref: "examQuestionType",
     },
     duration: {
-      type: Number     
+      type: Number,
     },
     instruction: {
-      type: String     
+      type: String,
     },
     totalNumberOfQuestions: {
-      type: Number     
+      type: Number,
     },
     creatorId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'user',
-    },    
-    deadline:{
-      type: Date 
-    }
+      ref: "user",
+    },
+    deadline: {
+      type: Date,
+    },
+    publish: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-    timestamps: true 
-  }, 
+    timestamps: true,
+  }
 );
+examSchema.virtual("results", {
+  ref: "examResult",
+  localField: "_id",
+  foreignField: "examId",
+  justOne: false,
+});
+examSchema.virtual("resultsCount", {
+  ref: "examResult",
+  localField: "_id",
+  foreignField: "examId",
+  count: true,
+});
 
-const exam = mongoose.model('exam', examSchema);
+const Exam = mongoose.model("exam", examSchema);
 
-export default exam;
+export default Exam;

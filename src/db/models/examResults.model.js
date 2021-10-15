@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const ExamResultsSchema = new mongoose.Schema(
   {
@@ -6,24 +6,35 @@ const ExamResultsSchema = new mongoose.Schema(
       {
         questionId: {
           type: mongoose.Schema.ObjectId,
-          ref: 'examQuestion',
+          ref: "examQuestion",
+        },
+        answer: {
+          type: String,
         },
         optionSelected: {
           type: Number,
         },
         correctOption: {
           type: Number,
-        }       
+        },
+        mark_weight: {
+          type: Number,
+        },
       },
     ],
     userId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'user',
+      ref: "user",
     },
     examId: {
       type: mongoose.Schema.ObjectId,
-      ref: 'exam',
-    }, 
+      ref: "exam",
+    },
+    status: {
+      type: String,
+      enum: ["marked", "pending"],
+      default: "pending",
+    },
     timeSpent: {
       type: String,
     },
@@ -39,6 +50,12 @@ const ExamResultsSchema = new mongoose.Schema(
     score: {
       type: Number,
     },
+    total: {
+      type: Number,
+    },
+    percentage: {
+      type: Number,
+    },
     remark: {
       type: String,
     },
@@ -46,10 +63,10 @@ const ExamResultsSchema = new mongoose.Schema(
   {
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
-    timestamps: true 
-  },
+    timestamps: true,
+  }
 );
 
-const ExamResult = mongoose.model('examResult', ExamResultsSchema);
+const ExamResult = mongoose.model("examResult", ExamResultsSchema);
 
 export default ExamResult;
