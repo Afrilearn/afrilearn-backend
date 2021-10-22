@@ -346,7 +346,7 @@ class PaymentController {
             error,
           });
         } else {
-          if (platform =='apple' || (platform =='android' && response.receipt.purchaseState === 0)) {
+          if (platform =='apple' || (platform =='google' && response.receipt.purchaseState === 0)) {
             verified = true;
 
             const dataToSend = {
@@ -952,7 +952,7 @@ class PaymentController {
             error,
           });
         } else {         
-          if (platform =='apple' || (platform =='android' && response.receipt.purchaseState === 0)) {
+          if (platform =='apple' || (platform =='google' && response.receipt.purchaseState === 0)) {
             verified = true;
             if (role === "602f3ce39b146b3201c2dc1d") {
               (async () => {
