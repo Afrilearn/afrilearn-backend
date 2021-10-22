@@ -317,304 +317,21 @@ class PaymentController {
     }
   }
 
-  // static async verifyGoogleBilingPayment(req, res) {
-  //   try {
-  //     let verified = null;
-  //     let condition = null;
-  //     let newClass = null;
-
-  //     const {
-  //       purchaseToken,
-  //       productId,
-  //       courseId,
-  //       clientUserId,
-  //       classId,
-  //       subjectIds,
-  //     } = req.body;
-
-  //     const { role } = req.data;
-
-  //     const platform = "google";
-  //     const payment = {
-  //       receipt: purchaseToken,
-  //       productId,
-  //       packageName: "com.afrilearn",
-  //       keyObject: require("./../../gcpconfig.json"),
-  //     };
-
-  //     iap.verifyPayment(platform, payment, function (error, response) {
-  //       if (error) {
-  //         console.log("error", error);
-  //         return res.status(400).json({
-  //           status: "error",
-  //           error,
-  //         });
-  //       } else {
-  //         console.log("response", response);
-  //         if (response.receipt.purchaseState === 0) {
-  //           verified = true;
-  //           if (role === "602f3ce39b146b3201c2dc1d") {
-  //             (async () => {
-  //               if (req.body.newClassName) {
-  //                 let classCode = await Helper.generateCode(8);
-
-  //                 const existingClassCode = await ClassModel.findOne({
-  //                   classCode,
-  //                 });
-  //                 if (existingClassCode) {
-  //                   classCode = await Helper.generateCode(9);
-  //                 }
-
-  //                 condition = {
-  //                   userId: clientUserId,
-  //                   name: req.body.newClassName,
-  //                   courseId,
-  //                   classCode,
-  //                 };
-  //                 if (req.body.subjectId) {
-  //                   condition.subjectIds = subjectIds.map((i) => {
-  //                     return {
-  //                       subjectId: i,
-  //                     };
-  //                   });
-  //                 }
-  //                 newClass = await ClassModel.create(condition);
-  //                 //console.log(newClass);
-  //               }
-
-  //               // check whether the user is already enrolled for this course
-  //               condition = {
-  //                 courseId,
-  //                 userId: clientUserId,
-  //               };
-  //               if (req.body.newClassName) {
-  //                 condition["classId"] = newClass.id;
-  //               }
-  //               let existingEnrolledCourse = await EnrolledCourse.findOne(
-  //                 condition
-  //               );
-
-  //               if (!existingEnrolledCourse) {
-  //                 // if (role === '602f3ce39b146b3201c2dc1d' && req.body.newClassName) {
-  //                 //   //console.log('attash class id')
-  //                 //   //console.log(newClass)
-  //                 //   condition['classId'] = newClass.id;
-  //                 // }
-  //                 existingEnrolledCourse = await EnrolledCourse.create(
-  //                   condition
-  //                 );
-  //               }
-
-  //               // Get payment plan length and amount
-  //               condition = {
-  //                 _id: productId,
-  //               };
-  //               const paymentPlan = await TeacherPaymentPlan.findOne(
-  //                 { _id: productId },
-  //                 {
-  //                   amount: 1,
-  //                   duration: 1,
-  //                 }
-  //               );
-  //               console.log("paymentPlan", paymentPlan);
-
-  //               //credit the user
-  //               const startdate = moment().toDate();
-  //               const endDate = moment(startdate, "DD-MM-YYYY")
-  //                 .add(paymentPlan.duration, "months")
-  //                 .toDate();
-
-  //               existingEnrolledCourse.startDate = startdate;
-  //               existingEnrolledCourse.endDate = endDate;
-  //               existingEnrolledCourse.status = "paid";
-  //               existingEnrolledCourse.save();
-
-  //               if (classId) {
-  //                 const classBeingPaidFor = await ClassModel.findById(classId);
-
-  //                 if (classBeingPaidFor.subjectIds.length > 0) {
-  //                   if (subjectIds) {
-  //                     for (let index = 0; index < subjectIds.length; index++) {
-  //                       const subjectIdItem = subjectIds[index];
-  //                       if (
-  //                         classBeingPaidFor.subjectIds.find(
-  //                           (i) => i.subjectId == subjectIdItem
-  //                         )
-  //                       ) {
-  //                         classBeingPaidFor.subjectIds[index] = {
-  //                           ...classBeingPaidFor.subjectIds[index],
-  //                           startdate,
-  //                           endDate,
-  //                         };
-  //                       } else {
-  //                         classBeingPaidFor.subjectIds.push({
-  //                           subjectId: subjectIdItem,
-  //                           startdate,
-  //                           endDate,
-  //                         });
-  //                       }
-  //                     }
-  //                   } else if (req.body.subjectId) {
-  //                     const alreadyIn = classBeingPaidFor.subjectIds.findIndex(
-  //                       (i) => i.subjectId == req.body.subjectId
-  //                     );
-  //                     if (alreadyIn === -1) {
-  //                       classBeingPaidFor.subjectIds = [
-  //                         ...classBeingPaidFor.subjectIds,
-  //                         {
-  //                           subjectId: req.body.subjectId,
-  //                           startdate,
-  //                           endDate,
-  //                         },
-  //                       ];
-  //                     } else {
-  //                       const cloneSubjects = classBeingPaidFor.subjectIds;
-  //                       cloneSubjects.splice(alreadyIn, 1, {
-  //                         subjectId: req.body.subjectId,
-  //                         startdate,
-  //                         endDate,
-  //                       });
-  //                       classBeingPaidFor.subjectIds = cloneSubjects;
-  //                     }
-  //                   }
-  //                 } else {
-  //                   if (subjectIds) {
-  //                     classBeingPaidFor.subjectIds = subjectIds.map((i) => {
-  //                       return {
-  //                         subjectId: i,
-  //                         startdate,
-  //                         endDate,
-  //                       };
-  //                     });
-  //                   } else if (req.body.subjectId) {
-  //                     classBeingPaidFor.subjectIds = [
-  //                       {
-  //                         subjectId: req.body.subjectId,
-  //                         startdate,
-  //                         endDate,
-  //                       },
-  //                     ];
-  //                   }
-  //                 }
-  //                 await classBeingPaidFor.save();
-  //               }
-  //               // // Create the transaction
-  //               condition = {
-  //                 tx_ref: purchaseToken,
-  //                 amount: paymentPlan.amount,
-  //                 status: "successful",
-  //                 userId: clientUserId,
-  //                 enrolledCourseId: existingEnrolledCourse._id,
-  //                 paymentPlanId: productId,
-  //               };
-  //               await Transaction.create(condition);
-  //             })();
-  //           } else {
-  //             // if is not a teacher do this
-  //             (async () => {
-  //               // check whether the user is already enrolled for this course
-  //               condition = {
-  //                 courseId,
-  //                 userId: clientUserId,
-  //               };
-
-  //               let existingEnrolledCourse = await EnrolledCourse.findOne(
-  //                 condition
-  //               );
-
-  //               if (!existingEnrolledCourse) {
-  //                 if (
-  //                   role === "602f3ce39b146b3201c2dc1d" &&
-  //                   req.body.newClassName
-  //                 ) {
-  //                   //console.log("attash class id");
-  //                   //console.log(newClass);
-  //                   condition["classId"] = newClass.id;
-  //                 }
-  //                 existingEnrolledCourse = await EnrolledCourse.create(
-  //                   condition
-  //                 );
-  //               }
-
-  //               // Get payment plan length and amount
-  //               condition = {
-  //                 _id: productId,
-  //               };
-  //               const paymentPlan = await PaymentPlan.findOne(
-  //                 {
-  //                   _id: productId,
-  //                 },
-  //                 {
-  //                   amount: 1,
-  //                   duration: 1,
-  //                 }
-  //               );
-
-  //               //credit the user
-  //               const startdate = moment().toDate();
-  //               const endDate = moment(startdate, "DD-MM-YYYY")
-  //                 .add(paymentPlan.duration, "months")
-  //                 .toDate();
-
-  //               existingEnrolledCourse.startDate = startdate;
-  //               existingEnrolledCourse.endDate = endDate;
-  //               existingEnrolledCourse.status = "paid";
-  //               existingEnrolledCourse.save();
-
-  //               // // Create the transaction
-  //               condition = {
-  //                 tx_ref: purchaseToken,
-  //                 amount: paymentPlan.amount,
-  //                 status: "successful",
-  //                 userId: clientUserId,
-  //                 enrolledCourseId: existingEnrolledCourse._id,
-  //                 paymentPlanId: productId,
-  //               };
-  //               await Transaction.create(condition);
-  //             })();
-  //           }
-
-  //           const dataToSend = {
-  //             verified: true,
-  //             purchaseState: response.receipt.purchaseState,
-  //           };
-
-  //           return res.status(200).json({
-  //             status: "success",
-  //             data: dataToSend,
-  //           });
-  //         } else {
-  //           return res.status(200).json({
-  //             status: "success",
-  //             data: {
-  //               verified: false,
-  //               purchaseState: response,
-  //               // purchaseState:response.receipt.purchaseState
-  //             },
-  //           });
-  //         }
-  //       }
-  //     });
-  //   } catch (error) {
-  //     return res.status(500).json({
-  //       status: "500 Internal server error",
-  //       error: "Error Verifying payment",
-  //     });
-  //   }
-  // }
-
   static async verifyGoogleBilingPaymentForCoinPurchase(req, res) {
     try {
       let verified = null;
       let condition = null;
       let newClass = null;
+      let platform = "google";
 
       const { purchaseToken, productId, courseId, clientUserId } = req.body;
 
       const paymentPlan = await AfriCoinPaymentPlan.findById(productId);
       const { role } = req.data;
-
-      const platform = "google";
+      if(req.body.platform){
+        platform = req.body.platform;
+      }       
+    
       const payment = {
         receipt: purchaseToken,
         productId,
@@ -629,7 +346,7 @@ class PaymentController {
             error,
           });
         } else {
-          if (response.receipt.purchaseState === 0) {
+          if (platform =='apple' || (platform =='android' && response.receipt.purchaseState === 0)) {
             verified = true;
 
             const dataToSend = {
@@ -1205,18 +922,22 @@ class PaymentController {
       });
     }
   }
+
   static async verifyGoogleBilingPayment(req, res) {
     try {
       let verified = null;
       let condition = null;
       let newClass = null;
+      let platform = "google";
 
       const { purchaseToken, productId, courseId, clientUserId, classId } =
         req.body;
 
       const { role } = req.data;
 
-      const platform = "google";
+      if(req.body.platform){
+        platform = req.body.platform;
+      }       
       const payment = {
         receipt: purchaseToken,
         productId,
@@ -1225,15 +946,13 @@ class PaymentController {
       };
 
       iap.verifyPayment(platform, payment, function (error, response) {
-        if (error) {
-          console.log("error", error);
+        if (error) {          
           return res.status(400).json({
             status: "error",
             error,
           });
-        } else {
-          console.log("response", response);
-          if (response.receipt.purchaseState === 0) {
+        } else {         
+          if (platform =='apple' || (platform =='android' && response.receipt.purchaseState === 0)) {
             verified = true;
             if (role === "602f3ce39b146b3201c2dc1d") {
               (async () => {
@@ -1355,9 +1074,7 @@ class PaymentController {
                   if (
                     role === "602f3ce39b146b3201c2dc1d" &&
                     req.body.newClassName
-                  ) {
-                    //console.log("attash class id");
-                    //console.log(newClass);
+                  ) {                  
                     condition["classId"] = newClass.id;
                   }
                   existingEnrolledCourse = await EnrolledCourse.create(
@@ -1432,4 +1149,5 @@ class PaymentController {
     }
   }
 }
+
 export default PaymentController;
