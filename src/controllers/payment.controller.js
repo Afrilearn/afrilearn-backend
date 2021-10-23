@@ -17,6 +17,7 @@ import TeacherPaymentPlan from "../db/models/teacherPaymentPlan";
 config();
 
 class PaymentController {
+
   static async verifyPayment(req, res) {
     try {
       await Transaction.create({
@@ -130,6 +131,7 @@ class PaymentController {
 
   static async getPaymentPlans(req, res) {
     try {
+      
       const paymentPlans = await PaymentPlan.find({}).populate("category");
 
       return res.status(200).json({
@@ -328,10 +330,10 @@ class PaymentController {
 
       const paymentPlan = await AfriCoinPaymentPlan.findById(productId);
       const { role } = req.data;
-      if(req.body.platform){
+      if (req.body.platform) {
         platform = req.body.platform;
-      }       
-    
+      }
+
       const payment = {
         receipt: purchaseToken,
         productId,
@@ -346,7 +348,7 @@ class PaymentController {
             error,
           });
         } else {
-          if (platform =='apple' || (platform =='google' && response.receipt.purchaseState === 0)) {
+          if (platform == 'apple' || (platform == 'google' && response.receipt.purchaseState === 0)) {
             verified = true;
 
             const dataToSend = {
@@ -935,9 +937,9 @@ class PaymentController {
 
       const { role } = req.data;
 
-      if(req.body.platform){
+      if (req.body.platform) {
         platform = req.body.platform;
-      }       
+      }
       const payment = {
         receipt: purchaseToken,
         productId,
@@ -946,13 +948,13 @@ class PaymentController {
       };
 
       iap.verifyPayment(platform, payment, function (error, response) {
-        if (error) {          
+        if (error) {
           return res.status(400).json({
             status: "error",
             error,
           });
-        } else {         
-          if (platform =='apple' || (platform =='google' && response.receipt.purchaseState === 0)) {
+        } else {
+          if (platform == 'apple' || (platform == 'google' && response.receipt.purchaseState === 0)) {
             verified = true;
             if (role === "602f3ce39b146b3201c2dc1d") {
               (async () => {
@@ -1074,7 +1076,7 @@ class PaymentController {
                   if (
                     role === "602f3ce39b146b3201c2dc1d" &&
                     req.body.newClassName
-                  ) {                  
+                  ) {
                     condition["classId"] = newClass.id;
                   }
                   existingEnrolledCourse = await EnrolledCourse.create(
@@ -1148,6 +1150,76 @@ class PaymentController {
       });
     }
   }
+
+  static async creditZenithUsers(req, res) {
+    try {
+      const { paymentPlanId, courseId, accountNumber } = req.body;
+
+      // get the users infor by email or phone or account number
+      const userInfo = await User.findOne({ accountNumber });
+      if (!userInfo) {
+        return res.status(404).json({
+          status: "error",
+          message: "User information not found"
+        });
+      }
+      // check whether the user is already enrolled for this course
+      let condition = { courseId, userId: userInfo.id }
+      let existingEnrolledCourse = await EnrolledCourse.findOne(condition);
+
+      if (!existingEnrolledCourse) {
+        existingEnrolledCourse = await EnrolledCourse.create(
+          condition
+        );
+      }
+
+      // Get payment plan length and amount     
+      const paymentPlan = await PaymentPlan.findOne(
+        {
+          _id: paymentPlanId,
+        },
+        {
+          amount: 1,
+          duration: 1,
+        }
+      );
+
+      // credit the user
+      const startdate = moment().toDate();
+      const endDate = moment(startdate, "DD-MM-YYYY")
+        .add(paymentPlan.duration, "months")
+        .toDate();
+
+      existingEnrolledCourse.startDate = startdate;
+      existingEnrolledCourse.endDate = endDate;
+      existingEnrolledCourse.status = "paid";
+      existingEnrolledCourse.save();
+
+      // Create the transaction
+      condition = {
+        tx_ref: 'zenith',
+        amount: paymentPlan.amount,
+        status: "successful",
+        userId: userInfo.id,
+        enrolledCourseId: existingEnrolledCourse._id,
+        paymentPlanId,
+      };
+      await Transaction.create(condition);
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          message: 'User Credited successfully'
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error crediting user",
+      });
+    }
+  }
+
 }
 
 export default PaymentController;

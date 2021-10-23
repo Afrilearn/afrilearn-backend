@@ -105,5 +105,23 @@ class SignUp {
     }
     return next();
   }
+
+  /**
+   * Check whether account number already exist.
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @param {Response} next - The next parameter.
+   * @memberof SignUp
+   * @returns {JSON} - A JSON response.
+   */
+   static async accountNumberAlreadyExist(req, res, next) {    
+     if(req.body.accountNumber){      
+      const { accountNumber } = req.body;
+      await AuthServices.accountNumberExist(accountNumber, res);      
+      return next();
+     }
+     return next();
+    
+  }
 }
 export default SignUp;

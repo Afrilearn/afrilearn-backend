@@ -1,7 +1,7 @@
 import { Router } from "express";
 import PaymentController from "../controllers/payment.controller";
 import validateToken from "../middlewares/auth.middleware";
-import AddTransaction from "../validations/payment/addTransaction.validator";
+import PaymentValidator from "../validations/payment/payments.validator";
 import VerifyPayment from "../validations/payment/verifyGooglePayment.validator";
 
 const router = Router();
@@ -14,8 +14,8 @@ router.post("/add-coin-plan", PaymentController.addAfriCoinPaymentPlan);
 router.post(
   "/add-transaction",
   validateToken,
-  AddTransaction.validateData(),
-  AddTransaction.myValidationResult,
+  PaymentValidator.validateData(),
+  PaymentValidator.myValidationResult,
   PaymentController.addTransaction
 );
 

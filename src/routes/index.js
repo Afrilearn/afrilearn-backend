@@ -24,6 +24,7 @@ import facultyRoute from "./faculty.route";
 import notificationRoute from "./notification.route";
 import examsRoute from "./exam.route";
 import userStoryRoute from "./userStory.route";
+import zenithRoute from "./zenith.route";
 
 const router = Router();
 
@@ -52,5 +53,7 @@ router.use("/exams", examsRoute);
 router.use("/faculty", facultyRoute);
 router.use("/notifications", notificationRoute);
 router.use("/user-story", userStoryRoute);
+router.use("/zenith", zenithRoute);
+
 
 export default router;

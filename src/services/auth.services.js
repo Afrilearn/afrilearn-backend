@@ -44,6 +44,7 @@ export default {
       });
     }
   },
+
   async verifyPasscode(email, code, res) {
     try {
       const condition = {
@@ -66,6 +67,7 @@ export default {
       });
     }
   },
+
   async getEmail(id, res) {
     try {
       const condition = {
@@ -80,7 +82,7 @@ export default {
       });
     }
   },
-  
+
   async referralExist(referral, res) {
     try {
       const condition = {
@@ -96,7 +98,27 @@ export default {
     } catch (err) {
       return res.status(500).json({
         status: "500 Internal server error",
-        error: "Error checking",
+        error: "Error checking for referral code",
+      });
+    }
+  },
+
+  async accountNumberExist(accountNumber, res) {
+    try {
+      const condition = {
+        accountNumber
+      };
+      const user = await Auth.findOne(condition);
+      if (user) {
+        return res.status(409).json({
+          status: '409 Conflict',
+          error: 'Account Number already exist',
+        });
+      }
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error checking for account number",
       });
     }
   },
