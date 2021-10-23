@@ -1,3 +1,4 @@
+import moment from "moment";
 import Auth from "../db/models/users.model";
 import Helper from "../utils/user.utils";
 import sendEmail from "../utils/email.utils";
@@ -49,6 +50,10 @@ class AuthController {
       };
       if (req.body.channel) {
         newUser["channel"] = req.body.channel;
+      }
+
+      if (req.body.accountNumber) {
+        newUser["accountNumber"] = req.body.accountNumber;
       }
 
       if (req.body.referralCode) {
@@ -103,10 +108,26 @@ class AuthController {
         role !== "606ed82e70f40e18e029165e" &&
         role !== "607ededa2712163504210684"
       ) {
-        enrolledCourse = await EnrolledCourse.create({
+        let condition = {
           userId: result._id,
           courseId: req.body.courseId,
-        });
+        }       
+
+        enrolledCourse = await EnrolledCourse.create(condition);
+        
+        if (req.body.channel && req.body.channel === 'zenith' && req.body.freeTrial) {
+           // credit the user 3 months free
+          const startdate = moment().toDate();
+          const endDate = moment(startdate, "DD-MM-YYYY")
+            .add(3, "months")
+            .toDate();
+
+          enrolledCourse.startDate = startdate;
+          enrolledCourse.endDate = endDate;
+          enrolledCourse.status = "paid";
+          enrolledCourse.save();
+        }
+       
       }
 
       //if school role, create school profile
@@ -771,7 +792,7 @@ class AuthController {
     } catch (err) {
       return res.status(500).json({
         status: "500 Internal server error",
-        error: "Error changing password",
+        error: "Error getting roles",
       });
     }
   }
@@ -813,6 +834,37 @@ class AuthController {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Loading user",
+      });
+    }
+  }
+
+  /**
+   * Get payment info for zenith
+   * @param {Request} req - Response object.
+   * @param {Response} res - The payload.
+   * @memberof AuthController
+   * @returns {JSON} - A JSON success response.
+   */
+   static async zenithPaymentData(req, res) {
+    try {      
+      // const roles = await Role.find({},{
+      //   name: 1,       
+      // });
+      const courses = await Course.find({},{
+        name: 1,        
+      });    
+     
+      return res.status(200).json({
+        status: "success",
+        data: {         
+          // roles,
+          courses,
+        }
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error loading payment info",
       });
     }
   }

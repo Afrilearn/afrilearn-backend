@@ -44,6 +44,33 @@ class AddTransaction {
     ];
   }
 
+
+  /**
+   * validate zenith payment.
+   * @memberof AddTransaction
+   * @returns {null} - No response.
+   */
+   static validateZenithPaymentData() {
+    return [
+      check('paymentPlanId')
+        .exists()
+        .withMessage('paymentPlanId is required')
+        .isMongoId()
+        .withMessage('accountNumber should be a mongoID'),             
+      check('courseId')
+        .exists()
+        .withMessage('courseId is required')
+        .isMongoId()
+        .withMessage('courseId should be a mongoID'),     
+      check('accountNumber')
+        .exists()
+        .withMessage('accountNumber is required') 
+        .not()
+        .isEmpty()
+        .withMessage('accountNumber cannot be empty'),            
+    ];
+  }
+
   /**
    * Validate results data.
    * @param {Request} req - Response object.

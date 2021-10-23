@@ -29,6 +29,7 @@ router.post(
   SignUpValidator.validateData(),
   SignUpValidator.myValidationResult,
   SignUpValidator.emailAlreadyExist,
+  SignUpValidator.accountNumberAlreadyExist,
   AuthController.signUp
 );
 // router.post('/delete-stuff', AuthController.deleteStuff)
