@@ -42,8 +42,8 @@ class AddExamValidator {
       check("deadline")
         .exists()
         .withMessage("deadline is required")
-        .isDate()
-        .withMessage("deadline should be a Date"),
+        .isString()
+        .withMessage("deadline should be a String"),
     ];
   }
 

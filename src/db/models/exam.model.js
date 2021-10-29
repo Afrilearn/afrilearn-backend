@@ -6,6 +6,10 @@ const examSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "subject",
     },
+    classId: {
+      type: mongoose.Schema.ObjectId,
+      ref: "class",
+    },
     termId: {
       type: mongoose.Schema.ObjectId,
       ref: "term",
@@ -37,6 +41,9 @@ const examSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
+    participants: {
+      type: Array,
+    },
   },
   {
     toJSON: { virtuals: true },
@@ -44,6 +51,12 @@ const examSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+examSchema.virtual("questions", {
+  ref: "examQuestion",
+  localField: "_id",
+  foreignField: "examId",
+  justOne: false,
+});
 examSchema.virtual("results", {
   ref: "examResult",
   localField: "_id",

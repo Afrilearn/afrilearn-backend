@@ -12,11 +12,12 @@ class ExamController {
       };
 
       const exam = await Exam.create(data);
+      const examPop = await Exam.findById(exam._id).populate("questions");
 
       return res.status(200).json({
         status: "success",
         data: {
-          exam,
+          exam: examPop,
         },
       });
     } catch (error) {
@@ -36,7 +37,17 @@ class ExamController {
         {
           new: true,
         }
-      );
+      )
+        .populate({ path: "questionTypeId", select: "name" })
+        .populate("questions")
+        .populate({
+          path: "results",
+          select: "userId createdAt status score",
+          populate: {
+            path: "userId",
+            select: "fullName",
+          },
+        });
 
       return res.status(200).json({
         status: "success",
@@ -94,8 +105,8 @@ class ExamController {
   static async getExam(req, res) {
     try {
       const exam = await Exam.findById(req.params.examId)
-        .select("results questionTypeId title duration")
         .populate({ path: "questionTypeId", select: "name" })
+        .populate("questions")
         .populate({
           path: "results",
           select: "userId createdAt status score",
@@ -236,7 +247,7 @@ class ExamController {
       const data = {
         ...req.body,
       };
-      if (req.files.contentImages) {
+      if (req.files && req.files.contentImages) {
         req.files.contentImages.forEach((img, index) => {
           data.question = data.question.replace(
             req.body.contentUrls[index],
@@ -247,7 +258,8 @@ class ExamController {
 
       const examQuestion = await ExamQuestion.findByIdAndUpdate(
         req.params.questionId,
-        { ...data }
+        { ...data },
+        { new: true }
       );
 
       return res.status(200).json({
@@ -390,6 +402,8 @@ class ExamController {
 
       const result = await ExamResult.create(data);
       // const result = data;
+      const exam = await Exam.findById(req.body.examId);
+      await exam.update({ participants: [...exam.participants, req.data.id] });
 
       return res.status(200).json({
         status: "success",
@@ -415,6 +429,29 @@ class ExamController {
           new: true,
         }
       );
+      return res.status(200).json({
+        status: "success",
+        data: {
+          result,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error updating exam result.",
+      });
+    }
+  }
+  static async updateExamResultScore(req, res) {
+    try {
+      const result = await ExamResult.findById(req.params.resultId);
+      const target = result.results.find(
+        (i) => i._id == req.params.resultItemId
+      );
+      console.log("target", target);
+      target.assignedScore = req.body.score;
+      target.graded = true;
+      await result.save();
       return res.status(200).json({
         status: "success",
         data: {

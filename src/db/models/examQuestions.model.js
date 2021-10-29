@@ -11,6 +11,9 @@ const ExamQuestionSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "user",
     },
+    type: {
+      type: String,
+    },
     question: {
       type: String,
     },
