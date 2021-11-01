@@ -325,21 +325,30 @@ class PaymentController {
       let condition = null;
       let newClass = null;
       let platform = "google";
+      let payment  = {}
 
       const { purchaseToken, productId, courseId, clientUserId } = req.body;
 
       const paymentPlan = await AfriCoinPaymentPlan.findById(productId);
       const { role } = req.data;
+      
       if (req.body.platform) {
         platform = req.body.platform;
       }
 
-      const payment = {
-        receipt: purchaseToken,
-        productId,
-        packageName: "com.afrilearn",
-        keyObject: require("./../../gcpconfig.json"),
-      };
+      if(platform === 'apple'){
+        payment = {
+          receipt: purchaseToken,
+          // productId         
+        };
+      }else{
+         payment = {
+          receipt: purchaseToken,
+          productId,
+          packageName: "com.afrilearn",
+          keyObject: require("./../../gcpconfig.json"),
+        };
+      }     
 
       iap.verifyPayment(platform, payment, function (error, response) {
         if (error) {
@@ -931,29 +940,40 @@ class PaymentController {
       let condition = null;
       let newClass = null;
       let platform = "google";
+      let payment  = {}
 
       const { purchaseToken, productId, courseId, clientUserId, classId } =
         req.body;
-
+     
       const { role } = req.data;
+  
 
       if (req.body.platform) {
         platform = req.body.platform;
       }
-      const payment = {
-        receipt: purchaseToken,
-        productId,
-        packageName: "com.afrilearn",
-        keyObject: require("./../../gcpconfig.json"),
-      };
+
+      if(platform === 'apple'){
+        payment = {
+          receipt: purchaseToken,
+          // productId         
+        };
+      }else{
+         payment = {
+          receipt: purchaseToken,
+          productId,
+          packageName: "com.afrilearn",
+          keyObject: require("./../../gcpconfig.json"),
+        };
+      }
+     
 
       iap.verifyPayment(platform, payment, function (error, response) {
-        if (error) {
+        if (error) {        
           return res.status(400).json({
             status: "error",
             error,
           });
-        } else {
+        } else {    
           if (platform == 'apple' || (platform == 'google' && response.receipt.purchaseState === 0)) {
             verified = true;
             if (role === "602f3ce39b146b3201c2dc1d") {

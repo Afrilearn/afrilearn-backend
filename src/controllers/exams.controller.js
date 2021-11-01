@@ -428,6 +428,33 @@ class ExamController {
       });
     }
   }
+  static async getExamInforForAClass(req, res) {
+    try {
+      const exam = await Exam.findById(req.params.classId)
+        .select("results questionTypeId title duration")
+        .populate({ path: "questionTypeId", select: "name" })
+        .populate({
+          path: "results",
+          select: "userId createdAt status score",
+          populate: {
+            path: "userId",
+            select: "fullName",
+          },
+        });
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          // exam,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error getting exams info for a class",
+      });
+    }
+  }
 
   //Get Question Types [done]
   //Get Exams for teacher (populate submissions count) [done]
