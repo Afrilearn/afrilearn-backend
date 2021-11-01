@@ -2,6 +2,10 @@ import mongoose from "mongoose";
 
 const examSchema = new mongoose.Schema(
   {
+    classId: {
+      type: mongoose.Schema.ObjectId,
+      ref: "class",
+    },
     subjectId: {
       type: mongoose.Schema.ObjectId,
       ref: "subject",
