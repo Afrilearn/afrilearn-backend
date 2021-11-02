@@ -37,10 +37,10 @@ router.post(
   ExamController.createExamQuestion
 );
 router.patch("/exam-result/:resultId", ExamController.updateExamResult);
-router.post(
-  "/exam-result/:resultId/:resultItemId",
-  ExamController.updateExamResultScore
-);
+// router.post(
+//   "/exam-result/:resultId/:resultItemId",
+//   ExamController.updateExamResultScore
+// );
 router.get("/exam-result/:resultId", ExamController.getResult);
 router.post(
   "/exam-result",
