@@ -85,5 +85,49 @@ class AdminRoleController {
       });
     }
   }
+  static async addTeacherAsAdminToClass(req, res) {
+    try {
+      const { email, roleDescription } = req.body;
+
+      const existingUsers = await User.find({
+        email: { $in: req.body.emails },
+      });
+
+      const existingClass = await ClassModel.findOne({ _id: req.body.classId });
+
+      if (!existingClass) {
+        return res.status(404).json({
+          status: "404 Not found",
+          error: "The class you selected is not found",
+        });
+      }
+      const admins = [];
+      for (let index = 0; index < existingUsers.length; index++) {
+        const user = existingUsers[index];
+
+        const admin = await AdminRole.create({
+          roleDescription: roleDescription || "Admin",
+          userId: user._id,
+          classId: req.body.classId,
+        });
+        admins.push(admin);
+      }
+      // const admin = await AdminRole.findOne({ _id: adminResult._id }).populate(
+      //   "userId"
+      // );
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          admins,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Adding admin",
+      });
+    }
+  }
 }
 export default AdminRoleController;

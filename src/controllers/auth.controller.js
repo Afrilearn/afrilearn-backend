@@ -280,6 +280,68 @@ class AuthController {
     }
   }
 
+  static async signUpTeacherWithFullAccess(req, res) {
+    try {
+      const { fullName, password, email, role, phoneNumber, className } =
+        req.body;
+
+      const encryptpassword = await Helper.encrptPassword(password);
+
+      const result = await Auth.create({
+        fullName,
+        password: encryptpassword,
+        email,
+        role,
+        // phoneNumber,
+      });
+
+      const enrolledCourse = await EnrolledCourse.create({
+        userId: result._id,
+        courseId: req.body.courseId,
+      });
+
+      let classCode = await Helper.generateCode(8);
+      const existingClassCode = await ClassModel.findOne({
+        classCode,
+      });
+      if (existingClassCode) {
+        classCode = await Helper.generateCode(8);
+      }
+      const newClass = await ClassModel.create({
+        userId: result._id,
+        name: className,
+        courseId: req.body.courseId,
+        classCode,
+      });
+
+      await enrolledCourse.update(
+        {
+          classId: newClass._id,
+        },
+        {
+          new: true,
+        }
+      );
+      await enrolledCourse.save();
+
+      const user = await AuthServices.emailExist(email, res);
+      const token = await Helper.generateToken(result._id, role, fullName);
+
+      return res.status(201).json({
+        status: "success",
+        data: {
+          token,
+          user,
+        },
+      });
+    } catch (err) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error creating new user",
+      });
+    }
+  }
+
   /**
    * Activate user account.
    * @param {Request} req - Response object.

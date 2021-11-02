@@ -20,6 +20,13 @@ const ExamResultsSchema = new mongoose.Schema(
         mark_weight: {
           type: Number,
         },
+        assignedScore: {
+          type: Number,
+        },
+        graded: {
+          type: Boolean,
+          default: false,
+        },
       },
     ],
     userId: {
