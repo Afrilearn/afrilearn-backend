@@ -442,6 +442,7 @@ class ExamController {
       });
     }
   }
+
   static async updateExamResultScore(req, res) {
     try {
       const result = await ExamResult.findById(req.params.resultId);
@@ -456,27 +457,15 @@ class ExamController {
         status: "success",
         data: {
           result,
-        },
+         },
       });
     } catch (error) {
       return res.status(500).json({
         status: "500 Internal server error",
-        error: "Error updating exam result.",
+        error: "Error getting exams info for a class",
       });
     }
   }
 
-  //Get Question Types [done]
-  //Get Exams for teacher (populate submissions count) [done]
-  //Get Exam (populate submissions i. results) [done]
-  //Results status [done]
-  //Get Result [done]
-  //Add Theory Question [done]
-  //Get question by id [done]
-  //Delete Question [done]
-  //Edit Exam [done]
-  //Edit Question
-  //Send Result to students [half-done]
-  //Add Answer to result [done]
 }
 export default ExamController;

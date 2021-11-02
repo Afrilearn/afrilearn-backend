@@ -115,6 +115,7 @@ class AuthController {
 
         enrolledCourse = await EnrolledCourse.create(condition);
         
+        //credit zenith bank users
         if (req.body.channel && req.body.channel === 'zenith' && req.body.freeTrial) {
            // credit the user 3 months free
           const startdate = moment().toDate();
@@ -127,6 +128,19 @@ class AuthController {
           enrolledCourse.status = "paid";
           enrolledCourse.save();
         }
+        // credit social campaign users
+        if (req.body.social) {
+          // credit the user 3 months free
+         const startdate = moment().toDate();
+         const endDate = moment(startdate, "DD-MM-YYYY")
+           .add(2, "weeks")
+           .toDate();
+
+         enrolledCourse.startDate = startdate;
+         enrolledCourse.endDate = endDate;
+         enrolledCourse.status = "paid";
+         enrolledCourse.save();
+       }
        
       }
 
