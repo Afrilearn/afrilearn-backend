@@ -428,24 +428,29 @@ class ExamController {
       });
     }
   }
-  static async getExamInforForAClass(req, res) {
+  static async getStudentLatestExam(req, res) {
     try {
-      const exam = await Exam.findById(req.params.classId)
-        .select("results questionTypeId title duration")
-        .populate({ path: "questionTypeId", select: "name" })
-        .populate({
-          path: "results",
-          select: "userId createdAt status score",
-          populate: {
-            path: "userId",
-            select: "fullName",
-          },
-        });
+      const exams = await Exam.findOne({classId:req.params.classId,publish:true}).select('subjectId termId title questionTypeId duration').populate({
+        path: "subjectId",
+        select:"name",
+        populate: {
+          path: "mainSubjectId",
+          select: "name",
+        }     
+      }).populate({
+        path: "termId",
+        select: "name"
+      }).populate({
+        path: "questionTypeId",
+        select: "name"
+      }).sort({
+        'created_at': -1,
+      })       
 
       return res.status(200).json({
         status: "success",
         data: {
-          // exam,
+          exams,
         },
       });
     } catch (error) {
@@ -455,18 +460,39 @@ class ExamController {
       });
     }
   }
+  static async getExamInformation(req, res) {
+    try {
+      const exams = await Exam.findById(req.params.examId).select('subjectId termId title questionTypeId duration').populate({
+        path: "subjectId",
+        select:"name",
+        populate: {
+          path: "mainSubjectId",
+          select: "name",
+        }     
+      }).populate({
+        path: "termId",
+        select: "name"
+      }).populate({
+        path: "questionTypeId",
+        select: "name"
+      }).sort({
+        'created_at': -1,
+      })       
 
-  //Get Question Types [done]
-  //Get Exams for teacher (populate submissions count) [done]
-  //Get Exam (populate submissions i. results) [done]
-  //Results status [done]
-  //Get Result [done]
-  //Add Theory Question [done]
-  //Get question by id [done]
-  //Delete Question [done]
-  //Edit Exam [done]
-  //Edit Question
-  //Send Result to students [half-done]
-  //Add Answer to result [done]
+      return res.status(200).json({
+        status: "success",
+        data: {
+          exams,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error getting exams info for a class",
+      });
+    }
+  }
+  
+  
 }
 export default ExamController;

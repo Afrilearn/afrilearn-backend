@@ -51,6 +51,6 @@ router.post(
   validateToken,
   ExamController.createExam
 );
-router.get("/class/:classId", validateToken, ExamController.getExamInforForAClass);
-
+router.get("/class/:classId", validateToken, ExamController.getStudentLatestExam);
+router.get("/instruction/:examId", validateToken, ExamController.getExamInformation);
 export default router;
