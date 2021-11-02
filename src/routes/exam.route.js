@@ -19,6 +19,11 @@ router.post(
 router.delete("/question/:questionId", ExamController.deleteQuestion);
 router.get("/question/:questionId", ExamController.getQuestion);
 router.get("/exam-question/:examId", ExamController.readExamQuestions);
+router.patch(
+  "/exam-theory-question/:questionId",
+  upload.fields([{ name: "contentImages" }]),
+  ExamController.updateTheoryExamQuestion
+);
 router.post(
   "/exam-theory-question",
   validateToken,
@@ -32,6 +37,10 @@ router.post(
   ExamController.createExamQuestion
 );
 router.patch("/exam-result/:resultId", ExamController.updateExamResult);
+router.post(
+  "/exam-result/:resultId/:resultItemId",
+  ExamController.updateExamResultScore
+);
 router.get("/exam-result/:resultId", ExamController.getResult);
 router.post(
   "/exam-result",

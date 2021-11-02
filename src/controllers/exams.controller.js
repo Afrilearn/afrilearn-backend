@@ -493,6 +493,5 @@ class ExamController {
     }
   }
   
-  
 }
 export default ExamController;
