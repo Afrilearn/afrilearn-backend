@@ -17,7 +17,7 @@ const ExamResultsSchema = new mongoose.Schema(
         correctOption: {
           type: Number,
         },
-        mark_weight: {
+        markWeight: {
           type: Number,
         },
         assignedScore: {
