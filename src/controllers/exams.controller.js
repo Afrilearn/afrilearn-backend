@@ -12,11 +12,11 @@ class ExamController {
       };
 
       const exam = await Exam.create(data);
-
+      const examPop = await Exam.findById(exam._id).populate("questions");
       return res.status(200).json({
         status: "success",
         data: {
-          exam,
+          exam:examPop
         },
       });
     } catch (error) {
@@ -94,8 +94,8 @@ class ExamController {
   static async getExam(req, res) {
     try {
       const exam = await Exam.findById(req.params.examId)
-        .select("results questionTypeId title duration")
         .populate({ path: "questionTypeId", select: "name" })
+        .populate("questions")
         .populate({
           path: "results",
           select: "userId createdAt status score",
@@ -343,6 +343,7 @@ class ExamController {
     }
   }
   static async saveExamResult(req, res) {
+    
     const remarks = [
       "You were Excellent.",
       "Good Result.",
@@ -362,10 +363,10 @@ class ExamController {
         total: 0,
       };
       req.body.results.forEach((result) => {
-        data.total += result.mark_weight;
+        data.total += result.markWeight;
         if (result.optionSelected) {
           if (result.optionSelected === result.correctOption) {
-            data.score += result.mark_weight;
+            data.score += result.markWeight;
             data.numberOfCorrectAnswers += 1;
           } else {
             data.numberOfWrongAnswers += 1;
@@ -389,8 +390,7 @@ class ExamController {
       }
 
       const result = await ExamResult.create(data);
-      // const result = data;
-
+      
       return res.status(200).json({
         status: "success",
         data: {

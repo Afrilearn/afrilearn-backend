@@ -33,6 +33,7 @@ const ExamQuestionSchema = new mongoose.Schema(
     },
     mark_weight: {
       type: Number,
+      default:1
     },
   },
   {
