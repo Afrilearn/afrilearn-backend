@@ -13,10 +13,11 @@ class ExamController {
 
       const exam = await Exam.create(data);
       const examPop = await Exam.findById(exam._id).populate("questions");
+
       return res.status(200).json({
         status: "success",
         data: {
-          exam:examPop
+          exam: examPop,
         },
       });
     } catch (error) {
@@ -36,7 +37,17 @@ class ExamController {
         {
           new: true,
         }
-      );
+      )
+        .populate({ path: "questionTypeId", select: "name" })
+        .populate("questions")
+        .populate({
+          path: "results",
+          select: "userId createdAt status score",
+          populate: {
+            path: "userId",
+            select: "fullName",
+          },
+        });
 
       return res.status(200).json({
         status: "success",
@@ -236,7 +247,7 @@ class ExamController {
       const data = {
         ...req.body,
       };
-      if (req.files.contentImages) {
+      if (req.files && req.files.contentImages) {
         req.files.contentImages.forEach((img, index) => {
           data.question = data.question.replace(
             req.body.contentUrls[index],
@@ -247,7 +258,8 @@ class ExamController {
 
       const examQuestion = await ExamQuestion.findByIdAndUpdate(
         req.params.questionId,
-        { ...data }
+        { ...data },
+        { new: true }
       );
 
       return res.status(200).json({
@@ -343,7 +355,6 @@ class ExamController {
     }
   }
   static async saveExamResult(req, res) {
-    
     const remarks = [
       "You were Excellent.",
       "Good Result.",
@@ -363,10 +374,10 @@ class ExamController {
         total: 0,
       };
       req.body.results.forEach((result) => {
-        data.total += result.markWeight;
+        data.total += result.mark_weight;
         if (result.optionSelected) {
           if (result.optionSelected === result.correctOption) {
-            data.score += result.markWeight;
+            data.score += result.mark_weight;
             data.numberOfCorrectAnswers += 1;
           } else {
             data.numberOfWrongAnswers += 1;
@@ -390,7 +401,10 @@ class ExamController {
       }
 
       const result = await ExamResult.create(data);
-      
+      // const result = data;
+      const exam = await Exam.findById(req.body.examId);
+      await exam.update({ participants: [...exam.participants, req.data.id] });
+
       return res.status(200).json({
         status: "success",
         data: {
@@ -428,24 +442,55 @@ class ExamController {
       });
     }
   }
+  static async updateExamResultScore(req, res) {
+    try {
+      const result = await ExamResult.findById(req.params.resultId);
+      const target = result.results.find(
+        (i) => i._id == req.params.resultItemId
+      );
+      console.log("target", target);
+      target.assignedScore = req.body.score;
+      target.graded = true;
+      await result.save();
+      return res.status(200).json({
+        status: "success",
+        data: {
+          result,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error updating exam result.",
+      });
+    }
+  }
   static async getStudentLatestExam(req, res) {
     try {
-      const exams = await Exam.findOne({classId:req.params.classId,publish:true}).select('subjectId termId title questionTypeId duration').populate({
-        path: "subjectId",
-        select:"name",
-        populate: {
-          path: "mainSubjectId",
+      const exams = await Exam.findOne({
+        classId: req.params.classId,
+        publish: true,
+      })
+        .select("subjectId termId title questionTypeId duration")
+        .populate({
+          path: "subjectId",
           select: "name",
-        }     
-      }).populate({
-        path: "termId",
-        select: "name"
-      }).populate({
-        path: "questionTypeId",
-        select: "name"
-      }).sort({
-        'created_at': -1,
-      })       
+          populate: {
+            path: "mainSubjectId",
+            select: "name",
+          },
+        })
+        .populate({
+          path: "termId",
+          select: "name",
+        })
+        .populate({
+          path: "questionTypeId",
+          select: "name",
+        })
+        .sort({
+          created_at: -1,
+        });
 
       return res.status(200).json({
         status: "success",
@@ -462,22 +507,27 @@ class ExamController {
   }
   static async getExamInformation(req, res) {
     try {
-      const exams = await Exam.findById(req.params.examId).select('subjectId termId title questionTypeId duration').populate({
-        path: "subjectId",
-        select:"name",
-        populate: {
-          path: "mainSubjectId",
+      const exams = await Exam.findById(req.params.examId)
+        .select("subjectId termId title questionTypeId duration")
+        .populate({
+          path: "subjectId",
           select: "name",
-        }     
-      }).populate({
-        path: "termId",
-        select: "name"
-      }).populate({
-        path: "questionTypeId",
-        select: "name"
-      }).sort({
-        'created_at': -1,
-      })       
+          populate: {
+            path: "mainSubjectId",
+            select: "name",
+          },
+        })
+        .populate({
+          path: "termId",
+          select: "name",
+        })
+        .populate({
+          path: "questionTypeId",
+          select: "name",
+        })
+        .sort({
+          created_at: -1,
+        });
 
       return res.status(200).json({
         status: "success",
@@ -492,6 +542,18 @@ class ExamController {
       });
     }
   }
-  
+
+  //Get Question Types [done]
+  //Get Exams for teacher (populate submissions count) [done]
+  //Get Exam (populate submissions i. results) [done]
+  //Results status [done]
+  //Get Result [done]
+  //Add Theory Question [done]
+  //Get question by id [done]
+  //Delete Question [done]
+  //Edit Exam [done]
+  //Edit Question
+  //Send Result to students [half-done]
+  //Add Answer to result [done]
 }
 export default ExamController;

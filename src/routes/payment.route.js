@@ -6,6 +6,7 @@ import VerifyPayment from "../validations/payment/verifyGooglePayment.validator"
 
 const router = Router();
 
+// router.post("/manual-sub-teacher", PaymentController.subscribeForTeachers);
 router.get("/teacher-plans", PaymentController.getTeacherPaymentPlans);
 router.get("/plans", PaymentController.getPaymentPlans);
 router.get("/coin-plans", PaymentController.getAfriCoinPaymentPlans);
