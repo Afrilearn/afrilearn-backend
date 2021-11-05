@@ -374,10 +374,10 @@ class ExamController {
         total: 0,
       };
       req.body.results.forEach((result) => {
-        data.total += result.mark_weight;
+        data.total += result.markWeight;
         if (result.optionSelected) {
           if (result.optionSelected === result.correctOption) {
-            data.score += result.mark_weight;
+            data.score += result.markWeight;
             data.numberOfCorrectAnswers += 1;
           } else {
             data.numberOfWrongAnswers += 1;
@@ -487,9 +487,9 @@ class ExamController {
         .populate({
           path: "questionTypeId",
           select: "name",
-        })
+        })       
         .sort({
-          created_at: -1,
+          createdAt: -1,
         });
 
       return res.status(200).json({
@@ -524,6 +524,9 @@ class ExamController {
         .populate({
           path: "questionTypeId",
           select: "name",
+        })
+        .populate({
+          path: "questionsCount"      
         })
         .sort({
           created_at: -1,

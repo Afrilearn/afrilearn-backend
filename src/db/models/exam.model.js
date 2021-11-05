@@ -73,6 +73,12 @@ examSchema.virtual("resultsCount", {
   foreignField: "examId",
   count: true,
 });
+examSchema.virtual("questionsCount", {
+  ref: "examQuestion",
+  localField: "_id",
+  foreignField: "examId",
+  count:true
+});
 
 const Exam = mongoose.model("exam", examSchema);
 
