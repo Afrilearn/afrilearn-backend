@@ -17,7 +17,6 @@ import TeacherPaymentPlan from "../db/models/teacherPaymentPlan";
 config();
 
 class PaymentController {
-
   static async verifyPayment(req, res) {
     try {
       await Transaction.create({
@@ -131,7 +130,6 @@ class PaymentController {
 
   static async getPaymentPlans(req, res) {
     try {
-      
       const paymentPlans = await PaymentPlan.find({}).populate("category");
 
       return res.status(200).json({
@@ -325,30 +323,30 @@ class PaymentController {
       let condition = null;
       let newClass = null;
       let platform = "google";
-      let payment  = {}
+      let payment = {};
 
       const { purchaseToken, productId, courseId, clientUserId } = req.body;
 
       const paymentPlan = await AfriCoinPaymentPlan.findById(productId);
       const { role } = req.data;
-      
+
       if (req.body.platform) {
         platform = req.body.platform;
       }
 
-      if(platform === 'apple'){
+      if (platform === "apple") {
         payment = {
           receipt: purchaseToken,
-          // productId         
+          // productId
         };
-      }else{
-         payment = {
+      } else {
+        payment = {
           receipt: purchaseToken,
           productId,
           packageName: "com.afrilearn",
           keyObject: require("./../../gcpconfig.json"),
         };
-      }     
+      }
 
       iap.verifyPayment(platform, payment, function (error, response) {
         if (error) {
@@ -357,7 +355,10 @@ class PaymentController {
             error,
           });
         } else {
-          if (platform == 'apple' || (platform == 'google' && response.receipt.purchaseState === 0)) {
+          if (
+            platform == "apple" ||
+            (platform == "google" && response.receipt.purchaseState === 0)
+          ) {
             verified = true;
 
             const dataToSend = {
@@ -940,41 +941,42 @@ class PaymentController {
       let condition = null;
       let newClass = null;
       let platform = "google";
-      let payment  = {}
+      let payment = {};
 
       const { purchaseToken, productId, courseId, clientUserId, classId } =
         req.body;
-     
+
       const { role } = req.data;
-  
 
       if (req.body.platform) {
         platform = req.body.platform;
       }
 
-      if(platform === 'apple'){
+      if (platform === "apple") {
         payment = {
           receipt: purchaseToken,
-          // productId         
+          // productId
         };
-      }else{
-         payment = {
+      } else {
+        payment = {
           receipt: purchaseToken,
           productId,
           packageName: "com.afrilearn",
           keyObject: require("./../../gcpconfig.json"),
         };
       }
-     
 
       iap.verifyPayment(platform, payment, function (error, response) {
-        if (error) {        
+        if (error) {
           return res.status(400).json({
             status: "error",
             error,
           });
-        } else {    
-          if (platform == 'apple' || (platform == 'google' && response.receipt.purchaseState === 0)) {
+        } else {
+          if (
+            platform == "apple" ||
+            (platform == "google" && response.receipt.purchaseState === 0)
+          ) {
             verified = true;
             if (role === "602f3ce39b146b3201c2dc1d") {
               (async () => {
@@ -1180,20 +1182,18 @@ class PaymentController {
       if (!userInfo) {
         return res.status(404).json({
           status: "error",
-          message: "User information not found"
+          message: "User information not found",
         });
       }
       // check whether the user is already enrolled for this course
-      let condition = { courseId, userId: userInfo.id }
+      let condition = { courseId, userId: userInfo.id };
       let existingEnrolledCourse = await EnrolledCourse.findOne(condition);
 
       if (!existingEnrolledCourse) {
-        existingEnrolledCourse = await EnrolledCourse.create(
-          condition
-        );
+        existingEnrolledCourse = await EnrolledCourse.create(condition);
       }
 
-      // Get payment plan length and amount     
+      // Get payment plan length and amount
       const paymentPlan = await PaymentPlan.findOne(
         {
           _id: paymentPlanId,
@@ -1217,7 +1217,7 @@ class PaymentController {
 
       // Create the transaction
       condition = {
-        tx_ref: 'zenith',
+        tx_ref: "zenith",
         amount: paymentPlan.amount,
         status: "successful",
         userId: userInfo.id,
@@ -1229,7 +1229,7 @@ class PaymentController {
       return res.status(200).json({
         status: "success",
         data: {
-          message: 'User Credited successfully'
+          message: "User Credited successfully",
         },
       });
     } catch (error) {
@@ -1240,6 +1240,42 @@ class PaymentController {
     }
   }
 
+  static async subscribeForTeachers(req, res) {
+    try {
+      const users = await User.find({ email: { $in: req.body.emails } });
+
+      const enrolledCourses = [];
+      const classes = [];
+      const startdate = moment().toDate();
+      const endDate = moment(startdate, "DD-MM-YYYY")
+        .add(12, "months")
+        .toDate();
+
+      for (let index = 0; index < users.length; index++) {
+        const user = users[index];
+        const clazz = await ClassModel.findOne({ userId: user._id }).populate(
+          "enrolledCourse"
+        );
+        classes.push(clazz);
+        const enrolledCourse = await EnrolledCourse.create({
+          courseId: clazz.courseId,
+          userId: clazz.userId,
+          classId: clazz._id,
+          startdate,
+          endDate,
+        });
+        enrolledCourses.push(enrolledCourse);
+      }
+      console.log("classes", classes.length);
+      return res.status(200).json({ enrolledCourses });
+    } catch (error) {
+      //console.log(error.response.data);
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error Verifying paystack payment",
+      });
+    }
+  }
 }
 
 export default PaymentController;
