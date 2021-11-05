@@ -33,14 +33,18 @@ router.post(
 router.post(
   "/exam-question",
   validateToken,
-  upload.fields([{ name: "images" }, { name: "question_image", maxCount: 1 }]),
+  upload.fields([
+    { name: "images" },
+    { name: "question_image", maxCount: 1 },
+    { name: "contentImages" },
+  ]),
   ExamController.createExamQuestion
 );
+router.post(
+  "/exam-result/:resultId/:resultItemId",
+  ExamController.updateExamResultScore
+);
 router.patch("/exam-result/:resultId", ExamController.updateExamResult);
-// router.post(
-//   "/exam-result/:resultId/:resultItemId",
-//   ExamController.updateExamResultScore
-// );
 router.get("/exam-result/:resultId", ExamController.getResult);
 router.post(
   "/exam-result",
@@ -60,6 +64,14 @@ router.post(
   validateToken,
   ExamController.createExam
 );
-router.get("/class/:classId", validateToken, ExamController.getStudentLatestExam);
-router.get("/instruction/:examId", validateToken, ExamController.getExamInformation);
+router.get(
+  "/class/:classId",
+  validateToken,
+  ExamController.getStudentLatestExam
+);
+router.get(
+  "/instruction/:examId",
+  validateToken,
+  ExamController.getExamInformation
+);
 export default router;
