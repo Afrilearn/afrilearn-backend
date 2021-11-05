@@ -465,6 +465,83 @@ class ExamController {
       });
     }
   }
+  static async getStudentLatestExam(req, res) {
+    try {
+      const exams = await Exam.findOne({
+        classId: req.params.classId,
+        publish: true,
+      })
+        .select("subjectId termId title questionTypeId duration")
+        .populate({
+          path: "subjectId",
+          select: "name",
+          populate: {
+            path: "mainSubjectId",
+            select: "name",
+          },
+        })
+        .populate({
+          path: "termId",
+          select: "name",
+        })
+        .populate({
+          path: "questionTypeId",
+          select: "name",
+        })
+        .sort({
+          created_at: -1,
+        });
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          exams,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error getting exams info for a class",
+      });
+    }
+  }
+  static async getExamInformation(req, res) {
+    try {
+      const exams = await Exam.findById(req.params.examId)
+        .select("subjectId termId title questionTypeId duration")
+        .populate({
+          path: "subjectId",
+          select: "name",
+          populate: {
+            path: "mainSubjectId",
+            select: "name",
+          },
+        })
+        .populate({
+          path: "termId",
+          select: "name",
+        })
+        .populate({
+          path: "questionTypeId",
+          select: "name",
+        })
+        .sort({
+          created_at: -1,
+        });
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          exams,
+        },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error getting exams info for a class",
+      });
+    }
+  }
 
   //Get Question Types [done]
   //Get Exams for teacher (populate submissions count) [done]
