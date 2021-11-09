@@ -15,7 +15,7 @@ import chat from "./events/chat";
 import login from "./events/login";
 import challenge from "./events/challenge";
 import disconnect from "./events/disconnect";
-
+import bodyParser from "body-parser";
 // scheduled creation of challenges on sunday
 const job = new CronJob("0 1 0 * * 6", ChallengeUtility.createNewChallenges);
 job.start();
@@ -37,11 +37,13 @@ const io = socketio(server, {
 
 const port = process.env.PORT || 5000;
 global.logger = logger;
+app.use(bodyParser.json({ limit: "50mb" }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(morgan("combined", { stream: logger.stream }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
 app.get("/api/v1", (req, res) =>
   res
     .status(200)

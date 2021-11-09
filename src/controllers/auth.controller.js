@@ -61,7 +61,7 @@ class AuthController {
         if (mongoose.isValidObjectId(req.body.referralCode)) {
           newUser.referee = req.body.referralCode;
           referee = await Auth.findById(req.body.referralCode);
-        } else {        
+        } else {
           referee = await Auth.findOne({
             alternateReferralCode: req.body.referralCode,
           });
@@ -111,13 +111,17 @@ class AuthController {
         let condition = {
           userId: result._id,
           courseId: req.body.courseId,
-        }       
+        };
 
         enrolledCourse = await EnrolledCourse.create(condition);
-        
+
         //credit zenith bank users
-        if (req.body.channel && req.body.channel === 'zenith' && req.body.freeTrial) {
-           // credit the user 3 months free
+        if (
+          req.body.channel &&
+          req.body.channel === "zenith" &&
+          req.body.freeTrial
+        ) {
+          // credit the user 3 months free
           const startdate = moment().toDate();
           const endDate = moment(startdate, "DD-MM-YYYY")
             .add(3, "months")
@@ -129,19 +133,21 @@ class AuthController {
           enrolledCourse.save();
         }
         // credit social campaign users
-        if (req.body.social || (req.body.referralCode && req.body.referralCode ==='12345')) {
+        if (
+          req.body.social ||
+          (req.body.referralCode && req.body.referralCode === "12345")
+        ) {
           // credit the user 3 months free
-         const startdate = moment().toDate();
-         const endDate = moment(startdate, "DD-MM-YYYY")
-           .add(2, "weeks")
-           .toDate();
+          const startdate = moment().toDate();
+          const endDate = moment(startdate, "DD-MM-YYYY")
+            .add(2, "weeks")
+            .toDate();
 
-         enrolledCourse.startDate = startdate;
-         enrolledCourse.endDate = endDate;
-         enrolledCourse.status = "paid";
-         enrolledCourse.save();
-       }
-       
+          enrolledCourse.startDate = startdate;
+          enrolledCourse.endDate = endDate;
+          enrolledCourse.status = "paid";
+          enrolledCourse.save();
+        }
       }
 
       //if school role, create school profile
@@ -799,6 +805,22 @@ class AuthController {
           `${user.fullName} submitted feedback and rating. \n What could we do to improve your Experience?: ${req.body.feedBack}\n How likely are you to recommend Afrilearn to a friend or colleague?: ${req.body.rating}/10`
         );
       }
+      if (req.body.feedBack && !req.body.rating) {
+        //send email to
+        sendEmail(
+          "myafrilearn@gmail.com",
+          `Feedback from ${user.fullName}`,
+          `
+          <div>
+          <div>
+            <div>${user.fullName}&nbsp;submitted&nbsp;feedback&nbsp;and&nbsp;rating.</div>
+          </div>
+          ${req.body.feedBack}
+        </div>  
+          
+          `
+        );
+      }
       return res.status(200).json({
         status: "success",
         data: {
@@ -921,21 +943,24 @@ class AuthController {
    * @memberof AuthController
    * @returns {JSON} - A JSON success response.
    */
-   static async zenithPaymentData(req, res) {
-    try {      
+  static async zenithPaymentData(req, res) {
+    try {
       // const roles = await Role.find({},{
-      //   name: 1,       
+      //   name: 1,
       // });
-      const courses = await Course.find({},{
-        name: 1,        
-      });    
-     
+      const courses = await Course.find(
+        {},
+        {
+          name: 1,
+        }
+      );
+
       return res.status(200).json({
         status: "success",
-        data: {         
+        data: {
           // roles,
           courses,
-        }
+        },
       });
     } catch (err) {
       return res.status(500).json({

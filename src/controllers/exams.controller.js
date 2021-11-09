@@ -197,6 +197,14 @@ class ExamController {
           return i.location;
         });
       }
+      if (req.files && req.files.contentImages) {
+        req.files.contentImages.forEach((img, index) => {
+          data.question = data.question.replace(
+            req.body.contentUrls[index],
+            img.location
+          );
+        });
+      }
       const examQuestion = await ExamQuestion.create(data);
 
       return res.status(200).json({
@@ -373,6 +381,8 @@ class ExamController {
         remark: "You participated.",
         total: 0,
       };
+      console.log("data", data);
+
       req.body.results.forEach((result) => {
         data.total += result.markWeight;
         if (result.optionSelected) {
@@ -412,6 +422,7 @@ class ExamController {
         },
       });
     } catch (error) {
+      console.log("error", error);
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error saving exam result.",
@@ -444,7 +455,12 @@ class ExamController {
   }
   static async updateExamResultScore(req, res) {
     try {
-      const result = await ExamResult.findById(req.params.resultId);
+      const result = await ExamResult.findById(req.params.resultId)
+        .populate({
+          path: "userId",
+          select: "fullName",
+        })
+        .populate("results.questionId");
       const target = result.results.find(
         (i) => i._id == req.params.resultItemId
       );
