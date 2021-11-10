@@ -381,8 +381,7 @@ class ExamController {
         remark: "You participated.",
         total: 0,
       };
-      console.log("data", data);
-
+    
       req.body.results.forEach((result) => {
         data.total += result.markWeight;
         if (result.optionSelected) {
@@ -411,7 +410,6 @@ class ExamController {
       }
 
       const result = await ExamResult.create(data);
-      // const result = data;
       const exam = await Exam.findById(req.body.examId);
       await exam.update({ participants: [...exam.participants, req.data.id] });
 
@@ -421,8 +419,7 @@ class ExamController {
           result,
         },
       });
-    } catch (error) {
-      console.log("error", error);
+    } catch (error) {     
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error saving exam result.",
@@ -503,9 +500,9 @@ class ExamController {
         .populate({
           path: "questionTypeId",
           select: "name",
-        })
+        })       
         .sort({
-          created_at: -1,
+          createdAt: -1,
         });
 
       return res.status(200).json({
@@ -540,6 +537,9 @@ class ExamController {
         .populate({
           path: "questionTypeId",
           select: "name",
+        })
+        .populate({
+          path: "questionsCount"      
         })
         .sort({
           created_at: -1,
