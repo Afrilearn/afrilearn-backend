@@ -25,15 +25,15 @@ const ExamQuestionSchema = new mongoose.Schema(
     },
     options: { type: Array },
     images: { type: Array },
-    correct_option: {
+    correctOption: {
       type: Number,
     },
     explanation: {
       type: String,
     },
-    mark_weight: {
+    markWeight: {
       type: Number,
-      default:1
+      default: 1,
     },
   },
   {
