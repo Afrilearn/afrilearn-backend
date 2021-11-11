@@ -106,15 +106,22 @@ class ExamController {
     try {
       const exam = await Exam.findById(req.params.examId)
         .populate({ path: "questionTypeId", select: "name" })
-        .populate("questions")
+        .populate("questions");
+      // .populate({
+      //   path: "results",
+      //   // select: "userId createdAt status score",
+      //   populate: {
+      //     path: "userId",
+      //     select: "fullName",
+      //   },
+      // });
+      const results = await ExamResult.find({ examId: exam._id })
         .populate({
-          path: "results",
-          select: "userId createdAt status score",
-          populate: {
-            path: "userId",
-            select: "fullName",
-          },
-        });
+          path: "userId",
+          select: "fullName",
+        })
+        .populate("results.questionId");
+      exam.results = results;
 
       return res.status(200).json({
         status: "success",
