@@ -6,7 +6,9 @@ import Auth from "../db/models/users.model";
 
 import Helper from "../utils/user.utils";
 import sendEmail from "../utils/email.utils";
-import EnrolledCourse from "../db/models/enrolledCourses.model";
+import EnrolledCourse, {
+  primaryCoursesIds,
+} from "../db/models/enrolledCourses.model";
 import ClassMember from "../db/models/classMembers.model";
 
 /**
@@ -63,6 +65,32 @@ class SchoolController {
           schoolId,
           classId: schoolClasses[i].id,
         });
+        let enrolledCourse = await EnrolledCourse.findOne({
+          schoolId,
+          classId: schoolClasses[i].id,
+        });
+        let isPrimary = false;
+        const enrolledCourseObject = enrolledCourse.toObject();
+
+        if (
+          enrolledCourseObject.courseId &&
+          primaryCoursesIds.includes(enrolledCourseObject.courseId.toString())
+        ) {
+          isPrimary = true;
+        }
+        if (
+          enrolledCourseObject.courseId &&
+          enrolledCourseObject.courseId._id &&
+          primaryCoursesIds.includes(
+            enrolledCourseObject.courseId._id.toString()
+          )
+        ) {
+          isPrimary = true;
+        }
+
+        enrolledCourseObject.paymentIsActive =
+          isPrimary || enrolledCourseObject.endDate > Date.now();
+        console.log("enrolledCourseObject", enrolledCourseObject);
 
         if (schoolClasses[i].userId) {
           ++numOfClassTeachers;
@@ -73,11 +101,12 @@ class SchoolController {
           numOfClassTeachers,
           courseId: schoolClasses[i].courseId._id,
           courseName: schoolClasses[i].courseId.name,
+          paymentIsActive: enrolledCourseObject.paymentIsActive,
           classId: schoolClasses[i].id,
         };
         schoolClassesData.push(data);
       }
-
+      // console.log("schoolClassesData", schoolClassesData);
       return res.status(201).json({
         status: "success",
         data: {
@@ -145,14 +174,8 @@ class SchoolController {
   static async signUpForStudent(req, res) {
     try {
       let customerRole = "Student";
-      const {
-        fullName,
-        password,
-        email,
-        classId,
-        schoolId,
-        courseId,
-      } = req.body;
+      const { fullName, password, email, classId, schoolId, courseId } =
+        req.body;
 
       const encryptpassword = await Helper.encrptPassword(password);
       const existingUser = await Auth.findOne({
