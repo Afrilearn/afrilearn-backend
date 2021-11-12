@@ -486,12 +486,16 @@ class ExamController {
     }
   }
   static async getStudentLatestExam(req, res) {
-    try {
+    try {     
       const exams = await Exam.findOne({
         classId: req.params.classId,
         publish: true,
+        deadline: { 
+          $gte: Date.now()
+        },
+        participants: { $nin: [req.data.id] } 
       })
-        .select("subjectId termId title questionTypeId duration")
+        .select("subjectId termId title questionTypeId duration participants deadline")
         .populate({
           path: "subjectId",
           select: "name",
@@ -511,7 +515,7 @@ class ExamController {
         .sort({
           createdAt: -1,
         });
-
+        
       return res.status(200).json({
         status: "success",
         data: {
