@@ -90,7 +90,6 @@ class SchoolController {
 
         enrolledCourseObject.paymentIsActive =
           isPrimary || enrolledCourseObject.endDate > Date.now();
-        console.log("enrolledCourseObject", enrolledCourseObject);
 
         if (schoolClasses[i].userId) {
           ++numOfClassTeachers;
