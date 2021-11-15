@@ -8,6 +8,11 @@ import AddQuestionTypeValidator from "../validations/exams/addQuestionType";
 
 const router = Router();
 
+router.get(
+  "/student-exams/:classId",
+  validateToken,
+  ExamController.getRelatedExam
+);
 router.get("/exam-question-type", ExamController.getExamQuestionType);
 router.post(
   "/exam-question-type",
