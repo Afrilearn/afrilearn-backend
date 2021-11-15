@@ -684,7 +684,10 @@ class PaymentController {
 
         if (response.data.data.status === "success") {
           verified = true;
-          if (role === "602f3ce39b146b3201c2dc1d") {
+          if (
+            role === "602f3ce39b146b3201c2dc1d" ||
+            role === "607ededa2712163504210684"
+          ) {
             (async () => {
               if (req.body.newClassName) {
                 let classCode = await Helper.generateCode(8);
