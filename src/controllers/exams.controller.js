@@ -603,6 +603,9 @@ class ExamController {
           total: 0,
           score: 0,
         };
+        if (exam.questionTypeId.name === "Objective") {
+          examResultObject.status = "marked";
+        }
         if (results[0]) {
           for (let index = 0; index < results[0].results.length; index++) {
             const result = results[0].results[index];
@@ -618,6 +621,9 @@ class ExamController {
                 examResultObject.totalTheory += result.markWeight;
                 examResultObject.scoreTheory += result.assignedScore;
                 examResultObject.score += result.assignedScore;
+                examResultObject.status = "pending";
+              } else {
+                examResultObject.status = "marked";
               }
             }
           }
