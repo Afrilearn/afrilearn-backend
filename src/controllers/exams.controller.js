@@ -1,3 +1,4 @@
+import ClassMember from "../db/models/classMembers.model";
 import Exam from "../db/models/exam.model";
 import ExamQuestion from "../db/models/examQuestions.model";
 import ExamQuestionType from "../db/models/examQuestionType.model";
@@ -561,6 +562,75 @@ class ExamController {
         data: {
           exams,
         },
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error getting exams info for a class",
+      });
+    }
+  }
+  static async getRelatedExam(req, res) {
+    try {
+      const exams = await Exam.find({ classId: req.params.classId })
+        .select("title questionTypeId duration participants deadline createdAt")
+
+        .populate({
+          path: "questionTypeId",
+          select: "name",
+        })
+        .sort({
+          created_at: -1,
+        });
+
+      const popExams = [];
+      for (let index = 0; index < exams.length; index++) {
+        const exam = exams[index];
+
+        const results = await ExamResult.find({
+          examId: exam._id,
+          userId: req.data.id,
+        })
+          .select("createdAt status results")
+          .sort({ createdAt: -1 })
+          .populate({ path: "results.questionId", select: "type" });
+
+        const examResultObject = {
+          totalObjective: 0,
+          scoreObjective: 0,
+          totalTheory: 0,
+          scoreTheory: 0,
+          total: 0,
+          score: 0,
+        };
+        if (results[0]) {
+          for (let index = 0; index < results[0].results.length; index++) {
+            const result = results[0].results[index];
+            examResultObject.total += result.markWeight;
+            if (result.questionId && result.questionId.type === "Objective") {
+              examResultObject.totalObjective += result.markWeight;
+              if (result.optionSelected === result.correctOption) {
+                examResultObject.scoreObjective += result.markWeight;
+                examResultObject.score += result.markWeight;
+              }
+            } else {
+              if (result.graded) {
+                examResultObject.totalTheory += result.markWeight;
+                examResultObject.scoreTheory += result.assignedScore;
+                examResultObject.score += result.assignedScore;
+              }
+            }
+          }
+        }
+        popExams.push({
+          ...exam.toObject(),
+          result: examResultObject,
+        });
+      }
+
+      return res.status(200).json({
+        status: "success",
+        data: { exams: popExams },
       });
     } catch (error) {
       return res.status(500).json({
