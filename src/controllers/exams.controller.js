@@ -602,6 +602,7 @@ class ExamController {
           scoreTheory: 0,
           total: 0,
           score: 0,
+          createdAt: results[0].createdAt
         };
         if (exam.questionTypeId.name === "Objective") {
           examResultObject.status = "marked";
