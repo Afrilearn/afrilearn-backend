@@ -25,6 +25,7 @@ import notificationRoute from "./notification.route";
 import examsRoute from "./exam.route";
 import userStoryRoute from "./userStory.route";
 import zenithRoute from "./zenith.route";
+import pinRoute from "./pin.route";
 import agentSubmissionRoute from "./agentSubmission.route";
 
 const router = Router();
@@ -56,5 +57,6 @@ router.use("/notifications", notificationRoute);
 router.use("/user-story", userStoryRoute);
 router.use("/zenith", zenithRoute);
 router.use("/agent", agentSubmissionRoute);
+router.use("/pin", pinRoute);
 
 export default router;
