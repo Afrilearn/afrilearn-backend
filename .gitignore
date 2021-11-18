@@ -48,3 +48,5 @@ googleplay-keystore.json,
 gcpconfig.json
 src/googlekey.json
 src/config/config.json
+src/lessons.json
+src/proccessed.json

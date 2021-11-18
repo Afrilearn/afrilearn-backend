@@ -820,6 +820,45 @@ class AuthController {
           
           `
         );
+        sendEmail(
+          "chijiokeo@myafrilearn.com",
+          `Feedback from ${user.fullName}`,
+          `
+          <div>
+          <div>
+            <div>${user.fullName}&nbsp;submitted&nbsp;feedback&nbsp;and&nbsp;rating.</div>
+          </div>
+          ${req.body.feedBack}
+        </div>  
+          
+          `
+        );
+        sendEmail(
+          "nifemi@myafrilearn.com",
+          `Feedback from ${user.fullName}`,
+          `
+          <div>
+          <div>
+            <div>${user.fullName}&nbsp;submitted&nbsp;feedback&nbsp;and&nbsp;rating.</div>
+          </div>
+          ${req.body.feedBack}
+        </div>  
+          
+          `
+        );
+        sendEmail(
+          "feyikemi199@gmail.com",
+          `Feedback from ${user.fullName}`,
+          `
+          <div>
+          <div>
+            <div>${user.fullName}&nbsp;submitted&nbsp;feedback&nbsp;and&nbsp;rating.</div>
+          </div>
+          ${req.body.feedBack}
+        </div>  
+          
+          `
+        );
       }
       return res.status(200).json({
         status: "success",
