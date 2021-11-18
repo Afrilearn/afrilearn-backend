@@ -68,7 +68,7 @@ const ChallengeSchema = new mongoose.Schema(
     },
     endDate: {
       type: Date,
-      default: new Date().setHours(168),
+      default: new Date().setHours(192),
     },
   },
   {

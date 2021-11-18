@@ -38,5 +38,10 @@ router.post(
   AddPastQuestionProgressValidator.myValidationResult,
   PastQuestionController.addPastQuestionProgress,
 );
+router.get(
+  '/examblyMobilePastQuestionLogic', 
+  PastQuestionController.mobilePastQuestionAppLogic,
+);
+
 
 export default router;
