@@ -6,7 +6,7 @@ import EnrolledCourse from "../db/models/enrolledCourses.model";
 import ResumePlaying from "../db/models/resumePlaying.model";
 import Favourite from "../db/models/favourite.model";
 import sendEmail from "../utils/email.utils";
-import lessonsJSON from "../lessons.json";
+// import lessonsJSON from "../lessons.json";
 const fs = require("fs");
 const request = require("request");
 import { randomString } from "../config/randomString";
