@@ -1,7 +1,7 @@
 import PastQuestionProgress from '../db/models/pastQuestionProgresses.model';
 import PastQuestionQuizResult from '../db/models/pastQuestionQuizResults.model';
-import pastQuestionsRaw from './../utils/pastQuestions copy';
-import pastQuestionsRawYears from './../utils/pastQuestions copy 2';
+// import pastQuestionsRaw from './../utils/pastQuestions copy';
+// import pastQuestionsRawYears from './../utils/pastQuestions copy 2';
 /**
  *Contains pastQuestion Controller
  *
@@ -99,86 +99,86 @@ class PastQuestionController {
    * @returns {JSON} - A JSON success response.
    *
    */
-    static async mobilePastQuestionAppLogic(req, res) {
-      try {    
-        let years = [];
-        let questions = [];
+    // static async mobilePastQuestionAppLogic(req, res) {
+    //   try {    
+    //     let years = [];
+    //     let questions = [];
       
-        pastQuestionsRawYears.forEach(element => {
-          let result = pastQuestionsRaw.filter(element2=>element2.subject_id === element.subject_id)
-          let currentQuestions = result.map((item)=>{
-            return {
-                exam_id:+element.subject_id,
-                question_id:item.question_id,
-                question: item.question,
-                question_image: item.question_image,
-                question_position: item.question_position,
-                options: [
-                  item.option_a,
-                  item.option_b,
-                  item.option_c,
-                  item.option_d,
-                  item.option_e
-                ],
-                images:[
-                  item.option_a_image,
-                  item.option_b_image,
-                  item.option_c_image,
-                  item.option_d_image,
-                  item.option_e_image
-                ],
-                grouped : (item.grouped == 1) ? true : false,
-                from_no : item.from_no,
-                to_no : item.to_no,
-                explanation : item.explanation,
-                correct_option : +item.correct_option,
-            }
-          })       
-          questions.push(...currentQuestions)
-        });
+    //     pastQuestionsRawYears.forEach(element => {
+    //       let result = pastQuestionsRaw.filter(element2=>element2.subject_id === element.subject_id)
+    //       let currentQuestions = result.map((item)=>{
+    //         return {
+    //             subject_id:+element.subject_id,
+    //             question_id:item.question_id,
+    //             question: item.question,
+    //             question_image: item.question_image,
+    //             question_position: item.question_position,
+    //             options: [
+    //               item.option_a,
+    //               item.option_b,
+    //               item.option_c,
+    //               item.option_d,
+    //               item.option_e
+    //             ],
+    //             images:[
+    //               item.option_a_image,
+    //               item.option_b_image,
+    //               item.option_c_image,
+    //               item.option_d_image,
+    //               item.option_e_image
+    //             ],
+    //             grouped : (item.grouped == 1) ? true : false,
+    //             from_no : item.from_no,
+    //             to_no : item.to_no,
+    //             explanation : item.explanation,
+    //             correct_option : +item.correct_option,
+    //         }
+    //       })       
+    //       questions.push(...currentQuestions)
+    //     });
    
-        // const result = pastQuestionsRaw.filter(item=>item.subject_id === '3')
-        // const questions = result.map((item)=>{
-        //   return {
-        //       question_id:item.question_id,
-        //       question: item.question,
-        //       question_image: item.question_image,
-        //       question_position: item.question_position,
-        //       options: [
-        //         item.option_a,
-        //         item.option_b,
-        //         item.option_c,
-        //         item.option_d,
-        //         item.option_e
-        //       ],
-        //       images:[
-        //         item.option_a_image,
-        //         item.option_b_image,
-        //         item.option_c_image,
-        //         item.option_d_image,
-        //         item.option_e_image
-        //       ],
-        //       grouped : (item.grouped == 1) ? true : false,
-        //       from_no : item.from_no,
-        //       to_no : item.to_no,
-        //       explanation : item.explanation,
-        //       correct_option : item.correct_option,
-        //   }
-        // })     
-        return res.status(201).json({
-          status: 'success',
-          data:{            
-            questions,
-            length: questions.length
-          }
-        });
-      } catch (error) {
-        console.log(error)
-        return res.status(500).json({
-          status: '500 Internal server error',
-          error: 'Error Occured',
-        });
-      }
-    }
+    //     // const result = pastQuestionsRaw.filter(item=>item.subject_id === '3')
+    //     // const questions = result.map((item)=>{
+    //     //   return {
+    //     //       question_id:item.question_id,
+    //     //       question: item.question,
+    //     //       question_image: item.question_image,
+    //     //       question_position: item.question_position,
+    //     //       options: [
+    //     //         item.option_a,
+    //     //         item.option_b,
+    //     //         item.option_c,
+    //     //         item.option_d,
+    //     //         item.option_e
+    //     //       ],
+    //     //       images:[
+    //     //         item.option_a_image,
+    //     //         item.option_b_image,
+    //     //         item.option_c_image,
+    //     //         item.option_d_image,
+    //     //         item.option_e_image
+    //     //       ],
+    //     //       grouped : (item.grouped == 1) ? true : false,
+    //     //       from_no : item.from_no,
+    //     //       to_no : item.to_no,
+    //     //       explanation : item.explanation,
+    //     //       correct_option : item.correct_option,
+    //     //   }
+    //     // })     
+    //     return res.status(201).json({
+    //       status: 'success',
+    //       data:{            
+    //         questions,
+    //         length: questions.length
+    //       }
+    //     });
+    //   } catch (error) {
+    //     console.log(error)
+    //     return res.status(500).json({
+    //       status: '500 Internal server error',
+    //       error: 'Error Occured',
+    //     });
+    //   }
+    // }
 }
 export default PastQuestionController;
