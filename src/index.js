@@ -17,7 +17,7 @@ import challenge from "./events/challenge";
 import disconnect from "./events/disconnect";
 import bodyParser from "body-parser";
 // scheduled creation of challenges on sunday
-const job = new CronJob("0 1 0 * * 6", ChallengeUtility.createNewChallenges);
+const job = new CronJob("0 23 * * 6", ChallengeUtility.createNewChallenges);
 job.start();
 
 config();
