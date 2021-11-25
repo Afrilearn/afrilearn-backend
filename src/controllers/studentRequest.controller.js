@@ -2,7 +2,7 @@ import AdminRole from "../db/models/adminRole.model";
 import ClassModel from "../db/models/classes.model";
 import User from "../db/models/users.model";
 import Helper from "../utils/user.utils";
-import sendEmail from "../utils/email.utils";
+import sendEmail, { sendEmailMany } from "../utils/email.utils";
 import StudentRequest from "../db/models/studentRequest.model";
 import sendWhatsappMessge from "../utils/whatsapp.utils";
 import Subject from "../db/models/subjects.model";
@@ -117,10 +117,11 @@ class StudentRequestController {
         "Assignment Help Request Received!",
         userHtmlMessage
       );
-      sendEmail(
-        "care@myafrilearn.com, adebiyivictoria4@gmail.com, legend@myafrilearn.com",
+      sendEmailMany(
+        "care@myafrilearn.com",
         " HOMEWORK ASSISTANCE",
-        htmlMessage
+        htmlMessage,
+        "adebiyivictoria4@gmail.com, legend@myafrilearn.com"
       );
       // care@myafrilearn.com
       return res.status(200).json({
