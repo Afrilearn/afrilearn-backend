@@ -117,7 +117,11 @@ class StudentRequestController {
         "Assignment Help Request Received!",
         userHtmlMessage
       );
-      sendEmail("care@myafrilearn.com", " HOMEWORK ASSISTANCE", htmlMessage);
+      sendEmail(
+        "care@myafrilearn.com, adebiyivictoria4@gmail.com, legend@myafrilearn.com",
+        " HOMEWORK ASSISTANCE",
+        htmlMessage
+      );
       // care@myafrilearn.com
       return res.status(200).json({
         status: "success",
