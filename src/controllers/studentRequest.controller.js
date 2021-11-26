@@ -121,7 +121,8 @@ class StudentRequestController {
         "care@myafrilearn.com",
         " HOMEWORK ASSISTANCE",
         htmlMessage,
-        "adebiyivictoria4@gmail.com, legend@myafrilearn.com"
+        "adebiyivictoria4@gmail.com, legend@myafrilearn.com",
+        req.body.email
       );
       // care@myafrilearn.com
       return res.status(200).json({

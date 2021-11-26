@@ -68,7 +68,13 @@ async function sendEmail(to, subject = "Afrilearn", message) {
   }
 }
 
-export const sendEmailMany = async (to, subject = "Afrilearn", message, cc) => {
+export const sendEmailMany = async (
+  to,
+  subject = "Afrilearn",
+  message,
+  cc,
+  replyTo
+) => {
   try {
     const auth = {
       auth: {
@@ -104,6 +110,7 @@ export const sendEmailMany = async (to, subject = "Afrilearn", message, cc) => {
         html: message,
         forceEmbeddedImages: true,
         cc,
+        replyTo,
       };
 
       transporter.sendMail(mailDetail, (err, resp) => {
