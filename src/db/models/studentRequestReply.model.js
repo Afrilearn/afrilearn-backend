@@ -1,11 +1,15 @@
 import mongoose from "mongoose";
 
-const StudentRequestSchema = new mongoose.Schema(
+const studentRequestReplySchema = new mongoose.Schema(
   {
     email: { type: String },
     attachment: { type: String },
-    question: { type: String },
+    body: { type: String },
     phone: { type: String },
+    requestId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "StudentRequest",
+    },
     userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "user",
@@ -24,13 +28,9 @@ const StudentRequestSchema = new mongoose.Schema(
   }
 );
 
-StudentRequestSchema.virtual("replies", {
-  ref: "studentRequestReply",
-  localField: "_id",
-  foreignField: "requestId",
-  justOne: false,
-});
+const studentRequestReply = mongoose.model(
+  "studentRequestReply",
+  studentRequestReplySchema
+);
 
-const StudentRequest = mongoose.model("StudentRequest", StudentRequestSchema);
-
-export default StudentRequest;
+export default studentRequestReply;
