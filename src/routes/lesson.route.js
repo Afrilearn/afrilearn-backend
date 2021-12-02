@@ -10,7 +10,7 @@ import Report from "../validations/lessons/report.validator";
 const router = Router();
 
 router.get("/", LessonController.getAllLessons);
-// router.get("/lessons-for-app", LessonController.getLessonsForWaecApp);
+router.get("/lessons-for-app", LessonController.getLessonsForWaecApp);
 router.get("/:lessonId/test", LessonController.loadTest);
 router.post(
   "/:lessonId/save-test-results",
@@ -89,4 +89,5 @@ router.post(
   Report.myValidationResult,
   LessonController.reportLesson
 );
+
 export default router;
