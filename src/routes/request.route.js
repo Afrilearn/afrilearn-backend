@@ -13,6 +13,6 @@ router.post(
   StudentRequestController.addStudentRequest
 );
 
-// router.get("/get-clears", StudentRequestController.clearEnrolledC);
+router.get("/", verifyToken, StudentRequestController.getMyRequests);
 
 export default router;

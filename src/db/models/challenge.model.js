@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import moment from "moment";
 
 const ChallengeSchema = new mongoose.Schema(
   {
@@ -68,7 +69,7 @@ const ChallengeSchema = new mongoose.Schema(
     },
     endDate: {
       type: Date,
-      default: new Date().setHours(192),
+      default: moment(new Date()).add(7, "d"),
     },
   },
   {

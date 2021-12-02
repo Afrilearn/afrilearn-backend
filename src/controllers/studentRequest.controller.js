@@ -2,7 +2,8 @@ import AdminRole from "../db/models/adminRole.model";
 import ClassModel from "../db/models/classes.model";
 import User from "../db/models/users.model";
 import Helper from "../utils/user.utils";
-import sendEmail from "../utils/email.utils";
+import sendEmail, { sendEmailMany } from "../utils/email.utils";
+import StudentRequestReply from "../db/models/studentRequestReply.model";
 import StudentRequest from "../db/models/studentRequest.model";
 import sendWhatsappMessge from "../utils/whatsapp.utils";
 import Subject from "../db/models/subjects.model";
@@ -117,7 +118,13 @@ class StudentRequestController {
         "Assignment Help Request Received!",
         userHtmlMessage
       );
-      sendEmail("care@myafrilearn.com", " HOMEWORK ASSISTANCE", htmlMessage);
+      sendEmailMany(
+        "care@myafrilearn.com",
+        " HOMEWORK ASSISTANCE",
+        htmlMessage,
+        "adebiyivictoria4@gmail.com, legend@myafrilearn.com",
+        req.body.email
+      );
       // care@myafrilearn.com
       return res.status(200).json({
         status: "success",
@@ -127,6 +134,26 @@ class StudentRequestController {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error Adding Student Request",
+      });
+    }
+  }
+
+  static async getMyRequests(req, res) {
+    try {
+      const requests = await StudentRequest.find({ userId: req.data.id })
+        .sort({ createdAt: -1 })
+        .populate({ path: "userId", select: "fullName email" })
+        .populate("replies");
+
+      return res.status(200).json({
+        status: "success",
+        data: { requests },
+      });
+    } catch (error) {
+      console.log("error", error);
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Error getting Student Requests",
       });
     }
   }
