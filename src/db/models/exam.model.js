@@ -38,6 +38,9 @@ const examSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: "user",
     },
+    startDate: {
+      type: Date,
+    },
     deadline: {
       type: Date,
     },

@@ -531,8 +531,8 @@ class ExamController {
     }
   }
   static async getExamInformation(req, res) {
-    try {
-      const exams = await Exam.findById(req.params.examId)
+    try {    
+      const exams = await Exam.findById(req.params.examId)      
         .select("subjectId termId title questionTypeId duration")
         .populate({
           path: "subjectId",
@@ -571,10 +571,9 @@ class ExamController {
     }
   }
   static async getRelatedExam(req, res) {
-    try {
+    try {     
       const exams = await Exam.find({ classId: req.params.classId })
-        .select("title questionTypeId duration participants deadline createdAt")
-
+        .select("title questionTypeId duration participants deadline startDate createdAt")
         .populate({
           path: "questionTypeId",
           select: "name",
@@ -584,6 +583,7 @@ class ExamController {
         });
 
       const popExams = [];
+      
       for (let index = 0; index < exams.length; index++) {
         const exam = exams[index];
 
@@ -594,6 +594,7 @@ class ExamController {
           .select("createdAt status results")
           .sort({ createdAt: -1 })
           .populate({ path: "results.questionId", select: "type" });
+        
 
         const examResultObject = {
           totalObjective: 0,
@@ -602,8 +603,9 @@ class ExamController {
           scoreTheory: 0,
           total: 0,
           score: 0,
-          createdAt: results[0].createdAt
+          createdAt: results.length?results[0].createdAt : null
         };
+       
         if (exam.questionTypeId.name === "Objective") {
           examResultObject.status = "marked";
         }
