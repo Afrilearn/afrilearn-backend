@@ -11,6 +11,7 @@ const fs = require("fs");
 const request = require("request");
 import { randomString } from "../config/randomString";
 import MainSubject from "../db/models/mainSubjects.model";
+import lessonData from "../../jsslessons.json";
 /**
  *Contains Lesson Controller
  *
@@ -695,54 +696,81 @@ class LessonController {
 
   static async getLessonsForWaecApp(req, res) {
     try {
-      const returnReplacedURLs = (text) => {
-        var download = function (uri, filename, callback) {
-          request.head(uri, function (err, res, body) {
-            console.log("content-type:", res.headers["content-type"]);
-            console.log("content-length:", res.headers["content-length"]);
+      const subjects = await MainSubject.find({});
+      const jss1 = [];
+      for (let index = 0; index < subjects.length; index++) {
+        const subject = subjects[index];
 
-            request(uri)
-              .pipe(fs.createWriteStream(filename))
-              .on("close", callback);
-          });
-        };
-
-        const randomSng = randomString(9);
-        let replacedString = `../../../../assets/img/question_images/${randomSng}.png`;
-        let downloadString = `./images/${randomSng}.png`;
-        if (text.split(".") && text.split(".").length > 0) {
-          replacedString = `../../../../assets/img/question_images/${
-            text.split(".")[0]
-          }.png`;
-          downloadString = `./images/${text.split(".")[0]}.png`;
+        const data = { subject, lessons: [] };
+        for (let index = 0; index < lessonData.jss1.length; index++) {
+          const lesson = lessonData.jss1[index];
+          if (
+            lesson.subjectId &&
+            lesson.subjectId.mainSubjectId &&
+            lesson.subjectId.mainSubjectId._id == subject._id
+          )
+            data.lessons.push(lesson);
         }
-        download(
-          `https://api.exambly.com/adminpanel/question_images/${text}`,
-          downloadString,
-          function () {
-            console.log("done", replacedString);
-          }
-        );
+        if (data.lessons.length > 0) {
+          jss1.push(data);
+        }
+      }
+      const jss2 = [];
+      for (let index = 0; index < subjects.length; index++) {
+        const subject = subjects[index];
 
-        return replacedString;
-      };
+        const data = { subject, lessons: [] };
+        for (let index = 0; index < lessonData.jss2.length; index++) {
+          const lesson = lessonData.jss2[index];
+          if (
+            lesson.subjectId &&
+            lesson.subjectId.mainSubjectId &&
+            lesson.subjectId.mainSubjectId._id == subject._id
+          )
+            data.lessons.push(lesson);
+        }
+        if (data.lessons.length > 0) {
+          jss2.push(data);
+        }
+      }
+      const jss3 = [];
+      for (let index = 0; index < subjects.length; index++) {
+        const subject = subjects[index];
 
-      const processedQuestion = questionsJSON.map((x) => {
-        return {
-          ...x,
-          images: x.images.map((i) => {
-            return i !== "" ? returnReplacedURLs(i) : "";
-          }),
-          question_image:
-            x.question_image !== "" ? returnReplacedURLs(x.question_image) : "",
-        };
-      });
+        const data = { subject, lessons: [] };
+        for (let index = 0; index < lessonData.jss3.length; index++) {
+          const lesson = lessonData.jss3[index];
+          if (
+            lesson.subjectId &&
+            lesson.subjectId.mainSubjectId &&
+            lesson.subjectId.mainSubjectId._id == subject._id
+          )
+            data.lessons.push(lesson);
+        }
+        if (data.lessons.length > 0) {
+          jss3.push(data);
+        }
+      }
 
-      return res.status(200).json(processedQuestion);
+      // const jss2 = await Lesson.find({ courseId: "5fff7329de0bdb47f826feb0" })
+      //   .populate({
+      //     path: "subjectId",
+      //     populate: { path: "mainSubjectId", select: "name" },
+      //   })
+      //   .populate({ path: "termId", select: "name" })
+      //   .select("-videoUrls");
+      // const jss3 = await Lesson.find({ courseId: "5fff734ade0bdb47f826feb1" })
+      //   .populate({
+      //     path: "subjectId",
+      //     populate: { path: "mainSubjectId", select: "name" },
+      //   })
+      //   .populate({ path: "termId", select: "name" })
+      //   .select("-videoUrls");
+      return res.status(200).json({ jss1, jss2, jss3 });
     } catch (error) {
       return res.status(500).json({
         status: "500 Internal server error",
-        error: "Error getting lesson",
+        error: "Error getting lessons",
       });
     }
   }
