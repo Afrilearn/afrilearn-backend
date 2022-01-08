@@ -65,9 +65,9 @@ class ExamController {
   }
   static async getTeacherExams(req, res) {
     try {
-      const exams = await Exam.find({ creatorId: req.data.id }).populate(
-        "resultsCount questionTypeId"
-      );
+      const exams = await Exam.find({ creatorId: req.data.id })
+        .populate("resultsCount questionTypeId")
+        .sort({ createdAt: -1 });
 
       return res.status(200).json({
         status: "success",
@@ -389,7 +389,7 @@ class ExamController {
         remark: "You participated.",
         total: 0,
       };
-    
+
       req.body.results.forEach((result) => {
         data.total += result.markWeight;
         if (result.optionSelected) {
@@ -427,7 +427,7 @@ class ExamController {
           result,
         },
       });
-    } catch (error) {     
+    } catch (error) {
       return res.status(500).json({
         status: "500 Internal server error",
         error: "Error saving exam result.",
@@ -487,16 +487,18 @@ class ExamController {
     }
   }
   static async getStudentLatestExam(req, res) {
-    try {     
+    try {
       const exams = await Exam.findOne({
         classId: req.params.classId,
         publish: true,
-        deadline: { 
-          $gte: Date.now()
+        deadline: {
+          $gte: Date.now(),
         },
-        participants: { $nin: [req.data.id] } 
+        participants: { $nin: [req.data.id] },
       })
-        .select("subjectId termId title questionTypeId duration participants deadline")
+        .select(
+          "subjectId termId title questionTypeId duration participants deadline"
+        )
         .populate({
           path: "subjectId",
           select: "name",
@@ -512,11 +514,11 @@ class ExamController {
         .populate({
           path: "questionTypeId",
           select: "name",
-        })       
+        })
         .sort({
           createdAt: -1,
         });
-        
+
       return res.status(200).json({
         status: "success",
         data: {
@@ -531,8 +533,8 @@ class ExamController {
     }
   }
   static async getExamInformation(req, res) {
-    try {    
-      const exams = await Exam.findById(req.params.examId)      
+    try {
+      const exams = await Exam.findById(req.params.examId)
         .select("subjectId termId title questionTypeId duration")
         .populate({
           path: "subjectId",
@@ -551,7 +553,7 @@ class ExamController {
           select: "name",
         })
         .populate({
-          path: "questionsCount"      
+          path: "questionsCount",
         })
         .sort({
           created_at: -1,
@@ -571,9 +573,11 @@ class ExamController {
     }
   }
   static async getRelatedExam(req, res) {
-    try {     
+    try {
       const exams = await Exam.find({ classId: req.params.classId })
-        .select("title questionTypeId duration participants deadline startDate createdAt")
+        .select(
+          "title questionTypeId duration participants deadline startDate createdAt"
+        )
         .populate({
           path: "questionTypeId",
           select: "name",
@@ -583,7 +587,7 @@ class ExamController {
         });
 
       const popExams = [];
-      
+
       for (let index = 0; index < exams.length; index++) {
         const exam = exams[index];
 
@@ -594,7 +598,6 @@ class ExamController {
           .select("createdAt status results")
           .sort({ createdAt: -1 })
           .populate({ path: "results.questionId", select: "type" });
-        
 
         const examResultObject = {
           totalObjective: 0,
@@ -603,9 +606,9 @@ class ExamController {
           scoreTheory: 0,
           total: 0,
           score: 0,
-          createdAt: results.length?results[0].createdAt : null
+          createdAt: results.length ? results[0].createdAt : null,
         };
-       
+
         if (exam.questionTypeId.name === "Objective") {
           examResultObject.status = "marked";
         }

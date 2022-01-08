@@ -33,6 +33,10 @@ class StudentRequestController {
       attachment = req.file.location;
     }
     try {
+      return res.status(500).json({
+        status: "500 Internal server error",
+        error: "Unavailable now, Coming Soon!",
+      });
       const data = {
         ...req.body,
         userId: req.data.id,
