@@ -101,9 +101,7 @@ class PastQuestionController {
    */
     // static async mobilePastQuestionAppLogic(req, res) {
     //   try {    
-    //     let years = [];
-    //     let questions = [];
-      
+    //          
     //     pastQuestionsRawYears.forEach(element => {
     //       let result = pastQuestionsRaw.filter(element2=>element2.subject_id === element.subject_id)
     //       let currentQuestions = result.map((item)=>{

@@ -72,8 +72,9 @@ EnrolledCourseSchema.methods.toJSON = function () {
     isPrimary = true;
   }
 
-  enrolledCourseObject.paymentIsActive =
-    isPrimary || enrolledCourseObject.endDate > Date.now();
+  // enrolledCourseObject.paymentIsActive =
+  //   isPrimary || enrolledCourseObject.endDate > Date.now();
+  enrolledCourseObject.paymentIsActive = true
   return enrolledCourseObject;
 };
 
