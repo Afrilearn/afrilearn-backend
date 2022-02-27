@@ -14,7 +14,7 @@ describe('Terms ', () => {
   it('should return an object containing terms with status 200', (done) => {
     chai
       .request(app)
-      .get('/api/v1/terms')
+      .get('/api/v2/terms')
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.an('object');

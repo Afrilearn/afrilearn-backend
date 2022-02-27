@@ -23,7 +23,7 @@ describe('Subjects ', () => {
   it('should create and return  a subject object with status 200', (done) => {
     chai
       .request(app)
-      .post('/api/v1/subjects/add-subject')
+      .post('/api/v2/subjects/add-subject')
       .send({
         _id: subject_id,
         mainSubjectId: main_subject_id,
@@ -42,7 +42,7 @@ describe('Subjects ', () => {
   it('should NOT create with status 400 when bad request is sent', (done) => {
     chai
       .request(app)
-      .post('/api/v1/subjects/add-subject')
+      .post('/api/v2/subjects/add-subject')
       .end((err, res) => {
         res.should.have.status(400);
         res.body.should.be.an('object');

@@ -102,7 +102,7 @@ describe("Courses ", () => {
   it("should return array of enrolledCourses with status 200", (done) => {
     chai
       .request(app)
-      .post("/api/v1/courses/enroll")
+      .post("/api/v2/courses/enroll")
       .send({ courseId: course_id, userId: user_id })
       .end((err, res) => {
         res.should.have.status(200);
@@ -117,7 +117,7 @@ describe("Courses ", () => {
   it("should NOT return array of enrolledCourses with status 400 when data is incomplete", (done) => {
     chai
       .request(app)
-      .post("/api/v1/courses/enroll")
+      .post("/api/v2/courses/enroll")
       .set("token", token)
       .end((err, res) => {
         res.should.have.status(400);
@@ -129,7 +129,7 @@ describe("Courses ", () => {
   it("should return array of courses with status 200", (done) => {
     chai
       .request(app)
-      .get("/api/v1/courses")
+      .get("/api/v2/courses")
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.an("object");
@@ -143,7 +143,7 @@ describe("Courses ", () => {
   it("should return a course with status 200", (done) => {
     chai
       .request(app)
-      .get(`/api/v1/courses/${course_id}`)
+      .get(`/api/v2/courses/${course_id}`)
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.an("object");
@@ -156,7 +156,7 @@ describe("Courses ", () => {
   it("should return array of subjects with status 200", (done) => {
     chai
       .request(app)
-      .get(`/api/v1/courses/${course_id}/subjects`)
+      .get(`/api/v2/courses/${course_id}/subjects`)
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.an("object");
@@ -169,7 +169,7 @@ describe("Courses ", () => {
   it("should return array of subjects with status 200", (done) => {
     chai
       .request(app)
-      .get(`/api/v1/courses/${course_id}/subjects`)
+      .get(`/api/v2/courses/${course_id}/subjects`)
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.an("object");
@@ -183,7 +183,7 @@ describe("Courses ", () => {
   // it('should return subjectsProgress with status 200', (done) => {
   //   chai
   //     .request(app)
-  //     .get('/api/v1/courses/5fd12c70e74b15663c5f4c6e/progress-and-performance')
+  //     .get('/api/v2/courses/5fd12c70e74b15663c5f4c6e/progress-and-performance')
   //     .set('token', token)
   //     .send({
   //       classId: '5fc8d2a4b55ab52a40d75a54',
@@ -263,7 +263,7 @@ describe("Courses ", () => {
   it("should register subject progress if it had not been done before", (done) => {
     chai
       .request(app)
-      .post("/api/v1/courses/subject-progress")
+      .post("/api/v2/courses/subject-progress")
       .set("token", token)
       .send(subjectProgress)
       .end((err, res) => {
@@ -276,7 +276,7 @@ describe("Courses ", () => {
   // it('should not register subject progress if it had not been done before', (done) => {
   //   chai
   //     .request(app)
-  //     .post('/api/v1/courses/subject-progress')
+  //     .post('/api/v2/courses/subject-progress')
   //     .set('token', token)
   //     .send(subjectProgress)
   //     .end((err, res) => {
@@ -290,7 +290,7 @@ describe("Courses ", () => {
   it("should not register progress if the user supplies incomplete information", (done) => {
     chai
       .request(app)
-      .post("/api/v1/courses/subject-progress")
+      .post("/api/v2/courses/subject-progress")
       .set("token", token)
       .end((err, res) => {
         res.should.have.status(400);

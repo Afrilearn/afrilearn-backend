@@ -63,7 +63,7 @@ describe('Classes ', () => {
   it('should  create an announcement and return an announcement with status 200', (done) => {
     chai
       .request(app)
-      .post(`/api/v1/classes/${class_id}/announce`)
+      .post(`/api/v2/classes/${class_id}/announce`)
       .set('token', token)
       .send({
         text: 'Welcome to the class',
@@ -81,7 +81,7 @@ describe('Classes ', () => {
   it('should NOT create an announcement if user is not authenticated', (done) => {
     chai
       .request(app)
-      .post(`/api/v1/classes/${class_id}/announce`)
+      .post(`/api/v2/classes/${class_id}/announce`)
       .send({
         text: 'Welcome to the class',
       })
@@ -94,7 +94,7 @@ describe('Classes ', () => {
   it('should NOT create an announcement if input is invalid', (done) => {
     chai
       .request(app)
-      .post(`/api/v1/classes/${class_id}/announce`)
+      .post(`/api/v2/classes/${class_id}/announce`)
       .send('text', 2)
       .set('token', token)
       .end((err, res) => {
@@ -106,7 +106,7 @@ describe('Classes ', () => {
   it('should create a comment and return a comment with status 200', (done) => {
     chai
       .request(app)
-      .post(`/api/v1/classes/${announcement_id}/comment`)
+      .post(`/api/v2/classes/${announcement_id}/comment`)
       .set('token', token)
       .send({
         text: 'Thank you instructor',
@@ -124,7 +124,7 @@ describe('Classes ', () => {
   it('should NOT create a comment if user is not authenticated', (done) => {
     chai
       .request(app)
-      .post(`/api/v1/classes/${announcement_id}/comment`)
+      .post(`/api/v2/classes/${announcement_id}/comment`)
       .send({
         text: 'Thank you Instructor',
       })
@@ -137,7 +137,7 @@ describe('Classes ', () => {
   it('should NOT create a comment and if input is invalid', (done) => {
     chai
       .request(app)
-      .post(`/api/v1/classes/${announcement_id}/comment`)
+      .post(`/api/v2/classes/${announcement_id}/comment`)
       .set('token', token)
       .send('text', 2)
       .end((err, res) => {
@@ -149,7 +149,7 @@ describe('Classes ', () => {
   it('should return a list of announcement with status 200', (done) => {
     chai
       .request(app)
-      .get(`/api/v1/classes/${class_id}/announcements`)
+      .get(`/api/v2/classes/${class_id}/announcements`)
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.an('object');
@@ -176,7 +176,7 @@ describe('Classes ', () => {
   it('should create a assignedComment and return a comment with status 200', (done) => {
     chai
       .request(app)
-      .post(`/api/v1/classes/${assigned_id}/comment-on-content`)
+      .post(`/api/v2/classes/${assigned_id}/comment-on-content`)
       .set('token', token)
       .send({
         text: 'Thank you instructor',
@@ -194,7 +194,7 @@ describe('Classes ', () => {
   it('should NOT create a assignedComment if user is not authenticated', (done) => {
     chai
       .request(app)
-      .post(`/api/v1/classes/${assigned_id}/comment-on-content`)
+      .post(`/api/v2/classes/${assigned_id}/comment-on-content`)
       .send({
         text: 'Thank you Instructor',
       })
@@ -207,7 +207,7 @@ describe('Classes ', () => {
   it('should NOT create a assignedComment and if input is invalid', (done) => {
     chai
       .request(app)
-      .post(`/api/v1/classes/${assigned_id}/comment-on-content`)
+      .post(`/api/v2/classes/${assigned_id}/comment-on-content`)
       .set('token', token)
       .send('text', 2)
       .end((err, res) => {

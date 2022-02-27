@@ -14,7 +14,7 @@ describe('SUpport ', () => {
   it('should create a supportRequest with status 200', (done) => {
     chai
       .request(app)
-      .post('/api/v1/supports/add-support')
+      .post('/api/v2/supports/add-support')
       .send({
         email: 'Ayobamiu@gmail.com',
         subject: 'Testing Support Request',

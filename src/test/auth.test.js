@@ -113,7 +113,7 @@ describe("No Matching Endpoint", () => {
     it("should throw 404 error when endpoint is not found", (done) => {
       chai
         .request(app)
-        .post("/api/v1/auth/none")
+        .post("/api/v2/auth/none")
         .end((err, res) => {
           res.should.have.status(404);
           done();
@@ -152,7 +152,7 @@ describe("Auth Route Endpoints", () => {
     it("should not create account if the user supplies incomplete information", (done) => {
       chai
         .request(app)
-        .post("/api/v1/auth/signup")
+        .post("/api/v2/auth/signup")
         .send(incompleteUser)
         .end((err, res) => {
           res.should.have.status(400);
@@ -166,7 +166,7 @@ describe("Auth Route Endpoints", () => {
       const stub = sinon.stub(sgMail, "send").callsFake(() => "done");
       chai
         .request(app)
-        .post("/api/v1/auth/signup")
+        .post("/api/v2/auth/signup")
         .send(user)
         .end((err, res) => {
           res.should.have.status(201);
@@ -180,7 +180,7 @@ describe("Auth Route Endpoints", () => {
     it("should not create account if the user supplies already exisiting email", (done) => {
       chai
         .request(app)
-        .post("/api/v1/auth/signup")
+        .post("/api/v2/auth/signup")
         .send(user)
         .end((err, res) => {
           res.should.have.status(409);
@@ -193,7 +193,7 @@ describe("Auth Route Endpoints", () => {
     it("should return available roles and classes", (done) => {
       chai
         .request(app)
-        .get("/api/v1/auth/roles")
+        .get("/api/v2/auth/roles")
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.an("object");
@@ -227,7 +227,7 @@ describe("Auth Route Endpoints", () => {
     it("should not create account if the user supplies incomplete information", (done) => {
       chai
         .request(app)
-        .post("/api/v1/auth/sign-up-for-a-child")
+        .post("/api/v2/auth/sign-up-for-a-child")
         .send(incompleteUser)
         .end((err, res) => {
           res.should.have.status(400);
@@ -241,7 +241,7 @@ describe("Auth Route Endpoints", () => {
       const stub = sinon.stub(sgMail, "send").callsFake(() => "done");
       chai
         .request(app)
-        .post("/api/v1/auth/sign-up-for-a-child")
+        .post("/api/v2/auth/sign-up-for-a-child")
         .send(customChild)
         .end((err, res) => {
           res.should.have.status(201);
@@ -272,7 +272,7 @@ describe("Auth Route Endpoints", () => {
     it("should activate account if user supplies valid token", (done) => {
       chai
         .request(app)
-        .get(`/api/v1/auth/activate_account?token=${myToken}`)
+        .get(`/api/v2/auth/activate_account?token=${myToken}`)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.an("object");
@@ -284,7 +284,7 @@ describe("Auth Route Endpoints", () => {
     it("should not activate account if the user does not supply token", (done) => {
       chai
         .request(app)
-        .get("/api/v1/auth/activate_account")
+        .get("/api/v2/auth/activate_account")
         .end((err, res) => {
           res.should.have.status(401);
           res.body.should.be.an("object");
@@ -297,7 +297,7 @@ describe("Auth Route Endpoints", () => {
       chai
         .request(app)
         .get(
-          "/api/v1/auth/activate_account?token=57576576thfcgfnfhfghfghfngfdtrd"
+          "/api/v2/auth/activate_account?token=57576576thfcgfnfhfghfghfngfdtrd"
         )
         .end((err, res) => {
           res.should.have.status(401);
@@ -329,7 +329,7 @@ describe("Auth Route Endpoints", () => {
     it("should not login a user if the user supplies incomplete information", (done) => {
       chai
         .request(app)
-        .post("/api/v1/auth/login")
+        .post("/api/v2/auth/login")
         .send(incompleteUser)
         .end((err, res) => {
           res.should.have.status(400);
@@ -342,7 +342,7 @@ describe("Auth Route Endpoints", () => {
     it("should login a user account if the user supplies complete valid information", (done) => {
       chai
         .request(app)
-        .post("/api/v1/auth/login")
+        .post("/api/v2/auth/login")
         .send(user)
         .end((err, res) => {
           res.should.have.status(200);
@@ -355,7 +355,7 @@ describe("Auth Route Endpoints", () => {
     it("should not login a user if the user email cannot be found", (done) => {
       chai
         .request(app)
-        .post("/api/v1/auth/login")
+        .post("/api/v2/auth/login")
         .send(invalidEmail)
         .end((err, res) => {
           res.should.have.status(401);
@@ -368,7 +368,7 @@ describe("Auth Route Endpoints", () => {
     it("should not login a user if the user supplies wrong password", (done) => {
       chai
         .request(app)
-        .post("/api/v1/auth/login")
+        .post("/api/v2/auth/login")
         .send(wrongPasscode)
         .end((err, res) => {
           res.should.have.status(401);
@@ -426,7 +426,7 @@ describe("Auth Route Endpoints", () => {
     it("should not send the user a reset password link if the users email does not exist", (done) => {
       chai
         .request(app)
-        .get("/api/v1/auth/okwuosach@gmail.com/reset_password")
+        .get("/api/v2/auth/okwuosach@gmail.com/reset_password")
         .end((err, res) => {
           res.should.have.status(401);
           res.body.should.be.an("object");
@@ -438,7 +438,7 @@ describe("Auth Route Endpoints", () => {
     it("should send the user reset password link via mail when he provides valid email", (done) => {
       chai
         .request(app)
-        .get("/api/v1/auth/okwuosachijioke56687@gmail.com/reset_password")
+        .get("/api/v2/auth/okwuosachijioke56687@gmail.com/reset_password")
         .end((err, res) => {
           res.should.have.status(201);
           res.body.should.be.an("object");
@@ -487,7 +487,7 @@ describe("Auth Route Endpoints", () => {
     it("should not change password if all parameters are not supplied", (done) => {
       chai
         .request(app)
-        .post("/api/v1/auth/change_password")
+        .post("/api/v2/auth/change_password")
         .end((err, res) => {
           res.should.have.status(400);
           res.body.should.be.an("object");
@@ -499,7 +499,7 @@ describe("Auth Route Endpoints", () => {
     it("should not change password if passcode is invalid", (done) => {
       chai
         .request(app)
-        .post("/api/v1/auth/change_password")
+        .post("/api/v2/auth/change_password")
         .send(changePasswordInvalidCode)
         .end((err, res) => {
           res.should.have.status(401);
@@ -512,7 +512,7 @@ describe("Auth Route Endpoints", () => {
     it("should change password if suppied data is complete", (done) => {
       chai
         .request(app)
-        .post("/api/v1/auth/change_password")
+        .post("/api/v2/auth/change_password")
         .send({
           email: "okwuosachijioke56687@gmail.com",
           password: "123456",
@@ -556,7 +556,7 @@ describe("Auth Route Endpoints", () => {
     it("should not verify token if is it expired", (done) => {
       chai
         .request(app)
-        .post("/api/v1/auth/change_password")
+        .post("/api/v2/auth/change_password")
         .send({
           email: "okwuosachijioke56687@gmail.com",
           password: "123456",
@@ -575,7 +575,7 @@ describe("Auth Route Endpoints", () => {
     it("should not login a user if the user supplies incomplete information", (done) => {
       chai
         .request(app)
-        .post("/api/v1/auth/social_login/google")
+        .post("/api/v2/auth/social_login/google")
         .end((err, res) => {
           res.should.have.status(400);
           res.body.should.be.an("object");
@@ -587,7 +587,7 @@ describe("Auth Route Endpoints", () => {
     it("should not login a user if the user token is invalid", (done) => {
       chai
         .request(app)
-        .post("/api/v1/auth/social_login/google")
+        .post("/api/v2/auth/social_login/google")
         .send({ token: "invalid" })
         .end((err, res) => {
           res.should.have.status(500);
@@ -617,7 +617,7 @@ describe("Auth Route Endpoints", () => {
     it("should update user profile if user is Authenticated", (done) => {
       chai
         .request(app)
-        .patch("/api/v1/auth/profile-update")
+        .patch("/api/v2/auth/profile-update")
         .set("token", token)
         .send({ fullName: "Updated Name" })
         .end((err, res) => {
@@ -644,7 +644,7 @@ describe("Auth Route Endpoints", () => {
     it("should not load a user if there is no token", (done) => {
       chai
         .request(app)
-        .get("/api/v1/auth/load-user")
+        .get("/api/v2/auth/load-user")
         .end((err, res) => {
           res.should.have.status(401);
           res.body.should.be.an("object");
@@ -657,7 +657,7 @@ describe("Auth Route Endpoints", () => {
     it("should not load a user if the token is invalid", (done) => {
       chai
         .request(app)
-        .get("/api/v1/auth/load-user")
+        .get("/api/v2/auth/load-user")
         .set("token", "invalid token")
         .end((err, res) => {
           res.should.have.status(401);
@@ -670,7 +670,7 @@ describe("Auth Route Endpoints", () => {
     it("should load a user if valid token is supplied", (done) => {
       chai
         .request(app)
-        .get("/api/v1/auth/load-user")
+        .get("/api/v2/auth/load-user")
         .set("token", myToken)
         .end((err, res) => {
           res.should.have.status(200);
@@ -698,7 +698,7 @@ describe("Auth Route Endpoints", () => {
     it("should not load a user if it doesn't ", (done) => {
       chai
         .request(app)
-        .get("/api/v1/auth/check-join-class")
+        .get("/api/v2/auth/check-join-class")
         .send({
           email: "strang@email.com",
           classId: "600fd9316b97f8283045b201",
@@ -712,7 +712,7 @@ describe("Auth Route Endpoints", () => {
     // it('should not load a user if the token is invalid', (done) => {
     //   chai
     //     .request(app)
-    //     .get('/api/v1/auth/load-user')
+    //     .get('/api/v2/auth/load-user')
     //     .set('token', 'invalid token')
     //     .end((err, res) => {
     //       res.should.have.status(401);
@@ -725,7 +725,7 @@ describe("Auth Route Endpoints", () => {
     // it('should load a user if valid token is supplied', (done) => {
     //   chai
     //     .request(app)
-    //     .get('/api/v1/auth/load-user')
+    //     .get('/api/v2/auth/load-user')
     //     .set('token', myToken)
     //     .end((err, res) => {
     //       res.should.have.status(200);

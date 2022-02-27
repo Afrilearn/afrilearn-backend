@@ -1,5 +1,6 @@
 import express from "express";
-import http from "http";
+import fs from "fs";
+import https from "https";
 import cors from "cors";
 import { config } from "dotenv";
 import morgan from "morgan";
@@ -17,39 +18,48 @@ import challenge from "./events/challenge";
 import disconnect from "./events/disconnect";
 import bodyParser from "body-parser";
 // scheduled creation of challenges on sunday
-const job = new CronJob("0 1 * * sun", ChallengeUtility.createNewChallenges);
-job.start();
+// const job = new CronJob("0 1 * * sun", ChallengeUtility.createNewChallenges);
+// job.start();
 
 config();
 
 const app = express();
+const options = {
+  key: fs.readFileSync(`${__dirname}/secure/certificates/s1-local.key`),
+  cert: fs.readFileSync(`${__dirname}/secure/certificates/s1-local.pem`),
+}
 
-const server = http.createServer(app);
+const server = https.createServer(options, app)
 
-const io = socketio(server, {
-  cors: {
-    origin: process.env.CLIENT_URL,
-    methods: ["GET", "POST"],
-  },
-  pingTimeout: 6000000,
-  pingInterval: 30000,
-});
+// const io = socketio(server, {
+//   cors: {
+//     origin: process.env.CLIENT_URL,
+//     methods: ["GET", "POST"],
+//   },
+//   pingTimeout: 6000000,
+//   pingInterval: 30000,
+// });
 
-const port = process.env.PORT || 5000;
-global.logger = logger;
+const port = 3301;
+// global.logger = logger;
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
-app.use(morgan("combined", { stream: logger.stream }));
+
+app.use(cors({
+  credentials: true,
+  origin: [`https://s1.local:3000`, `https://s1.local:3301`, `https://s1.local:3302`, `https://s1.local:3303`],
+}));
+app.use(morgan("combined"));
 
 // app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
-app.get("/api/v1", (req, res) =>
+app.get("/api/v2", (req, res) =>
   res
     .status(200)
     .json({ status: "success", message: "Welcome to Afrilearn API" })
 );
-app.use("/api/v1", v1Router);
+app.use("/api/v2", v1Router);
 
 app.use((req, res, next) => {
   const err = new Error("No endpoint found");
@@ -68,16 +78,16 @@ app.use((err, req, res) => {
 
 //server
 server.listen(port, () => {
-  logger.info(`Server running at port ${port} on ${process.env.NODE_ENV}`);
+  console.log(`Server running at port ${port} on ${process.env.NODE_ENV}`);
 });
 
 const users = {};
-const onConnection = (socket) => {
-  chat(io, socket);
-  login(io, socket, users);
-  challenge(io, socket, users);
-  disconnect(io, socket, users);
-};
+// const onConnection = (socket) => {
+//   chat(io, socket);
+//   login(io, socket, users);
+//   challenge(io, socket, users);
+//   disconnect(io, socket, users);
+// };
 
-io.of("/").on("connection", onConnection);
+// io.of("/").on("connection", onConnection);
 export default app;

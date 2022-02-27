@@ -114,7 +114,7 @@ describe('Classes ', () => {
   it('should return array of question with status 200', (done) => {
     chai
       .request(app)
-      .get(`/api/v1/lessons/${lesson_id}/test`)
+      .get(`/api/v2/lessons/${lesson_id}/test`)
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.an('object');
@@ -128,7 +128,7 @@ describe('Classes ', () => {
   it('should submit test result and  return array of quiz results with status 200', (done) => {
     chai
       .request(app)
-      .post(`/api/v1/lessons/${lesson_id}/save-test-results`)
+      .post(`/api/v2/lessons/${lesson_id}/save-test-results`)
       .set('token', token)
       .send({ ...testResultData })
       .end((err, res) => {
@@ -144,7 +144,7 @@ describe('Classes ', () => {
   it('should neither submit test result nor  return array of quiz results with status 400', (done) => {
     chai
       .request(app)
-      .post(`/api/v1/lessons/${lesson_id}/save-test-results`)
+      .post(`/api/v2/lessons/${lesson_id}/save-test-results`)
       .set('token', token)
       .send({ ...testResultData, timeSpent: 2 })
       .end((err, res) => {
@@ -158,7 +158,7 @@ describe('Classes ', () => {
   it('should return array of quiz results with status 200', (done) => {
     chai
       .request(app)
-      .get(`/api/v1/lessons/${lesson_id}/get-test-results`)
+      .get(`/api/v2/lessons/${lesson_id}/get-test-results`)
       .set('token', token)
       .end((err, res) => {
         res.should.have.status(200);
@@ -173,7 +173,7 @@ describe('Classes ', () => {
   it('should return array of quiz results related to a class with status 200', (done) => {
     chai
       .request(app)
-      .get(`/api/v1/lessons/${lesson_id}/get-test-results`)
+      .get(`/api/v2/lessons/${lesson_id}/get-test-results`)
       .set('token', token)
       .send({ classId: '5fc8e7134bfe993c34a9689c' })
       .end((err, res) => {
@@ -189,7 +189,7 @@ describe('Classes ', () => {
   it("should not return array of quiz results when lesson doesn't exists, status 404", (done) => {
     chai
       .request(app)
-      .get(`/api/v1/lessons/${unknown_lesson_id}/get-test-results`)
+      .get(`/api/v2/lessons/${unknown_lesson_id}/get-test-results`)
       .set('token', token)
       .end((err, res) => {
         res.should.have.status(404);
@@ -201,7 +201,7 @@ describe('Classes ', () => {
   // it('should return array of lessons with status 200', (done) => {
   //   chai
   //     .request(app)
-  //     .get('/api/v1/lessons')
+  //     .get('/api/v2/lessons')
   //     .query({ searchQuery: 'vicini' })
   //     .end((err, res) => {
   //       res.should.have.status(200);
@@ -216,7 +216,7 @@ describe('Classes ', () => {
   // it('should return array of lessons even with no searchQuery, with status 200', (done) => {
   //   chai
   //     .request(app)
-  //     .get('/api/v1/lessons')
+  //     .get('/api/v2/lessons')
   //     .end((err, res) => {
   //       res.should.have.status(200);
   //       res.body.should.be.an('object');
@@ -287,7 +287,7 @@ describe('Classes ', () => {
     chai
       .request(app)
       .post(
-        '/api/v1/lessons/5fc8d2a4b55ab52a40d75a54/5fc8d2a4b55ab52a40d75a54/subject-lessons',
+        '/api/v2/lessons/5fc8d2a4b55ab52a40d75a54/5fc8d2a4b55ab52a40d75a54/subject-lessons',
       )
       .set('token', token)
       .send(getSubject)
@@ -305,7 +305,7 @@ describe('Classes ', () => {
     chai
       .request(app)
       .post(
-        '/api/v1/lessons/5fc8d2a4b55ab52a40d75a54/5fc8d2a4b55ab52a40d75a54/subject-lessons',
+        '/api/v2/lessons/5fc8d2a4b55ab52a40d75a54/5fc8d2a4b55ab52a40d75a54/subject-lessons',
       )
       .set('token', token)
       .send(getSubjectWithClas)

@@ -167,7 +167,7 @@ describe('Past Questions ', () => {
   // it('should update enrolled course if payment is succesful with status 200', (done) => {
   //   chai
   //     .request(app)
-  //     .post('/api/v1/payments/verify-payment')
+  //     .post('/api/v2/payments/verify-payment')
   //     .send(refReq)
   //     .set('verif-hash', 'afrilearnofafrica')
   //     .end((err, res) => {
@@ -184,7 +184,7 @@ describe('Past Questions ', () => {
   it('should NOT update enrolled course if payment ref is not found', (done) => {
     chai
       .request(app)
-      .post('/api/v1/payments/verify-payment')
+      .post('/api/v2/payments/verify-payment')
       .send(failedPaymentRefReq)
       .set('verif-hash', 'afrilearnofafrica')
       .end((err, res) => {
@@ -198,7 +198,7 @@ describe('Past Questions ', () => {
   it('should NOT update enrolled course if verif-hash is not match', (done) => {
     chai
       .request(app)
-      .post('/api/v1/payments/verify-payment')
+      .post('/api/v2/payments/verify-payment')
       .send(failedPaymentRefReq)
       .set('verif-hash', 'afrilearn')
       .end((err, res) => {
@@ -210,7 +210,7 @@ describe('Past Questions ', () => {
   it('should return list of Student payment plans with status 200', (done) => {
     chai
       .request(app)
-      .get('/api/v1/payments/plans')
+      .get('/api/v2/payments/plans')
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.an('object');
@@ -223,7 +223,7 @@ describe('Past Questions ', () => {
   it('should add a transaction with status 200', (done) => {
     chai
       .request(app)
-      .post('/api/v1/payments/add-transaction')
+      .post('/api/v2/payments/add-transaction')
       .set('token', token)
       .send({
         tx_ref: 'Links-616626414629',
@@ -243,7 +243,7 @@ describe('Past Questions ', () => {
   // it('should add a transaction with status 200 when courseId is sent', (done) => {
   //   chai
   //     .request(app)
-  //     .post('/api/v1/payments/add-transaction')
+  //     .post('/api/v2/payments/add-transaction')
   //     .set('token', token)
   //     .send({
   //       tx_ref: 'Links-616626414629',
@@ -264,7 +264,7 @@ describe('Past Questions ', () => {
   it('should NOT add a transaction when input is invalid', (done) => {
     chai
       .request(app)
-      .post('/api/v1/payments/add-transaction')
+      .post('/api/v2/payments/add-transaction')
       .set('token', token)
       .send({
         tx_ref: 'Links-616626414629',

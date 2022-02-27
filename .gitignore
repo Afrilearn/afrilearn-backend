@@ -1,3 +1,6 @@
+src/secure/certificates/*
+*.env
+
 # Compiled source #
 ###################
 *.com

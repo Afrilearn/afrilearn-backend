@@ -4,9 +4,9 @@ const client = require("twilio")(accountSid, authToken);
 
 const sendWhatsappMessge = (body, mediaUrl) => {
   const data = {
-    from: "whatsapp:+14155238886",
+    from: "whatsapp:+18646643250",
     body,
-    to: "whatsapp:+2348180172978",
+    to: "whatsapp:+966542328067",
   };
   if (mediaUrl) {
     data.mediaUrl = mediaUrl;

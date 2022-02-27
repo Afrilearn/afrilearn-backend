@@ -357,7 +357,7 @@ class AuthController {
    */
   static async activateAccount(req, res) {
     try {
-      const { id } = req.data;
+      const { id } = req.body;
 
       const newData = {
         isActivated: true,

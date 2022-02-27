@@ -30,7 +30,7 @@ describe('Counts ', () => {
   it('should return an object containing counts with status 200', (done) => {
     chai
       .request(app)
-      .get('/api/v1/counts/get-all-counts')
+      .get('/api/v2/counts/get-all-counts')
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.an('object');
