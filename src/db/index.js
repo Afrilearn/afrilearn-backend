@@ -16,12 +16,13 @@ mongoose.connect(url, {
   // sslValidate: false,
   // sslCA: "/secure/certificates/rootCA.pem",
   useNewUrlParser: true,
-  useCreateIndex: true,
   useUnifiedTopology: true,
+  useCreateIndex: true,
   useFindAndModify: false,
+
 });
 const { connection } = mongoose;
 
 connection.once('open', () => {
-  logger.info('MongoDB database connected successfully');
+  console.log('MongoDB database connected successfully');
 });

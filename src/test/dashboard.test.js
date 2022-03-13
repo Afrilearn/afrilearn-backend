@@ -84,7 +84,7 @@ describe("Dashboard ", () => {
   it("should return an object containing user data with status 200", (done) => {
     chai
       .request(app)
-      .post("/api/v1/dashboard")
+      .post("/api/v2/dashboard")
       .set("token", token)
       .send({ enrolledCourseId: enrolled_course_id })
       .end((err, res) => {

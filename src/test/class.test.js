@@ -65,7 +65,7 @@ describe("Classes ", () => {
   it("should  save an EnrooledClass and return a class with status 200", (done) => {
     chai
       .request(app)
-      .post("/api/v1/classes/add-class")
+      .post("/api/v2/classes/add-class")
       .set("token", token)
       .send({
         name: "Class for testing",
@@ -85,7 +85,7 @@ describe("Classes ", () => {
   it("should NOT return a class with status 400 when data is incomplete", (done) => {
     chai
       .request(app)
-      .post("/api/v1/classes/add-class")
+      .post("/api/v2/classes/add-class")
       .set("token", token)
       .end((err, res) => {
         res.should.have.status(400);
@@ -97,7 +97,7 @@ describe("Classes ", () => {
   it("should return a classMember and message with status 200", (done) => {
     chai
       .request(app)
-      .post("/api/v1/classes/send-class-request")
+      .post("/api/v2/classes/send-class-request")
       .set("token", token)
       .send({
         classCode: "00000000",
@@ -116,7 +116,7 @@ describe("Classes ", () => {
   it("should return a classMember and message with status 200 when it is auto approved", (done) => {
     chai
       .request(app)
-      .post("/api/v1/classes/send-class-request")
+      .post("/api/v2/classes/send-class-request")
       .set("token", token)
       .send({
         classCode: "00000000",
@@ -136,7 +136,7 @@ describe("Classes ", () => {
   it("should NOT return a classMember and message with status 400", (done) => {
     chai
       .request(app)
-      .post("/api/v1/classes/send-class-request")
+      .post("/api/v2/classes/send-class-request")
       .set("token", token)
       .end((err, res) => {
         res.should.have.status(400);
@@ -148,7 +148,7 @@ describe("Classes ", () => {
   it("should return a success status and message with status 200", (done) => {
     chai
       .request(app)
-      .post("/api/v1/classes/send-class-invite")
+      .post("/api/v2/classes/send-class-invite")
       .set("token", token)
       .send({
         link: "www.afri.com",
@@ -167,7 +167,7 @@ describe("Classes ", () => {
   it("should NOT return a success status with 400 when input is invalid", (done) => {
     chai
       .request(app)
-      .post("/api/v1/classes/send-class-invite")
+      .post("/api/v2/classes/send-class-invite")
       .set("token", token)
       .send({
         link: "00000000",
@@ -181,7 +181,7 @@ describe("Classes ", () => {
   it("should NOT return a classMember and message with status 401 when user is not authenticated", (done) => {
     chai
       .request(app)
-      .post("/api/v1/classes/send-class-invite")
+      .post("/api/v2/classes/send-class-invite")
       .end((err, res) => {
         res.should.have.status(401);
         done();
@@ -191,7 +191,7 @@ describe("Classes ", () => {
   it("should return a classMember with updated status with status 200", (done) => {
     chai
       .request(app)
-      .patch("/api/v1/classes/accept-reject-class-request")
+      .patch("/api/v2/classes/accept-reject-class-request")
       .set("token", token)
       .send({
         classId: class_id,
@@ -211,7 +211,7 @@ describe("Classes ", () => {
   it("should not return a classMember with updated status if class ID and User ID are not present with status 400", (done) => {
     chai
       .request(app)
-      .patch("/api/v1/classes/accept-reject-class-request")
+      .patch("/api/v2/classes/accept-reject-class-request")
       .set("token", token)
       .end((err, res) => {
         res.should.have.status(400);
@@ -223,7 +223,7 @@ describe("Classes ", () => {
   it("should return a students in a class with status 200", (done) => {
     chai
       .request(app)
-      .get(`/api/v1/classes/${class_id}/students`)
+      .get(`/api/v2/classes/${class_id}/students`)
       .set("token", token)
       .end((err, res) => {
         res.should.have.status(200);
@@ -238,7 +238,7 @@ describe("Classes ", () => {
   it("should return a class with status 200", (done) => {
     chai
       .request(app)
-      .get(`/api/v1/classes/${class_id}`)
+      .get(`/api/v2/classes/${class_id}`)
       .set("token", token)
       .end((err, res) => {
         res.should.have.status(200);
@@ -253,7 +253,7 @@ describe("Classes ", () => {
   it("should create and return an assignedContent with status 200", (done) => {
     chai
       .request(app)
-      .post(`/api/v1/classes/${class_id}/assign-content`)
+      .post(`/api/v2/classes/${class_id}/assign-content`)
       .set("token", token)
       .send({
         description: "Attemp the last English test again",
@@ -273,7 +273,7 @@ describe("Classes ", () => {
   it("should NOT create an assignedContent with status 400 when input is invalid", (done) => {
     chai
       .request(app)
-      .post(`/api/v1/classes/${class_id}/assign-content`)
+      .post(`/api/v2/classes/${class_id}/assign-content`)
       .set("token", token)
       .send({
         description: "Attemp the last English test again",
@@ -288,7 +288,7 @@ describe("Classes ", () => {
   it("should return classes with status 200 ", (done) => {
     chai
       .request(app)
-      .get("/api/v1/classes")
+      .get("/api/v2/classes")
       .end((err, res) => {
         res.should.have.status(200);
         res.body.should.be.an("object");

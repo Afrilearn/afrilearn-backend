@@ -53,16 +53,17 @@ class SignUp {
         .trim()
         .escape()
         .custom((value, { req }) => value === req.body.password)
+        .withMessage('Confirm password does not match')
         .withMessage('Confirm password does not match'),
-      check('role')
-        .exists()
-        .withMessage('Profile category is equired')
-        .not()
-        .isEmpty()
-        .withMessage('Profile category cannot be empty')
-        .trim()
-        .escape(),
-    ];
+      // check('role')
+      //   .exists()
+      //   .withMessage('Profile category is equired')
+      //   .not()
+      //   .isEmpty()
+      //   .withMessage('Profile category cannot be empty')
+      //   .trim()
+      //   .escape(),
+          ];
   }
 
   /**

@@ -69,7 +69,7 @@ describe('Past Questions ', () => {
   it('should add a new pastQuestion Progress with status 200', (done) => {
     chai
       .request(app)
-      .post('/api/v1/past-questions/add-progress')
+      .post('/api/v2/past-questions/add-progress')
       .set('token', token)
       .send({
         _id: pq_id,
@@ -90,7 +90,7 @@ describe('Past Questions ', () => {
   it('should NOT add new pastQuestion Progress with status 400 if input is invalid', (done) => {
     chai
       .request(app)
-      .post('/api/v1/past-questions/add-progress')
+      .post('/api/v2/past-questions/add-progress')
       .set('token', token)
       .send({
         courseId: '3',
@@ -105,7 +105,7 @@ describe('Past Questions ', () => {
   it('should add a new pastQuestion Result with status 200', (done) => {
     chai
       .request(app)
-      .post('/api/v1/past-questions/save-past-question-result')
+      .post('/api/v2/past-questions/save-past-question-result')
       .set('token', token)
       .send({ ...pq_test })
       .end((err, res) => {
@@ -120,7 +120,7 @@ describe('Past Questions ', () => {
   it('should NOT add a new pastQuestion Result with status 400 when input is invalid', (done) => {
     chai
       .request(app)
-      .post('/api/v1/past-questions/save-past-question-result')
+      .post('/api/v2/past-questions/save-past-question-result')
       .set('token', token)
       .send({ ...pq_test, timeSpent: 2 })
       .end((err, res) => {

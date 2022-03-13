@@ -36,7 +36,7 @@ describe("RecentActivities ", () => {
   // it("should save and return an object RecentActivity with status 200", (done) => {
   //   chai
   //     .request(app)
-  //     .post("/api/v1/recents/add-recent-activity")
+  //     .post("/api/v2/recents/add-recent-activity")
   //     .set("token", token)
   //     .send({
   //       type: "lesson",
@@ -55,7 +55,7 @@ describe("RecentActivities ", () => {
   it("should return 5 most recent RecentActivities with status 200", (done) => {
     chai
       .request(app)
-      .get("/api/v1/recents/activities")
+      .get("/api/v2/recents/activities")
       .set("token", token)
       .end((err, res) => {
         res.should.have.status(200);
