@@ -25,8 +25,8 @@ config();
 
 const app = express();
 const options = {
-  // key: fs.readFileSync(`${__dirname}/secure/certificates/s1-local.key`),
-  // cert: fs.readFileSync(`${__dirname}/secure/certificates/s1-local.pem`),
+  key: process.env.S1_KEY,
+  cert: process.env.S1_CERT,
 }
 
 const server = https.createServer(options, app)
