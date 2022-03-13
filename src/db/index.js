@@ -17,9 +17,6 @@ mongoose.connect(url, {
   // sslCA: "/secure/certificates/rootCA.pem",
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-
 });
 const { connection } = mongoose;
 
