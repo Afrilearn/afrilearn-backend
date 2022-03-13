@@ -1,11 +1,10 @@
 {
   "name": "afrilearn-backend",
-  "version": "1.0.0",
+  "version": "2.0.1",
   "description": "Afrilearn is an education technology corporation leveraging seasoned teachers, animators and developers to deliver affordable, world-class education for Africans, anywhere.",
   "main": "index.js",
   "scripts": {
-    "heroku-prebuild": "node src/gcpSetup.js",
-    "preinstall": "node src/gcpSetup.js",
+    "production": "node -r esm src/",
     "start": "node --max_old_space_size=8192 --optimize_for_size --stack_size=4096 -r esm src/",
     "dev": "nodemon -r esm src/",
     "test": "env-cmd ./test.env nyc --reporter=html --reporter=text mocha src/**/*.test.js -r esm  --timeout 90000  --recursive --exit",
@@ -83,8 +82,5 @@
       "src/db/*",
       "src/routes/index.js"
     ]
-  },
-  "engines": {
-    "node": "v16.4.0"
   }
 }
