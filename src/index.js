@@ -25,11 +25,11 @@ config();
 
 const app = express();
 const options = {
-  key: process.env.S1_KEY,
-  cert: process.env.S1_CERT,
+  // key: fs.readFileSync(`${__dirname}/secure/certificates/s1-local.key`),
+  // cert: fs.readFileSync(`${__dirname}/secure/certificates/s1-local.pem`),
 }
 
-const server = https.createServer(options, app)
+// const server = https.createServer(options, app)
 
 // const io = socketio(server, {
 //   cors: {
@@ -77,7 +77,7 @@ app.use((err, req, res) => {
 });
 
 //server
-server.listen(port, () => {
+app.listen(port, () => {
   console.log(`Server running at port ${port} on ${process.env.NODE_ENV}`);
 });
 
