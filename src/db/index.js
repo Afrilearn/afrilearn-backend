@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import { config } from 'dotenv';
 import logger from '../config';
 
+
 config();
 
 const url = process.env.ATLAS_URL;
