@@ -17,19 +17,19 @@ import challenge from "./events/challenge";
 import disconnect from "./events/disconnect";
 import bodyParser from "body-parser";
 
-import swaggerUI from 'swagger-ui-express';
-import swaggerJsDoc from 'swagger-jsdoc';
+import swaggerJsDoc from 'swagger-ui-express';
+import swaggerDocumentation from "./helper/documentations";
 // scheduled creation of challenges on sunday
 const job = new CronJob("0 1 * * sun", ChallengeUtility.createNewChallenges);
 job.start();
 
 config();
 
-const options = {
-  
-}
 
 const app = express();
+
+app.use("/documentations", swaggerJsDoc.serve)
+app.use("/documentations", swaggerJsDoc.setup(swaggerDocumentation))
 
 const server = http.createServer(app);
 
