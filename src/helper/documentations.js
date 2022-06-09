@@ -1,3 +1,4 @@
+const authRouteDoc = require("../routes/auth.doc");
 
 const swaggerDocumentation = {
     openapi: "3.0.0",
@@ -21,34 +22,15 @@ const swaggerDocumentation = {
     tags: [
         {
             name: "auth",
+            description: "Auth routes"
+        },
+        {
+            name: "lessons",
             description: "Lessons routes"
         },
     ],
 
-    paths: {
-        "/auth/roles": {
-            get: {
-                tags: ["auth"],
-                description: "List of all the lessons' videos",
-                responses: {
-                    200: {
-                        description: "Ok",
-                        content: {
-                            "application/json": {
-                                schema: {
-                                    type: "object",
-                                    example: {
-                                        count: 0,
-                                        lesson: [],
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    paths: { ...authRouteDoc  }
 };
 
 
