@@ -1,4 +1,5 @@
 const authRouteDoc = require("../routes/auth.doc");
+const classesRouteDoc = require("../routes/classes.doc");
 
 const swaggerDocumentation = {
     openapi: "3.0.0",
@@ -21,16 +22,12 @@ const swaggerDocumentation = {
 
     tags: [
         {
-            name: "auth",
-            description: "Auth routes"
-        },
-        {
             name: "lessons",
             description: "Lessons routes"
         },
     ],
 
-    paths: { ...authRouteDoc  }
+    paths: {  ...classesRouteDoc  }
 };
 
 
