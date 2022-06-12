@@ -26,11 +26,11 @@ const getLessons = {
             }
 }
 
-
 const classesRouteDoc = {
     "/lessons":{
         get: getLessons,
     }
+
 
 };
 
