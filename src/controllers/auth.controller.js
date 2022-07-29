@@ -37,6 +37,7 @@ class AuthController {
   static async signUp(req, res) {
     try {
       let customerRole = "Student";
+      
       const { fullName, password, email, role, phoneNumber } = req.body;
 
       const encryptpassword = await Helper.encrptPassword(password);

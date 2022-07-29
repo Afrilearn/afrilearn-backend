@@ -53,6 +53,7 @@
     "nodemailer": "^6.6.3",
     "nodemailer-mailgun-transport": "^2.1.3",
     "nodemailer-plugin-inline-base64": "^2.1.1",
+    "nodemon": "^2.0.19",
     "request": "^2.88.2",
     "socket.io": "^4.1.3",
     "twilio": "^3.67.0",
